@@ -9,18 +9,18 @@ const supabaseClient = window.supabase.createClient(
 async function loadBookings() {
 
     const { data, error } = await supabaseClient
-    .from("bookings")
+        .from("bookings")
         .select("*")
         .order("check_in", { ascending: true });
 
     if (error) {
-    console.error("Error loading bookings:", error.message);
-    console.error("Full error:", error);
-    return;
-}
+        console.error("Error loading bookings:", error);
+        return;
+    }
 
-    const tableBody =
-        document.getElementById("bookings-table-body");
+    console.log("Bookings loaded:", data);
+
+    const tableBody = document.getElementById("bookings-table-body");
 
     tableBody.innerHTML = "";
 
@@ -28,12 +28,15 @@ async function loadBookings() {
     let upcomingBookings = 0;
 
     const today = new Date();
+    today.setHours(0, 0, 0, 0);
 
-    data.forEach(function(booking) {
+    data.forEach(function (booking) {
 
         totalRevenue += Number(booking.amount) || 0;
 
-        if (new Date(booking.check_in) >= today) {
+        const checkInDate = new Date(booking.check_in);
+
+        if (checkInDate >= today) {
             upcomingBookings++;
         }
 
@@ -61,5 +64,4 @@ async function loadBookings() {
         totalRevenue + " SAR";
 }
 
-
-loadBookings(); 
+loadBookings();
