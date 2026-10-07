@@ -5,11 +5,10 @@ const supabaseClient = window.supabase.createClient(
     SUPABASE_KEY
 );
 
-
 async function loadBookings() {
 
     const { data, error } = await supabaseClient
-        .from("bookings")
+        .from("Bookings")
         .select("*")
         .order("check_in", { ascending: true });
 
