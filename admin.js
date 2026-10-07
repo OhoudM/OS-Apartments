@@ -4,10 +4,6 @@ const supabaseUrl = 'https://ptpdexboeaummnywwgyv.supabase.co'
 const supabaseKey = 'sb_publishable_JrsJrxQ86TCBZWRc9g7HTg_bsLXaYJ8'
 const supabase = createClient(supabaseUrl, supabaseKey)
 
-const supabaseClient = window.supabase.createClient(
-    SUPABASE_URL,
-    SUPABASE_KEY
-);
 
 async function loadBookings() {
 
