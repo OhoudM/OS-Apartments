@@ -1,15 +1,15 @@
 const SUPABASE_URL = "https://ptpdexboeaummnywwgyv.supabase.co/rest/v1/";
 const SUPABASE_KEY = "sb_publishable_JrsJrxQ86TCBZWRc9g7HTg_bsLXaYJ8";
 
-const supabase = window.supabase.createClient(
+const supabaseClient = window.supabase.createClient(
     SUPABASE_URL,
     SUPABASE_KEY
 );
 
 async function loadBookings() {
 
-    const { data, error } = await supabase
-        .from("bookings")
+    const { data, error } = await supabaseClient
+    .from("bookings")
         .select("*")
         .order("check_in", { ascending: true });
 
@@ -61,4 +61,4 @@ async function loadBookings() {
 }
 
 
-loadBookings();
+loadBookings(); 
