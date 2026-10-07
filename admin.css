@@ -1,0 +1,130 @@
+body {
+    margin: 0;
+    font-family: Arial, Tahoma, sans-serif;
+    background-color: #e4ded3;
+    color: #24302a;
+}
+
+.admin-container {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 50px 30px;
+}
+
+.admin-header {
+    margin-bottom: 35px;
+}
+
+.admin-label {
+    margin: 0 0 8px;
+    font-size: 11px;
+    letter-spacing: 2px;
+    color: #7d857f;
+}
+
+.admin-header h1 {
+    margin: 0;
+    font-size: 32px;
+}
+
+.admin-subtitle {
+    margin-top: 8px;
+    color: #59635d;
+}
+
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+    margin-bottom: 35px;
+}
+
+.stat-card {
+    padding: 24px;
+    background-color: #f7f4ee;
+    border: 1px solid #ebe5da;
+    border-radius: 18px;
+}
+
+.stat-card span {
+    display: block;
+    font-size: 13px;
+    color: #7d857f;
+    margin-bottom: 10px;
+}
+
+.stat-card strong {
+    font-size: 26px;
+}
+
+.bookings-section {
+    background-color: #f7f4ee;
+    border: 1px solid #ebe5da;
+    border-radius: 20px;
+    padding: 25px;
+}
+
+.section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.section-header h2 {
+    margin: 0;
+}
+
+.section-header p {
+    margin: 6px 0 0;
+    color: #7d857f;
+    font-size: 13px;
+}
+
+#add-booking-btn {
+    border: none;
+    background-color: #24302a;
+    color: white;
+    padding: 11px 16px;
+    border-radius: 10px;
+    cursor: pointer;
+}
+
+.table-wrapper {
+    overflow-x: auto;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+th,
+td {
+    padding: 14px 10px;
+    text-align: left;
+    border-bottom: 1px solid #ebe5da;
+    font-size: 13px;
+}
+
+th {
+    color: #7d857f;
+    font-weight: 600;
+}
+
+@media (max-width: 700px) {
+
+    .admin-container {
+        padding: 30px 16px;
+    }
+
+    .stats-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .section-header {
+        align-items: flex-start;
+        gap: 15px;
+        flex-direction: column;
+    }
+}

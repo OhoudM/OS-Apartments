@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>OS Apartments Admin</title>
+
+    <link rel="stylesheet" href="admin.css">
+</head>
+
+<body>
+
+    <main class="admin-container">
+
+        <header class="admin-header">
+            <div>
+                <p class="admin-label">OS APARTMENTS</p>
+                <h1>Dashboard</h1>
+                <p class="admin-subtitle">
+                    Manage your bookings and apartment activity.
+                </p>
+            </div>
+        </header>
+
+
+        <section class="stats-grid">
+
+            <div class="stat-card">
+                <span>Total Bookings</span>
+                <strong id="total-bookings">0</strong>
+            </div>
+
+            <div class="stat-card">
+                <span>Upcoming</span>
+                <strong id="upcoming-bookings">0</strong>
+            </div>
+
+            <div class="stat-card">
+                <span>Revenue</span>
+                <strong id="total-revenue">0 SAR</strong>
+            </div>
+
+        </section>
+
+
+        <section class="bookings-section">
+
+            <div class="section-header">
+                <div>
+                    <h2>Bookings</h2>
+                    <p>Your latest reservations.</p>
+                </div>
+
+                <button id="add-booking-btn">
+                    + Add booking
+                </button>
+            </div>
+
+
+            <div class="table-wrapper">
+
+                <table>
+
+                    <thead>
+                        <tr>
+                            <th>Guest</th>
+                            <th>Platform</th>
+                            <th>Check-in</th>
+                            <th>Check-out</th>
+                            <th>Status</th>
+                            <th>Amount</th>
+                        </tr>
+                    </thead>
+
+                    <tbody id="bookings-table-body">
+                        <!-- Bookings will appear here -->
+                    </tbody>
+
+                </table>
+
+            </div>
+
+        </section>
+
+    </main>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="admin.js"></script>
+
+</body>
+</html>
