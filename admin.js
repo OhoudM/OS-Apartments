@@ -5,6 +5,15 @@ const supabaseClient = window.supabase.createClient(
     SUPABASE_KEY
 );
 
+// Elements
+const loginSection = document.getElementById("login-section");
+const dashboardSection = document.getElementById("dashboard-section");
+const loginForm = document.getElementById("login-form");
+const loginError = document.getElementById("login-error");
+const logoutBtn = document.getElementById("logout-btn");
+
+
+// Load bookings
 async function loadBookings() {
 
     const { data, error } = await supabaseClient
@@ -53,6 +62,7 @@ async function loadBookings() {
         tableBody.appendChild(row);
     });
 
+
     document.getElementById("total-bookings").textContent =
         data.length;
 
@@ -63,4 +73,77 @@ async function loadBookings() {
         totalRevenue + " SAR";
 }
 
-loadBookings();
+
+// Show dashboard
+function showDashboard() {
+
+    loginSection.hidden = true;
+    dashboardSection.hidden = false;
+
+    loadBookings();
+}
+
+
+// Show login
+function showLogin() {
+
+    loginSection.hidden = false;
+    dashboardSection.hidden = true;
+}
+
+
+// Login
+loginForm.addEventListener("submit", async function (event) {
+
+    event.preventDefault();
+
+    loginError.textContent = "";
+
+    const email = document.getElementById("email").value;
+    const password = document.getElementById("password").value;
+
+    const { data, error } =
+        await supabaseClient.auth.signInWithPassword({
+            email: email,
+            password: password
+        });
+
+    if (error) {
+
+        console.error("Login error:", error);
+
+        loginError.textContent =
+            "Incorrect email or password.";
+
+        return;
+    }
+
+    console.log("Logged in:", data.user.email);
+
+    showDashboard();
+});
+
+
+// Logout
+logoutBtn.addEventListener("click", async function () {
+
+    await supabaseClient.auth.signOut();
+
+    showLogin();
+});
+
+
+// Check existing session
+async function checkSession() {
+
+    const { data } = await supabaseClient.auth.getSession();
+
+    if (data.session) {
+        showDashboard();
+    } else {
+        showLogin();
+    }
+}
+
+
+checkSession();
