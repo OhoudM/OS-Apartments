@@ -14,9 +14,10 @@ async function loadBookings() {
         .order("check_in", { ascending: true });
 
     if (error) {
-        console.error("Error loading bookings:", error);
-        return;
-    }
+    console.error("Error loading bookings:", error.message);
+    console.error("Full error:", error);
+    return;
+}
 
     const tableBody =
         document.getElementById("bookings-table-body");
