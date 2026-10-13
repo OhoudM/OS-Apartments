@@ -5,55 +5,113 @@ const supabaseClient = window.supabase.createClient(
     SUPABASE_KEY
 );
 
+
+const SUPABASE_URL =
+  "https://ptpdexboeaummnywwgyv.supabase.co";
+
+const SUPABASE_KEY =
+  "PASTE_YOUR_SUPABASE_PUBLISHABLE_KEY_HERE";
+
+const supabaseClient = window.supabase.createClient(
+  SUPABASE_URL,
+  SUPABASE_KEY
+);
+
 const loginSection = document.getElementById("login-section");
 const dashboardSection = document.getElementById("dashboard-section");
 const loginForm = document.getElementById("login-form");
 const loginError = document.getElementById("login-error");
 const dashboardMessage = document.getElementById("dashboard-message");
-const availabilityResult = document.getElementById("availability-result");
+
 const calendarGrid = document.getElementById("calendar-grid");
 const calendarMonth = document.getElementById("calendar-month");
 
-const todayString = localDateString(new Date());
+const breakdownDialog = document.getElementById("breakdown-dialog");
+const breakdownContent = document.getElementById("breakdown-content");
+
 let bookings = [];
 let bookingsLoaded = false;
+
 let displayedMonth = new Date();
 displayedMonth.setDate(1);
 
-function localDateString(date) {
-  const year = date.getFullYear();
-  const month = String(date.getMonth() + 1).padStart(2, "0");
-  const day = String(date.getDate()).padStart(2, "0");
-  return `${year}-${month}-${day}`;
+function dateString(date) {
+  return [
+    date.getFullYear(),
+    String(date.getMonth() + 1).padStart(2, "0"),
+    String(date.getDate()).padStart(2, "0")
+  ].join("-");
 }
 
-function activeBooking(b) {
+function money(value) {
+  if (value === null || value === undefined || value === "") {
+    return "Not recorded";
+  }
+
+  const number = Number(value);
+  if (!Number.isFinite(number)) return "Not recorded";
+
+  return number.toLocaleString("en-SA", {
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2
+  }) + " SAR";
+}
+
+function activeBooking(booking) {
   return [
     "confirmed",
     "checked_in",
     "checked-in",
     "checked in"
-  ].includes(String(b.status || "").toLowerCase());
+  ].includes(String(booking.status || "").toLowerCase());
 }
 
 function overlaps(startA, endA, startB, endB) {
   return startA < endB && endA > startB;
 }
 
-function bookingCoversDate(b, date) {
-  return activeBooking(b) &&
-    b.check_in <= date &&
-    date < b.check_out;
-}
-
 function setText(id, value) {
   document.getElementById(id).textContent = value;
+}
+
+function sumField(field) {
+  let total = 0;
+  let recorded = 0;
+
+  const active = bookings.filter(activeBooking);
+
+  for (const booking of active) {
+    const value = booking[field];
+
+    if (value !== null && value !== undefined && value !== "") {
+      const number = Number(value);
+
+      if (Number.isFinite(number)) {
+        total += number;
+        recorded++;
+      }
+    }
+  }
+
+  return {
+    total,
+    recorded,
+    complete: recorded === active.length
+  };
+}
+
+function displayTotal(field) {
+  const result = sumField(field);
+
+  if (result.recorded === 0) return "Not recorded";
+
+  return money(result.total) +
+    (result.complete ? "" : " *");
 }
 
 async function loadBookings() {
   dashboardMessage.textContent = "Loading bookings…";
   bookingsLoaded = false;
-  availabilityResult.textContent = "";
 
   try {
     const all = [];
@@ -62,13 +120,19 @@ async function loadBookings() {
     for (let offset = 0; ; offset += pageSize) {
       const { data, error } = await supabaseClient
         .from("Bookings")
-        .select("id,guest_name,platform,check_in,check_out,status,amount")
+        .select(
+          "id,guest_name,platform,check_in,check_out,status," +
+          "amount,original_price,discount_amount," +
+          "accommodation_total,guest_total,occupancy_tax," +
+          "platform_commission,other_fees"
+        )
         .order("check_in", { ascending: true })
         .range(offset, offset + pageSize - 1);
 
       if (error) throw error;
 
       all.push(...data);
+
       if (data.length < pageSize) break;
     }
 
@@ -77,47 +141,58 @@ async function loadBookings() {
     dashboardMessage.textContent = "";
 
     renderStatistics();
-    renderTable();
+    renderFinancialOverview();
     renderCalendar();
+    renderTable();
 
   } catch (error) {
-    console.error("Unable to load bookings", error);
+    console.error("Loading error:", error);
+
     bookings = [];
     bookingsLoaded = false;
 
     dashboardMessage.textContent =
-      "Could not load bookings. Check your Supabase key, login permissions, and internet connection.";
-
-    setText("total-bookings", "—");
-    setText("upcoming-bookings", "—");
-    setText("total-revenue", "—");
+      "Could not load bookings. Check your Supabase connection and permissions.";
 
     document.getElementById("bookings-table-body").replaceChildren();
     calendarGrid.replaceChildren();
+
+    [
+      "total-bookings", "upcoming-bookings",
+      "guest-payments", "host-payouts",
+      "original-prices", "discounts",
+      "accommodation-revenue", "occupancy-taxes",
+      "platform-fees", "other-fees"
+    ].forEach(id => setText(id, "—"));
   }
 }
 
 function renderStatistics() {
-  const valid = bookings.filter(b => activeBooking(b));
+  const today = dateString(new Date());
+
+  const active = bookings.filter(activeBooking);
 
   setText("total-bookings", String(bookings.length));
 
   setText(
     "upcoming-bookings",
-    String(valid.filter(b => b.check_in >= todayString).length)
+    String(active.filter(b => b.check_in >= today).length)
   );
 
-  const total = valid.reduce(
-    (sum, b) => sum + (Number(b.amount) || 0),
-    0
-  );
+  setText("guest-payments", displayTotal("guest_total"));
+  setText("host-payouts", displayTotal("amount"));
+}
 
+function renderFinancialOverview() {
+  setText("original-prices", displayTotal("original_price"));
+  setText("discounts", displayTotal("discount_amount"));
   setText(
-    "total-revenue",
-    `${total.toLocaleString("en-SA", {
-      maximumFractionDigits: 2
-    })} SAR`
+    "accommodation-revenue",
+    displayTotal("accommodation_total")
   );
+  setText("occupancy-taxes", displayTotal("occupancy_tax"));
+  setText("platform-fees", displayTotal("platform_commission"));
+  setText("other-fees", displayTotal("other_fees"));
 }
 
 function renderTable() {
@@ -127,31 +202,122 @@ function renderTable() {
   if (!bookings.length) {
     const row = body.insertRow();
     const cell = row.insertCell();
-    cell.colSpan = 6;
-    cell.textContent = "No bookings recorded yet.";
+    cell.colSpan = 7;
+    cell.textContent = "No bookings recorded.";
     return;
   }
 
-  for (const booking of bookings) {
+  bookings.forEach((booking, index) => {
     const row = body.insertRow();
 
-    const values = [
+    [
       booking.guest_name,
       booking.platform,
       booking.check_in,
       booking.check_out,
       booking.status,
-      booking.amount == null
-        ? "—"
-        : `${booking.amount} SAR`
-    ];
-
-    for (const value of values) {
+      money(booking.amount)
+    ].forEach(value => {
       const cell = row.insertCell();
       cell.textContent = String(value ?? "—");
-    }
-  }
+    });
+
+    const actionCell = row.insertCell();
+    const button = document.createElement("button");
+
+    button.className = "details-btn";
+    button.textContent = "View breakdown";
+    button.type = "button";
+
+    button.addEventListener("click", () => {
+      showBreakdown(index);
+    });
+
+    actionCell.appendChild(button);
+  });
 }
+
+function addBreakdownRow(label, value, options = {}) {
+  const row = document.createElement("div");
+  row.className = "breakdown-row";
+
+  if (options.highlight) row.classList.add("highlight");
+
+  const name = document.createElement("span");
+  name.textContent = label;
+
+  const amount = document.createElement("span");
+
+  if (value === null || value === undefined) {
+    amount.textContent = "Not recorded";
+  } else {
+    const formatted = money(value);
+    amount.textContent = options.negative
+      ? "−" + formatted
+      : formatted;
+  }
+
+  row.append(name, amount);
+  breakdownContent.appendChild(row);
+}
+
+function showBreakdown(index) {
+  const booking = bookings[index];
+  if (!booking) return;
+
+  setText(
+    "breakdown-guest",
+    `${booking.guest_name || "Guest"} · ${booking.platform || "Booking"}`
+  );
+
+  breakdownContent.replaceChildren();
+
+  addBreakdownRow("Original accommodation price", booking.original_price);
+
+  addBreakdownRow(
+    "Discount / price adjustment",
+    booking.discount_amount,
+    { negative: true }
+  );
+
+  addBreakdownRow(
+    "Accommodation after discount",
+    booking.accommodation_total
+  );
+
+  addBreakdownRow("Occupancy tax", booking.occupancy_tax);
+
+  addBreakdownRow(
+    "Total guest payment",
+    booking.guest_total
+  );
+
+  addBreakdownRow(
+    "Platform fee (including VAT where applicable)",
+    booking.platform_commission,
+    { negative: true }
+  );
+
+  addBreakdownRow(
+    "Other fees",
+    booking.other_fees,
+    { negative: true }
+  );
+
+  addBreakdownRow(
+    "Final host payout",
+    booking.amount,
+    { highlight: true }
+  );
+
+  breakdownDialog.showModal();
+}
+
+document.getElementById("close-breakdown")
+  .addEventListener("click", () => breakdownDialog.close());
+
+document.getElementById("close-breakdown-bottom")
+  .addEventListener("click", () => breakdownDialog.close());
 
 function renderCalendar() {
   calendarGrid.replaceChildren();
@@ -165,34 +331,32 @@ function renderCalendar() {
 
   const year = displayedMonth.getFullYear();
   const month = displayedMonth.getMonth();
+
   const offset = new Date(year, month, 1).getDay();
-  const daysInMonth = new Date(year, month + 1, 0).getDate();
+  const days = new Date(year, month + 1, 0).getDate();
 
   for (let i = 0; i < offset; i++) {
     const blank = document.createElement("div");
     blank.className = "calendar-day outside";
-    blank.setAttribute("aria-hidden", "true");
     calendarGrid.appendChild(blank);
   }
 
-  for (let day = 1; day <= daysInMonth; day++) {
-    const date = localDateString(new Date(year, month, day));
+  for (let day = 1; day <= days; day++) {
+    const date = dateString(new Date(year, month, day));
 
-    const occupied = bookings.some(
-      b => bookingCoversDate(b, date)
+    const occupied = bookings.some(b =>
+      activeBooking(b) &&
+      b.check_in <= date &&
+      date < b.check_out
     );
 
     const cell = document.createElement("div");
+    cell.className = "calendar-day";
 
-    cell.className =
-      `calendar-day ${occupied ? "booked" : ""} ` +
-      `${date === todayString ? "today" : ""}`;
-
-    cell.setAttribute("role", "gridcell");
-    cell.setAttribute(
-      "aria-label",
-      `${date}: ${occupied ? "Booked" : "No booking recorded"}`
-    );
+    if (occupied) cell.classList.add("booked");
+    if (date === dateString(new Date())) {
+      cell.classList.add("today");
+    }
 
     const number = document.createElement("span");
     number.className = "day-number";
@@ -206,6 +370,61 @@ function renderCalendar() {
     calendarGrid.appendChild(cell);
   }
 }
+
+document.getElementById("prev-month")
+  .addEventListener("click", () => {
+    displayedMonth.setMonth(displayedMonth.getMonth() - 1);
+    renderCalendar();
+  });
+
+document.getElementById("next-month")
+  .addEventListener("click", () => {
+    displayedMonth.setMonth(displayedMonth.getMonth() + 1);
+    renderCalendar();
+  });
+
+document.getElementById("availability-form")
+  .addEventListener("submit", event => {
+    event.preventDefault();
+
+    const result = document.getElementById("availability-result");
+    result.className = "availability-result";
+
+    if (!bookingsLoaded) {
+      result.textContent = "Bookings have not loaded.";
+      result.classList.add("warning");
+      return;
+    }
+
+    const start = document.getElementById("check-in-date").value;
+    const end = document.getElementById("check-out-date").value;
+
+    if (!start || !end || start >= end) {
+      result.textContent = "Check-out must be after check-in.";
+      result.classList.add("warning");
+      return;
+    }
+
+    const conflict = bookings.some(b =>
+      activeBooking(b) &&
+      overlaps(start, end, b.check_in, b.check_out)
+    );
+
+    result.textContent = conflict
+      ? "These dates overlap an existing reservation."
+      : "No conflicting booking recorded. Check all platforms before confirming.";
+
+    result.classList.add(conflict ? "warning" : "success");
+  });
+
+document.getElementById("check-in-date")
+  .addEventListener("change", event => {
+    document.getElementById("check-out-date").min =
+      event.target.value;
+  });
+
+document.getElementById("refresh-bookings-btn")
+  .addEventListener("click", loadBookings);
 
 function showDashboard() {
   loginSection.hidden = true;
@@ -233,87 +452,23 @@ loginForm.addEventListener("submit", async event => {
   });
 
   if (error) {
-    loginError.textContent =
-      "Unable to sign in. Check your email and password.";
+    loginError.textContent = "Incorrect email or password.";
     return;
   }
 
   showDashboard();
 });
 
-document.getElementById("logout-btn").addEventListener(
-  "click",
-  async () => {
+document.getElementById("logout-btn")
+  .addEventListener("click", async () => {
     await supabaseClient.auth.signOut();
     showLogin();
-  }
-);
-
-document.getElementById("refresh-bookings-btn")
-  .addEventListener("click", loadBookings);
-
-document.getElementById("prev-month")
-  .addEventListener("click", () => {
-    displayedMonth.setMonth(displayedMonth.getMonth() - 1);
-    renderCalendar();
   });
 
-document.getElementById("next-month")
-  .addEventListener("click", () => {
-    displayedMonth.setMonth(displayedMonth.getMonth() + 1);
-    renderCalendar();
-  });
-
-document.getElementById("availability-form")
-  .addEventListener("submit", event => {
-    event.preventDefault();
-
-    availabilityResult.className = "availability-result";
-
-    if (!bookingsLoaded) {
-      availabilityResult.textContent =
-        "Bookings have not loaded. Please refresh and try again.";
-      availabilityResult.classList.add("warning");
-      return;
-    }
-
-    const start = document.getElementById("check-in-date").value;
-    const end = document.getElementById("check-out-date").value;
-
-    if (!start || !end || start >= end) {
-      availabilityResult.textContent =
-        "Check-out must be after check-in.";
-      availabilityResult.classList.add("warning");
-      return;
-    }
-
-    const conflict = bookings.some(
-      b => activeBooking(b) &&
-        overlaps(start, end, b.check_in, b.check_out)
-    );
-
-    availabilityResult.textContent = conflict
-      ? "These dates overlap an existing reservation."
-      : "No conflicting reservation recorded in Supabase for these dates. Verify other platforms before accepting a booking.";
-
-    availabilityResult.classList.add(
-      conflict ? "warning" : "success"
-    );
-  });
-
-document.getElementById("check-in-date")
-  .addEventListener("change", event => {
-    document.getElementById("check-out-date").min =
-      event.target.value;
-  });
-
-(async function checkSession() {
-  if (
-    SUPABASE_KEY ===
-    "PASTE_YOUR_SUPABASE_PUBLISHABLE_KEY_HERE"
-  ) {
+async function checkSession() {
+  if (SUPABASE_KEY === "PASTE_YOUR_SUPABASE_PUBLISHABLE_KEY_HERE") {
     loginError.textContent =
-      "Setup required: add your Supabase publishable key to admin.js.";
+      "Add your Supabase publishable key in admin.js first.";
     return;
   }
 
@@ -324,4 +479,6 @@ document.getElementById("check-in-date")
   } else {
     showLogin();
   }
-})();
+}
+
+checkSession();

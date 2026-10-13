@@ -8,78 +8,209 @@
   <link rel="stylesheet" href="admin.css">
 </head>
 <body>
+
   <section id="login-section" class="login-section">
     <div class="login-card">
       <p class="admin-label">OS APARTMENTS</p>
       <h1>Admin Login</h1>
       <p class="admin-subtitle">Sign in to manage your apartment.</p>
+
       <form id="login-form">
         <label for="email">Email</label>
-        <input type="email" id="email" placeholder="Enter your email" autocomplete="username" required>
+        <input id="email" type="email" autocomplete="username" required>
+
         <label for="password">Password</label>
-        <input type="password" id="password" placeholder="Enter your password" autocomplete="current-password" required>
-        <button type="submit" id="login-btn">Sign in</button>
-        <p id="login-error" class="login-error" role="alert"></p>
+        <input id="password" type="password" autocomplete="current-password" required>
+
+        <button type="submit">Sign in</button>
+        <p id="login-error" class="error-message" role="alert"></p>
       </form>
     </div>
   </section>
 
   <main id="dashboard-section" class="admin-container" hidden>
+
     <header class="admin-header">
       <div>
         <p class="admin-label">OS APARTMENTS</p>
         <h1>Dashboard</h1>
-        <p class="admin-subtitle">Manage your bookings and apartment activity.</p>
+        <p class="admin-subtitle">
+          Manage your bookings and apartment finances.
+        </p>
       </div>
-      <button id="logout-btn" type="button" class="secondary-btn">Log out</button>
+      <button id="logout-btn" class="outline-btn">Log out</button>
     </header>
 
-    <section class="stats-grid" aria-label="Booking statistics">
-      <div class="stat-card"><span>Total Bookings</span><strong id="total-bookings">—</strong></div>
-      <div class="stat-card"><span>Upcoming</span><strong id="upcoming-bookings">—</strong></div>
-      <div class="stat-card"><span>Revenue</span><strong id="total-revenue">—</strong></div>
+    <p id="dashboard-message" class="error-message" role="status"></p>
+
+    <section class="stats-grid">
+      <div class="stat-card">
+        <span>Total bookings</span>
+        <strong id="total-bookings">—</strong>
+      </div>
+
+      <div class="stat-card">
+        <span>Upcoming bookings</span>
+        <strong id="upcoming-bookings">—</strong>
+      </div>
+
+      <div class="stat-card">
+        <span>Guest payments</span>
+        <strong id="guest-payments">—</strong>
+      </div>
+
+      <div class="stat-card featured">
+        <span>Host payouts</span>
+        <strong id="host-payouts">—</strong>
+      </div>
     </section>
 
-    <p id="dashboard-message" class="status-message" role="status" aria-live="polite"></p>
-
-    <section class="calendar-section panel">
+    <section class="panel">
       <div class="section-header">
-        <div><h2>Booking calendar</h2><p>Confirmed reservations from Supabase.</p></div>
-        <div class="calendar-controls">
-          <button type="button" id="prev-month" class="icon-btn" aria-label="Previous month">‹</button>
-          <strong id="calendar-month" aria-live="polite"></strong>
-          <button type="button" id="next-month" class="icon-btn" aria-label="Next month">›</button>
+        <div>
+          <h2>Financial overview</h2>
+          <p>Breakdown of your recorded reservations.</p>
         </div>
       </div>
-      <div class="calendar-legend"><span><i class="legend-dot booked"></i> Booked</span><span><i class="legend-dot available"></i> No booking recorded</span></div>
-      <div class="calendar-weekdays" aria-hidden="true"><span>Sun</span><span>Mon</span><span>Tue</span><span>Wed</span><span>Thu</span><span>Fri</span><span>Sat</span></div>
-      <div id="calendar-grid" class="calendar-grid" role="grid" aria-label="Booking calendar"></div>
+
+      <div class="finance-grid">
+        <div class="finance-item">
+          <span>Original accommodation prices</span>
+          <strong id="original-prices">—</strong>
+        </div>
+
+        <div class="finance-item">
+          <span>Discounts / price adjustments</span>
+          <strong id="discounts">—</strong>
+        </div>
+
+        <div class="finance-item">
+          <span>Accommodation after discounts</span>
+          <strong id="accommodation-revenue">—</strong>
+        </div>
+
+        <div class="finance-item">
+          <span>Occupancy taxes</span>
+          <strong id="occupancy-taxes">—</strong>
+        </div>
+
+        <div class="finance-item">
+          <span>Platform fees (VAT included where applicable)</span>
+          <strong id="platform-fees">—</strong>
+        </div>
+
+        <div class="finance-item">
+          <span>Other fees</span>
+          <strong id="other-fees">—</strong>
+        </div>
+      </div>
+
+      <p class="fine-print">
+        Totals include recorded values only. Missing financial
+        details are not assumed to be zero.
+      </p>
     </section>
 
-    <section class="checker-section panel">
-      <div class="section-header"><div><h2>Check availability</h2><p>Check a date range against your recorded reservations.</p></div></div>
+    <section class="panel">
+      <div class="section-header">
+        <div>
+          <h2>Booking calendar</h2>
+          <p>Confirmed reservations from Supabase.</p>
+        </div>
+
+        <div class="calendar-controls">
+          <button id="prev-month" class="outline-btn" aria-label="Previous month">‹</button>
+          <strong id="calendar-month"></strong>
+          <button id="next-month" class="outline-btn" aria-label="Next month">›</button>
+        </div>
+      </div>
+
+      <div class="calendar-legend">
+        <span><i class="legend-dot booked"></i> Booked</span>
+        <span><i class="legend-dot available"></i> No booking recorded</span>
+      </div>
+
+      <div class="calendar-weekdays">
+        <span>Sun</span><span>Mon</span><span>Tue</span>
+        <span>Wed</span><span>Thu</span><span>Fri</span><span>Sat</span>
+      </div>
+
+      <div id="calendar-grid" class="calendar-grid"></div>
+    </section>
+
+    <section class="panel">
+      <div class="section-header">
+        <div>
+          <h2>Check availability</h2>
+          <p>Check dates against recorded reservations.</p>
+        </div>
+      </div>
+
       <form id="availability-form" class="availability-form">
-        <div><label for="check-in-date">Check-in</label><input id="check-in-date" type="date" required></div>
-        <div><label for="check-out-date">Check-out</label><input id="check-out-date" type="date" required></div>
+        <div>
+          <label for="check-in-date">Check-in</label>
+          <input type="date" id="check-in-date" required>
+        </div>
+
+        <div>
+          <label for="check-out-date">Check-out</label>
+          <input type="date" id="check-out-date" required>
+        </div>
+
         <button type="submit">Check dates</button>
       </form>
-      <p id="availability-result" class="availability-result" role="status" aria-live="polite"></p>
-      <p class="fine-print">Results only include bookings already saved in Supabase. Check other platforms before confirming availability.</p>
+
+      <p id="availability-result" class="availability-result" role="status"></p>
+      <p class="fine-print">
+        Check other booking platforms before confirming availability.
+      </p>
     </section>
 
-    <section class="bookings-section panel">
+    <section class="panel">
       <div class="section-header">
-        <div><h2>Bookings</h2><p>Your reservations, ordered by check-in date.</p></div>
-        <button id="refresh-bookings-btn" type="button">↻ Refresh bookings</button>
+        <div>
+          <h2>Bookings</h2>
+          <p>Click View breakdown to see financial details.</p>
+        </div>
+
+        <button id="refresh-bookings-btn">↻ Refresh bookings</button>
       </div>
+
       <div class="table-wrapper">
         <table>
-          <thead><tr><th>Guest</th><th>Platform</th><th>Check-in</th><th>Check-out</th><th>Status</th><th>Amount</th></tr></thead>
+          <thead>
+            <tr>
+              <th>Guest</th>
+              <th>Platform</th>
+              <th>Check-in</th>
+              <th>Check-out</th>
+              <th>Status</th>
+              <th>Host payout</th>
+              <th>Details</th>
+            </tr>
+          </thead>
           <tbody id="bookings-table-body"></tbody>
         </table>
       </div>
     </section>
   </main>
+
+  <dialog id="breakdown-dialog" class="breakdown-dialog">
+    <div class="dialog-header">
+      <div>
+        <p class="admin-label">OS APARTMENTS</p>
+        <h2>Reservation breakdown</h2>
+        <p id="breakdown-guest" class="admin-subtitle"></p>
+      </div>
+      <button id="close-breakdown" class="outline-btn" type="button">✕</button>
+    </div>
+
+    <div id="breakdown-content"></div>
+
+    <button id="close-breakdown-bottom" type="button" class="dialog-close">
+      Close
+    </button>
+  </dialog>
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="admin.js"></script>
