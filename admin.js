@@ -5,16 +5,17 @@ const supabaseClient = window.supabase.createClient(
     SUPABASE_KEY
 );
 
+const $ = id => document.getElementById(id);
 
-const loginSection = document.getElementById("login-section");
-const dashboardSection = document.getElementById("dashboard-section");
-const loginForm = document.getElementById("login-form");
-const loginError = document.getElementById("login-error");
-const dashboardMessage = document.getElementById("dashboard-message");
-const calendarGrid = document.getElementById("calendar-grid");
-const calendarMonth = document.getElementById("calendar-month");
-const breakdownDialog = document.getElementById("breakdown-dialog");
-const breakdownContent = document.getElementById("breakdown-content");
+const loginSection = $("login-section");
+const dashboardSection = $("dashboard-section");
+const loginForm = $("login-form");
+const loginError = $("login-error");
+const dashboardMessage = $("dashboard-message");
+const calendarGrid = $("calendar-grid");
+const calendarMonth = $("calendar-month");
+const breakdownDialog = $("breakdown-dialog");
+const breakdownContent = $("breakdown-content");
 
 let bookings = [];
 let bookingsLoaded = false;
@@ -36,8 +37,8 @@ const translations = {
     subtitle: "Manage your bookings and apartment finances.",
     totalBookings: "Total bookings",
     upcomingBookings: "Upcoming bookings",
-    guestPayments: "Guest payments",
-    hostPayouts: "Host payouts",
+    guestPayments: "Guest paid",
+    hostPayouts: "You earn",
     calendar: "Booking calendar",
     calendarDesc: "Confirmed reservations from Supabase.",
     booked: "Booked",
@@ -47,48 +48,54 @@ const translations = {
     checkIn: "Check-in",
     checkOut: "Check-out",
     checkDates: "Check dates",
-    availabilityNote:
-      "Check other booking platforms before confirming availability.",
+    availabilityNote: "Check other booking platforms before confirming availability.",
     bookings: "Bookings",
     bookingsDesc: "Click View breakdown to see financial details.",
     refresh: "↻ Refresh bookings",
     guest: "Guest",
     platform: "Platform",
     status: "Status",
-    payout: "Host payout",
+    payout: "You earn",
     details: "Details",
     viewBreakdown: "View breakdown",
     noBookings: "No bookings recorded.",
     breakdown: "Reservation breakdown",
     close: "Close",
-    hostPayout: "Host payout",
+    hostPayout: "You earn",
     guestPaid: "Guest paid",
     roomFee: "Room fee",
     adjustment: "Nightly rate adjustment",
-    hostFee: "Host service fee (including VAT where applicable)",
+    hostFee: "Host service fee (VAT included where applicable)",
     otherFees: "Other fees",
-    totalHost: "Total (SAR) — Host payout",
+    totalHost: "Total host payout",
     roomAfter: "Room fee after adjustments",
     guestFee: "Guest service fee",
     taxes: "Taxes",
-    totalGuest: "Total (SAR) — Guest paid",
+    totalGuest: "Total guest payment",
+    originalBookingPrice: "Original booking price",
+    originallyPaid: "Originally paid by guest",
+    refundAmount: "Refund amount",
+    refundStatus: "Refund status",
+    refunded: "Refunded",
+    refundPending: "Pending",
+    cancelledReservation: "Cancelled reservation",
     notRecorded: "Not recorded",
-    loading: "Loading bookings…",
-    loadError:
-      "Could not load bookings. Check your Supabase connection and permissions.",
+    loading: "Loading bookings...",
+    loadError: "Could not load bookings. Check your Supabase connection and permissions.",
     notLoaded: "Bookings have not loaded.",
     invalidDates: "Check-out must be after check-in.",
     conflict: "These dates overlap an existing reservation.",
-    noConflict:
-      "No conflicting booking recorded. Check all platforms before confirming.",
+    noConflict: "No conflicting booking recorded. Check all platforms before confirming.",
     incorrectLogin: "Incorrect email or password.",
     missingKey: "Add your Supabase publishable key in admin.js first.",
     language: "العربية",
     guestFallback: "Guest",
     bookingFallback: "Booking",
+    confirmed: "Confirmed",
+    cancelled: "Cancelled",
+    pending: "Pending",
     weekdays: ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"]
   },
-
   ar: {
     adminLogin: "تسجيل دخول الإدارة",
     loginSubtitle: "سجّل الدخول لإدارة الشقة.",
@@ -100,7 +107,7 @@ const translations = {
     subtitle: "إدارة الحجوزات والحسابات المالية للشقة.",
     totalBookings: "إجمالي الحجوزات",
     upcomingBookings: "الحجوزات القادمة",
-    guestPayments: "مدفوعات الضيوف",
+    guestPayments: "ما دفعه الضيوف",
     hostPayouts: "مستحقات المضيف",
     calendar: "تقويم الحجوزات",
     calendarDesc: "الحجوزات المؤكدة المسجلة في النظام.",
@@ -111,8 +118,7 @@ const translations = {
     checkIn: "تاريخ الدخول",
     checkOut: "تاريخ الخروج",
     checkDates: "التحقق من التواريخ",
-    availabilityNote:
-      "تحقق من منصات الحجز الأخرى قبل تأكيد التوفر.",
+    availabilityNote: "تحقق من منصات الحجز الأخرى قبل تأكيد التوفر.",
     bookings: "الحجوزات",
     bookingsDesc: "اضغط على عرض التفاصيل لمعرفة تفاصيل المبالغ.",
     refresh: "↻ تحديث الحجوزات",
@@ -131,33 +137,48 @@ const translations = {
     adjustment: "تعديل سعر الليلة",
     hostFee: "رسوم خدمة المضيف (شاملة الضريبة عند تطبيقها)",
     otherFees: "رسوم أخرى",
-    totalHost: "الإجمالي (ر.س) — مستحقات المضيف",
+    totalHost: "إجمالي مستحقات المضيف",
     roomAfter: "رسوم الإقامة بعد التعديلات",
     guestFee: "رسوم خدمة الضيف",
     taxes: "الضرائب",
-    totalGuest: "الإجمالي (ر.س) — ما دفعه الضيف",
+    totalGuest: "إجمالي ما دفعه الضيف",
+    originalBookingPrice: "سعر الحجز الأصلي",
+    originallyPaid: "المبلغ الذي دفعه الضيف سابقاً",
+    refundAmount: "مبلغ الاسترداد",
+    refundStatus: "حالة الاسترداد",
+    refunded: "تم الاسترداد",
+    refundPending: "قيد الانتظار",
+    cancelledReservation: "حجز ملغي",
     notRecorded: "غير مسجل",
-    loading: "جارٍ تحميل الحجوزات…",
+    loading: "جارٍ تحميل الحجوزات...",
     loadError: "تعذر تحميل الحجوزات. تحقق من اتصال Supabase والصلاحيات.",
     notLoaded: "لم يتم تحميل الحجوزات.",
     invalidDates: "يجب أن يكون تاريخ الخروج بعد تاريخ الدخول.",
     conflict: "هذه التواريخ تتداخل مع حجز موجود.",
-    noConflict:
-      "لا يوجد حجز متعارض مسجل. تحقق من جميع المنصات قبل التأكيد.",
+    noConflict: "لا يوجد حجز متعارض مسجل. تحقق من جميع المنصات قبل التأكيد.",
     incorrectLogin: "البريد الإلكتروني أو كلمة المرور غير صحيحة.",
     missingKey: "أضف مفتاح Supabase العام في ملف admin.js أولاً.",
     language: "English",
     guestFallback: "ضيف",
     bookingFallback: "حجز",
-    weekdays: [
-      "الأحد", "الاثنين", "الثلاثاء",
-      "الأربعاء", "الخميس", "الجمعة", "السبت"
-    ]
+    confirmed: "مؤكد",
+    cancelled: "ملغي",
+    pending: "قيد الانتظار",
+    weekdays: ["الأحد", "الاثنين", "الثلاثاء", "الأربعاء", "الخميس", "الجمعة", "السبت"]
   }
 };
 
 function t(key) {
-  return translations[currentLanguage][key];
+  return translations[currentLanguage][key] || key;
+}
+
+function setText(id, value) {
+  if ($(id)) $(id).textContent = value;
+}
+
+function setSelectorText(selector, value) {
+  const element = document.querySelector(selector);
+  if (element) element.textContent = value;
 }
 
 function dateString(date) {
@@ -185,32 +206,22 @@ function money(value) {
 }
 
 function activeBooking(booking) {
-  return [
-    "confirmed",
-    "checked_in",
-    "checked-in",
-    "checked in"
-  ].includes(String(booking.status || "").toLowerCase());
+  return ["confirmed", "checked_in", "checked-in", "checked in"]
+    .includes(String(booking.status || "").trim().toLowerCase());
+}
+
+function cancelledBooking(booking) {
+  return ["cancelled", "canceled"]
+    .includes(String(booking.status || "").trim().toLowerCase());
 }
 
 function overlaps(startA, endA, startB, endB) {
   return startA < endB && endA > startB;
 }
 
-function setText(id, value) {
-  const element = document.getElementById(id);
-  if (element) element.textContent = value;
-}
-
-function setSelectorText(selector, value) {
-  const element = document.querySelector(selector);
-  if (element) element.textContent = value;
-}
-
 function sumField(field) {
   let total = 0;
   let recorded = 0;
-
   const active = bookings.filter(activeBooking);
 
   for (const booking of active) {
@@ -242,6 +253,8 @@ function displayTotal(field) {
   return money(result.total) + (result.complete ? "" : " *");
 }
 
+// LOAD BOOKINGS FROM SUPABASE
+
 async function loadBookings() {
   dashboardMessage.textContent = t("loading");
   bookingsLoaded = false;
@@ -257,7 +270,8 @@ async function loadBookings() {
           "id,guest_name,platform,check_in,check_out,status," +
           "amount,original_price,discount_amount," +
           "accommodation_total,guest_total,occupancy_tax," +
-          "platform_commission,other_fees"
+          "platform_commission,other_fees," +
+          "original_guest_payment,refund_amount,refund_status"
         )
         .order("check_in", { ascending: true })
         .range(offset, offset + pageSize - 1);
@@ -278,24 +292,21 @@ async function loadBookings() {
     renderTable();
 
   } catch (error) {
-    console.error("Loading error:", error);
+    console.error("Supabase loading error:", error);
 
     bookings = [];
     bookingsLoaded = false;
-
     dashboardMessage.textContent = t("loadError");
 
-    document.getElementById("bookings-table-body").replaceChildren();
+    $("bookings-table-body").replaceChildren();
     calendarGrid.replaceChildren();
 
-    [
-      "total-bookings",
-      "upcoming-bookings",
-      "guest-payments",
-      "host-payouts"
-    ].forEach(id => setText(id, "—"));
+    ["total-bookings", "upcoming-bookings", "guest-payments", "host-payouts"]
+      .forEach(id => setText(id, "—"));
   }
 }
+
+// DASHBOARD STATISTICS
 
 function renderStatistics() {
   const today = dateString(new Date());
@@ -312,82 +323,127 @@ function renderStatistics() {
   setText("host-payouts", displayTotal("amount"));
 }
 
+// BOOKING STATUS
+
 function translateStatus(status) {
-  if (currentLanguage !== "ar") return status || "—";
+  const normalized = String(status || "").trim().toLowerCase();
 
-  const labels = {
-    confirmed: "مؤكد",
-    checked_in: "تم تسجيل الدخول",
-    "checked-in": "تم تسجيل الدخول",
-    "checked in": "تم تسجيل الدخول",
-    cancelled: "ملغي",
-    canceled: "ملغي",
-    pending: "قيد الانتظار",
-    completed: "مكتمل",
-    checked_out: "تم تسجيل الخروج"
-  };
+  if (["cancelled", "canceled"].includes(normalized)) {
+    return t("cancelled");
+  }
 
-  return labels[String(status || "").toLowerCase()] || status || "—";
+  if (normalized === "confirmed") {
+    return t("confirmed");
+  }
+
+  if (normalized === "pending") {
+    return t("pending");
+  }
+
+  return status || "—";
 }
 
+// BOOKINGS TABLE
+
 function renderTable() {
-  const body = document.getElementById("bookings-table-body");
-  body.replaceChildren();
+  const tbody = $("bookings-table-body");
+  tbody.replaceChildren();
 
   if (!bookings.length) {
-    const cell = body.insertRow().insertCell();
+    const row = document.createElement("tr");
+    const cell = document.createElement("td");
+
     cell.colSpan = 7;
     cell.textContent = t("noBookings");
+
+    row.appendChild(cell);
+    tbody.appendChild(row);
     return;
   }
 
   bookings.forEach((booking, index) => {
-    const row = body.insertRow();
+    const row = document.createElement("tr");
 
-    [
-      booking.guest_name,
-      booking.platform,
-      booking.check_in,
-      booking.check_out,
+    const values = [
+      booking.guest_name || t("guestFallback"),
+      booking.platform || "—",
+      booking.check_in || "—",
+      booking.check_out || "—",
       translateStatus(booking.status),
-      money(booking.amount)
-    ].forEach(value => {
-      const cell = row.insertCell();
-      cell.textContent = String(value ?? "—");
+      cancelledBooking(booking)
+        ? "—"
+        : money(booking.amount)
+    ];
+
+    values.forEach(value => {
+      const cell = document.createElement("td");
+      cell.textContent = value;
+      row.appendChild(cell);
     });
 
+    const detailsCell = document.createElement("td");
     const button = document.createElement("button");
-    button.className = "details-btn";
-    button.textContent = t("viewBreakdown");
+
     button.type = "button";
+    button.className = "breakdown-btn";
+    button.textContent = t("viewBreakdown");
 
     button.addEventListener("click", () => showBreakdown(index));
 
-    row.insertCell().appendChild(button);
+    detailsCell.appendChild(button);
+    row.appendChild(detailsCell);
+    tbody.appendChild(row);
   });
 }
+
+// FINANCIAL BREAKDOWN HELPERS
 
 function addBreakdownRow(label, value, options = {}) {
   const row = document.createElement("div");
   row.className = "breakdown-row";
 
-  if (options.highlight) {
-    row.classList.add("highlight");
-  }
+  if (options.highlight) row.classList.add("highlight");
 
   const name = document.createElement("span");
   name.textContent = label;
 
   const amount = document.createElement("span");
+  const formatted = money(value);
 
   amount.textContent =
-    value === null || value === undefined || value === ""
-      ? t("notRecorded")
-      : (options.negative && Number(value) !== 0 ? "−" : "") + money(value);
+    options.negative && formatted !== t("notRecorded")
+      ? "−" + formatted
+      : formatted;
 
   row.append(name, amount);
   breakdownContent.appendChild(row);
 }
+
+function addBreakdownTextRow(label, value, options = {}) {
+  const row = document.createElement("div");
+  row.className = "breakdown-row";
+
+  if (options.highlight) row.classList.add("highlight");
+
+  const name = document.createElement("span");
+  name.textContent = label;
+
+  const content = document.createElement("span");
+  content.textContent = value;
+
+  row.append(name, content);
+  breakdownContent.appendChild(row);
+}
+
+function addBreakdownHeading(text) {
+  const heading = document.createElement("h3");
+  heading.textContent = text;
+  heading.style.marginTop = "22px";
+  heading.style.marginBottom = "12px";
+  breakdownContent.appendChild(heading);
+}
+
+// VIEW BREAKDOWN
 
 function showBreakdown(index) {
   const booking = bookings[index];
@@ -400,69 +456,123 @@ function showBreakdown(index) {
 
   breakdownContent.replaceChildren();
 
-  // HOST PAYOUT
-  const hostHeading = document.createElement("h3");
-  hostHeading.textContent = t("hostPayout");
-  breakdownContent.appendChild(hostHeading);
+  if (cancelledBooking(booking)) {
 
-  addBreakdownRow(t("roomFee"), booking.original_price);
+    // CANCELLED BOOKING
 
-  addBreakdownRow(
-    t("adjustment"),
-    booking.discount_amount,
-    { negative: true }
-  );
+    addBreakdownHeading(t("cancelledReservation"));
 
-  addBreakdownRow(
-    t("hostFee"),
-    booking.platform_commission,
-    { negative: true }
-  );
+    addBreakdownRow(
+      t("originalBookingPrice"),
+      booking.original_price
+    );
 
-  addBreakdownRow(
-    t("otherFees"),
-    booking.other_fees,
-    { negative: true }
-  );
+    addBreakdownRow(
+      t("originallyPaid"),
+      booking.original_guest_payment
+    );
 
-  addBreakdownRow(
-    t("totalHost"),
-    booking.amount,
-    { highlight: true }
-  );
+    addBreakdownRow(
+      t("refundAmount"),
+      booking.refund_amount
+    );
 
-  // GUEST PAYMENT
-  const guestHeading = document.createElement("h3");
-  guestHeading.textContent = t("guestPaid");
-  breakdownContent.appendChild(guestHeading);
+    const refundStatus = String(
+      booking.refund_status || ""
+    ).trim().toLowerCase();
 
-  addBreakdownRow(
-    t("roomAfter"),
-    booking.accommodation_total
-  );
+    let refundLabel = t("notRecorded");
 
-  // Guest service fee is not stored separately yet.
-  addBreakdownRow(t("guestFee"), null);
+    if (refundStatus === "refunded") {
+      refundLabel = t("refunded");
+    } else if (refundStatus === "pending") {
+      refundLabel = t("refundPending");
+    } else if (booking.refund_status) {
+      refundLabel = booking.refund_status;
+    }
 
-  addBreakdownRow(
-    t("taxes"),
-    booking.occupancy_tax
-  );
+    addBreakdownTextRow(
+      t("refundStatus"),
+      refundLabel,
+      { highlight: true }
+    );
 
-  addBreakdownRow(
-    t("totalGuest"),
-    booking.guest_total,
-    { highlight: true }
-  );
+  } else {
+
+    // CONFIRMED BOOKING: HOST PAYOUT
+
+    addBreakdownHeading(t("hostPayout"));
+
+    addBreakdownRow(
+      t("roomFee"),
+      booking.original_price
+    );
+
+    addBreakdownRow(
+      t("adjustment"),
+      booking.discount_amount,
+      { negative: true }
+    );
+
+    addBreakdownRow(
+      t("hostFee"),
+      booking.platform_commission,
+      { negative: true }
+    );
+
+    addBreakdownRow(
+      t("otherFees"),
+      booking.other_fees,
+      { negative: true }
+    );
+
+    addBreakdownRow(
+      t("totalHost"),
+      booking.amount,
+      { highlight: true }
+    );
+
+    // CONFIRMED BOOKING: GUEST PAYMENT
+
+    addBreakdownHeading(t("guestPaid"));
+
+    addBreakdownRow(
+      t("roomAfter"),
+      booking.accommodation_total
+    );
+
+    // A separate guest service fee is not currently stored.
+    addBreakdownRow(
+      t("guestFee"),
+      null
+    );
+
+    addBreakdownRow(
+      t("taxes"),
+      booking.occupancy_tax
+    );
+
+    addBreakdownRow(
+      t("totalGuest"),
+      booking.guest_total,
+      { highlight: true }
+    );
+  }
 
   breakdownDialog.showModal();
 }
 
-document.getElementById("close-breakdown")
-  .addEventListener("click", () => breakdownDialog.close());
+// CLOSE BREAKDOWN
 
-document.getElementById("close-breakdown-bottom")
-  .addEventListener("click", () => breakdownDialog.close());
+$("close-breakdown").addEventListener("click", () => {
+  breakdownDialog.close();
+});
+
+$("close-breakdown-bottom").addEventListener("click", () => {
+  breakdownDialog.close();
+});
+
+// BOOKING CALENDAR
 
 function renderCalendar() {
   calendarGrid.replaceChildren();
@@ -489,10 +599,10 @@ function renderCalendar() {
   for (let day = 1; day <= days; day++) {
     const date = dateString(new Date(year, month, day));
 
-    const occupied = bookings.some(b =>
-      activeBooking(b) &&
-      b.check_in <= date &&
-      date < b.check_out
+    const occupied = bookings.some(booking =>
+      activeBooking(booking) &&
+      booking.check_in <= date &&
+      date < booking.check_out
     );
 
     const cell = document.createElement("div");
@@ -517,56 +627,55 @@ function renderCalendar() {
   }
 }
 
-document.getElementById("prev-month")
-  .addEventListener("click", () => {
-    displayedMonth.setMonth(displayedMonth.getMonth() - 1);
-    renderCalendar();
-  });
+$("prev-month").addEventListener("click", () => {
+  displayedMonth.setMonth(displayedMonth.getMonth() - 1);
+  renderCalendar();
+});
 
-document.getElementById("next-month")
-  .addEventListener("click", () => {
-    displayedMonth.setMonth(displayedMonth.getMonth() + 1);
-    renderCalendar();
-  });
+$("next-month").addEventListener("click", () => {
+  displayedMonth.setMonth(displayedMonth.getMonth() + 1);
+  renderCalendar();
+});
 
-document.getElementById("availability-form")
-  .addEventListener("submit", event => {
-    event.preventDefault();
+// AVAILABILITY CHECKER
 
-    const result = document.getElementById("availability-result");
-    result.className = "availability-result";
+$("availability-form").addEventListener("submit", event => {
+  event.preventDefault();
 
-    if (!bookingsLoaded) {
-      result.textContent = t("notLoaded");
-      result.classList.add("warning");
-      return;
-    }
+  const result = $("availability-result");
+  result.className = "availability-result";
 
-    const start = document.getElementById("check-in-date").value;
-    const end = document.getElementById("check-out-date").value;
+  if (!bookingsLoaded) {
+    result.textContent = t("notLoaded");
+    result.classList.add("warning");
+    return;
+  }
 
-    if (!start || !end || start >= end) {
-      result.textContent = t("invalidDates");
-      result.classList.add("warning");
-      return;
-    }
+  const start = $("check-in-date").value;
+  const end = $("check-out-date").value;
 
-    const conflict = bookings.some(b =>
-      activeBooking(b) &&
-      overlaps(start, end, b.check_in, b.check_out)
-    );
+  if (!start || !end || start >= end) {
+    result.textContent = t("invalidDates");
+    result.classList.add("warning");
+    return;
+  }
 
-    result.textContent = conflict ? t("conflict") : t("noConflict");
-    result.classList.add(conflict ? "warning" : "success");
-  });
+  const conflict = bookings.some(booking =>
+    activeBooking(booking) &&
+    overlaps(start, end, booking.check_in, booking.check_out)
+  );
 
-document.getElementById("check-in-date")
-  .addEventListener("change", event => {
-    document.getElementById("check-out-date").min = event.target.value;
-  });
+  result.textContent = conflict ? t("conflict") : t("noConflict");
+  result.classList.add(conflict ? "warning" : "success");
+});
 
-document.getElementById("refresh-bookings-btn")
-  .addEventListener("click", loadBookings);
+$("check-in-date").addEventListener("change", event => {
+  $("check-out-date").min = event.target.value;
+});
+
+$("refresh-bookings-btn").addEventListener("click", loadBookings);
+
+// AUTHENTICATION
 
 function showDashboard() {
   loginSection.hidden = true;
@@ -585,8 +694,8 @@ loginForm.addEventListener("submit", async event => {
   event.preventDefault();
   loginError.textContent = "";
 
-  const email = document.getElementById("email").value;
-  const password = document.getElementById("password").value;
+  const email = $("email").value;
+  const password = $("password").value;
 
   const { error } = await supabaseClient.auth.signInWithPassword({
     email,
@@ -601,11 +710,10 @@ loginForm.addEventListener("submit", async event => {
   showDashboard();
 });
 
-document.getElementById("logout-btn")
-  .addEventListener("click", async () => {
-    await supabaseClient.auth.signOut();
-    showLogin();
-  });
+$("logout-btn").addEventListener("click", async () => {
+  await supabaseClient.auth.signOut();
+  showLogin();
+});
 
 async function checkSession() {
   if (SUPABASE_KEY === "PASTE_YOUR_SUPABASE_PUBLISHABLE_KEY_HERE") {
@@ -622,6 +730,8 @@ async function checkSession() {
   }
 }
 
+// LANGUAGE SWITCHER
+
 function setLanguage(lang) {
   currentLanguage = lang === "ar" ? "ar" : "en";
 
@@ -631,26 +741,28 @@ function setLanguage(lang) {
   document.documentElement.dir =
     currentLanguage === "ar" ? "rtl" : "ltr";
 
-  const languageToggle = document.getElementById("language-toggle");
+  const languageToggle = $("language-toggle");
 
   if (languageToggle) {
     languageToggle.textContent = t("language");
   }
 
-  setText("logout-btn", t("logout"));
-
   // LOGIN
+
   setSelectorText(".login-card h1", t("adminLogin"));
   setSelectorText(".login-card .admin-subtitle", t("loginSubtitle"));
   setSelectorText('label[for="email"]', t("email"));
   setSelectorText('label[for="password"]', t("password"));
   setSelectorText('#login-form button[type="submit"]', t("signIn"));
 
-  // DASHBOARD HEADER
+  // HEADER
+
+  setText("logout-btn", t("logout"));
   setSelectorText(".admin-header h1", t("dashboard"));
   setSelectorText(".admin-header .admin-subtitle", t("subtitle"));
 
   // STATISTICS
+
   const statLabels = document.querySelectorAll(".stat-card span");
 
   [
@@ -663,7 +775,11 @@ function setLanguage(lang) {
   });
 
   // SECTION HEADINGS
-  const headings = document.querySelectorAll(".panel .section-header h2");
+
+  const headings = document.querySelectorAll(
+    ".panel .section-header h2"
+  );
+
   const descriptions = document.querySelectorAll(
     ".panel .section-header p"
   );
@@ -687,12 +803,14 @@ function setLanguage(lang) {
   setText("refresh-bookings-btn", t("refresh"));
 
   // AVAILABILITY FORM
+
   setSelectorText('label[for="check-in-date"]', t("checkIn"));
   setSelectorText('label[for="check-out-date"]', t("checkOut"));
   setSelectorText("#availability-form button", t("checkDates"));
   setSelectorText(".fine-print", t("availabilityNote"));
 
-  // BOOKING TABLE
+  // BOOKINGS TABLE
+
   const tableHeaders = document.querySelectorAll("thead th");
 
   [
@@ -707,15 +825,21 @@ function setLanguage(lang) {
     if (tableHeaders[i]) tableHeaders[i].textContent = value;
   });
 
-  // BREAKDOWN POPUP
+  // BREAKDOWN DIALOG
+
   setSelectorText(".dialog-header h2", t("breakdown"));
   setText("close-breakdown-bottom", t("close"));
 
-  document.getElementById("close-breakdown")
-    .setAttribute("aria-label", t("close"));
+  $("close-breakdown").setAttribute(
+    "aria-label",
+    t("close")
+  );
 
   // CALENDAR LEGEND
-  const legend = document.querySelectorAll(".calendar-legend span");
+
+  const legend = document.querySelectorAll(
+    ".calendar-legend span"
+  );
 
   if (legend[0]) {
     const dot = legend[0].querySelector("i");
@@ -732,17 +856,20 @@ function setLanguage(lang) {
   }
 
   // WEEKDAYS
-  const weekdays = document.querySelectorAll(".calendar-weekdays span");
+
+  const weekdays = document.querySelectorAll(
+    ".calendar-weekdays span"
+  );
 
   t("weekdays").forEach((day, i) => {
     if (weekdays[i]) weekdays[i].textContent = day;
   });
 
-  // REFRESH TRANSLATED CONTENT
-  const availabilityResult =
-    document.getElementById("availability-result");
+  // REFRESH TRANSLATED DATA
 
-  if (availabilityResult && availabilityResult.textContent.trim()) {
+  const availabilityResult = $("availability-result");
+
+  if (availabilityResult) {
     availabilityResult.textContent = "";
   }
 
@@ -754,8 +881,7 @@ function setLanguage(lang) {
   renderCalendar();
 }
 
-// LANGUAGE BUTTON
-const languageToggle = document.getElementById("language-toggle");
+const languageToggle = $("language-toggle");
 
 if (languageToggle) {
   languageToggle.addEventListener("click", () => {
@@ -764,5 +890,6 @@ if (languageToggle) {
 }
 
 // INITIALIZE
+
 setLanguage(currentLanguage);
 checkSession();
