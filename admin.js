@@ -493,4 +493,65 @@ async function checkSession() {
   }
 }
 
+
+const translations = {
+  en: {
+    dashboard: "Dashboard",
+    subtitle: "Manage your bookings and apartment finances.",
+    totalBookings: "Total bookings",
+    upcomingBookings: "Upcoming bookings",
+    guestPayments: "Guest payments",
+    hostPayouts: "Host payouts",
+    calendar: "Booking calendar",
+    calendarDesc: "Confirmed reservations from Supabase.",
+    availability: "Check availability",
+    availabilityDesc: "Check dates against recorded reservations.",
+    bookings: "Bookings",
+    bookingsDesc: "Click View breakdown to see financial details.",
+    refresh: "↻ Refresh bookings",
+    logout: "Log out",
+    language: "العربية"
+  },
+  ar: {
+    dashboard: "لوحة التحكم",
+    subtitle: "إدارة الحجوزات والحسابات المالية للشقة.",
+    totalBookings: "إجمالي الحجوزات",
+    upcomingBookings: "الحجوزات القادمة",
+    guestPayments: "مدفوعات الضيوف",
+    hostPayouts: "مستحقات المضيف",
+    calendar: "تقويم الحجوزات",
+    calendarDesc: "الحجوزات المؤكدة المسجلة في النظام.",
+    availability: "التحقق من التوفر",
+    availabilityDesc: "التحقق من توفر التواريخ المطلوبة.",
+    bookings: "الحجوزات",
+    bookingsDesc: "اضغطي على عرض التفاصيل لمعرفة تفاصيل المبالغ.",
+    refresh: "↻ تحديث الحجوزات",
+    logout: "تسجيل الخروج",
+    language: "English"
+  }
+};
+
+let currentLanguage = localStorage.getItem("osAdminLanguage") || "en";
+
+function setLanguage(lang) {
+  currentLanguage = lang;
+  localStorage.setItem("osAdminLanguage", lang);
+
+  document.documentElement.lang = lang;
+  document.documentElement.dir = lang === "ar" ? "rtl" : "ltr";
+
+  document.getElementById("language-toggle").textContent =
+    translations[lang].language;
+
+  document.getElementById("logout-btn").textContent =
+    translations[lang].logout;
+}
+
+document.getElementById("language-toggle")
+  .addEventListener("click", () => {
+    setLanguage(currentLanguage === "en" ? "ar" : "en");
+  });
+
+setLanguage(currentLanguage);
+
 checkSession();
