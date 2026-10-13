@@ -213,7 +213,9 @@ function renderTable() {
     const button = document.createElement("button");
 
     button.className = "details-btn";
-    button.textContent = "View breakdown";
+    button.textContent = currentLanguage === "ar"
+  ? "عرض التفاصيل"
+  : "View breakdown";
     button.type = "button";
 
     button.addEventListener("click", () => {
@@ -533,6 +535,7 @@ const translations = {
 
 let currentLanguage = localStorage.getItem("osAdminLanguage") || "en";
 
+
 function setLanguage(lang) {
   currentLanguage = lang;
   localStorage.setItem("osAdminLanguage", lang);
@@ -540,18 +543,98 @@ function setLanguage(lang) {
   document.documentElement.lang = lang;
   document.documentElement.dir = lang === "ar" ? "rtl" : "ltr";
 
-  document.getElementById("language-toggle").textContent =
-    translations[lang].language;
+  const t = translations[lang];
 
-  document.getElementById("logout-btn").textContent =
-    translations[lang].logout;
-}
+  document.getElementById("language-toggle").textContent = t.language;
+  document.getElementById("logout-btn").textContent = t.logout;
 
-document.getElementById("language-toggle")
-  .addEventListener("click", () => {
-    setLanguage(currentLanguage === "en" ? "ar" : "en");
+  const updateText = (selector, value) => {
+    const element = document.querySelector(selector);
+    if (element) element.textContent = value;
+  };
+
+  updateText(".admin-header h1", t.dashboard);
+  updateText(".admin-header .admin-subtitle", t.subtitle);
+
+  const stats = document.querySelectorAll(".stat-card span");
+  [
+    t.totalBookings,
+    t.upcomingBookings,
+    t.guestPayments,
+    t.hostPayouts
+  ].forEach((label, index) => {
+    if (stats[index]) stats[index].textContent = label;
   });
 
-setLanguage(currentLanguage);
+  const panels = document.querySelectorAll(".panel");
+
+  if (panels[0]) {
+    updateText(".panel:nth-of-type(2) h2", t.calendar);
+  }
+
+  // Translate headings and descriptions in order
+  const headings = document.querySelectorAll(".panel .section-header h2");
+  const descriptions = document.querySelectorAll(".panel .section-header p");
+
+  [t.calendar, t.availability, t.bookings].forEach((value, i) => {
+    if (headings[i]) headings[i].textContent = value;
+  });
+
+  [t.calendarDesc, t.availabilityDesc, t.bookingsDesc].forEach((value, i) => {
+    if (descriptions[i]) descriptions[i].textContent = value;
+  });
+
+  updateText("#refresh-bookings-btn", t.refresh);
+
+  const extra = lang === "ar"
+    ? {
+        checkIn: "تاريخ الدخول",
+        checkOut: "تاريخ الخروج",
+        checkDates: "التحقق من التواريخ",
+        guest: "الضيف",
+        platform: "المنصة",
+        status: "الحالة",
+        payout: "مستحقات المضيف",
+        details: "التفاصيل",
+        breakdown: "تفاصيل الحجز",
+        close: "إغلاق"
+      }
+    : {
+        checkIn: "Check-in",
+        checkOut: "Check-out",
+        checkDates: "Check dates",
+        guest: "Guest",
+        platform: "Platform",
+        status: "Status",
+        payout: "Host payout",
+        details: "Details",
+        breakdown: "Reservation breakdown",
+        close: "Close"
+      };
+
+  updateText('label[for="check-in-date"]', extra.checkIn);
+  updateText('label[for="check-out-date"]', extra.checkOut);
+  updateText('#availability-form button', extra.checkDates);
+
+  const tableHeaders = document.querySelectorAll("thead th");
+  [
+    extra.guest,
+    extra.platform,
+    extra.checkIn,
+    extra.checkOut,
+    extra.status,
+    extra.payout,
+    extra.details
+  ].forEach((value, i) => {
+    if (tableHeaders[i]) tableHeaders[i].textContent = value;
+  });
+
+  updateText(".dialog-header h2", extra.breakdown);
+  updateText("#close-breakdown-bottom", extra.close);
+
+  if (typeof renderTable === "function") renderTable();
+  if (typeof renderCalendar === "function") renderCalendar();
+}
+
 
 checkSession();
