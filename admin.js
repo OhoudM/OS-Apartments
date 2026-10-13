@@ -5,18 +5,6 @@ const supabaseClient = window.supabase.createClient(
     SUPABASE_KEY
 );
 
-
-const SUPABASE_URL =
-  "https://ptpdexboeaummnywwgyv.supabase.co";
-
-const SUPABASE_KEY =
-  "PASTE_YOUR_SUPABASE_PUBLISHABLE_KEY_HERE";
-
-const supabaseClient = window.supabase.createClient(
-  SUPABASE_URL,
-  SUPABASE_KEY
-);
-
 const loginSection = document.getElementById("login-section");
 const dashboardSection = document.getElementById("dashboard-section");
 const loginForm = document.getElementById("login-form");
