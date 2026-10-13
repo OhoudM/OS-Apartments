@@ -128,8 +128,7 @@ async function loadBookings() {
     bookingsLoaded = true;
     dashboardMessage.textContent = "";
 
-    renderStatistics();
-    renderFinancialOverview();
+  renderStatistics();
     renderCalendar();
     renderTable();
 
