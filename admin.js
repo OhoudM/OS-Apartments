@@ -248,6 +248,7 @@ function addBreakdownRow(label, value, options = {}) {
   breakdownContent.appendChild(row);
 }
 
+
 function showBreakdown(index) {
   const booking = bookings[index];
   if (!booking) return;
@@ -259,28 +260,24 @@ function showBreakdown(index) {
 
   breakdownContent.replaceChildren();
 
-  addBreakdownRow("Original accommodation price", booking.original_price);
+  // HOST EARNINGS
+  const hostHeading = document.createElement("h3");
+  hostHeading.textContent = "Host payout";
+  breakdownContent.appendChild(hostHeading);
 
   addBreakdownRow(
-    "Discount / price adjustment",
+    "Room fee",
+    booking.original_price
+  );
+
+  addBreakdownRow(
+    "Nightly rate adjustment",
     booking.discount_amount,
     { negative: true }
   );
 
   addBreakdownRow(
-    "Accommodation after discount",
-    booking.accommodation_total
-  );
-
-  addBreakdownRow("Occupancy tax", booking.occupancy_tax);
-
-  addBreakdownRow(
-    "Total guest payment",
-    booking.guest_total
-  );
-
-  addBreakdownRow(
-    "Platform fee (including VAT where applicable)",
+    "Host service fee (including VAT where applicable)",
     booking.platform_commission,
     { negative: true }
   );
@@ -292,13 +289,41 @@ function showBreakdown(index) {
   );
 
   addBreakdownRow(
-    "Final host payout",
+    "Total (SAR) — Host payout",
     booking.amount,
+    { highlight: true }
+  );
+
+  // GUEST PAYMENT
+  const guestHeading = document.createElement("h3");
+  guestHeading.textContent = "Guest paid";
+  breakdownContent.appendChild(guestHeading);
+
+  addBreakdownRow(
+    "Room fee after adjustments",
+    booking.accommodation_total
+  );
+
+  // Guest service fee is not stored separately yet.
+  addBreakdownRow(
+    "Guest service fee",
+    null
+  );
+
+  addBreakdownRow(
+    "Taxes",
+    booking.occupancy_tax
+  );
+
+  addBreakdownRow(
+    "Total (SAR) — Guest paid",
+    booking.guest_total,
     { highlight: true }
   );
 
   breakdownDialog.showModal();
 }
+
 
 document.getElementById("close-breakdown")
   .addEventListener("click", () => breakdownDialog.close());
