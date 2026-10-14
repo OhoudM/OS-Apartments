@@ -1406,3 +1406,44 @@ html[dir="rtl"] .breakdown-row strong {
     font-size: 14px;
   }
 }
+
+/* Cleaner OS Apartments dashboard header */
+
+.admin-header {
+  padding: 14px 0;
+  margin-bottom: 12px;
+}
+
+.admin-header .brand {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.admin-header .admin-logo {
+  width: 75px;
+  height: 75px;
+  object-fit: contain;
+}
+
+.admin-header .brand h1 {
+  display: none;
+}
+
+.admin-header .brand p {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 500;
+  color: #4b5235;
+}
+
+@media (max-width: 600px) {
+  .admin-header .admin-logo {
+    width: 65px;
+    height: 65px;
+  }
+
+  .admin-header .brand p {
+    font-size: 14px;
+  }
+}
