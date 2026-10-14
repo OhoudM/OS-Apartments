@@ -5,298 +5,389 @@ const supabaseClient = window.supabase.createClient(
     SUPABASE_KEY
 );
 
-
-const $ = id => document.getElementById(id);
-
-const loginSection = $("login-section");
-const dashboardSection = $("dashboard-section");
-const loginForm = $("login-form");
-const loginError = $("login-error");
-const dashboardMessage = $("dashboard-message");
-const calendarGrid = $("calendar-grid");
-const calendarMonth = $("calendar-month");
-const breakdownDialog = $("breakdown-dialog");
-const breakdownContent = $("breakdown-content");
-
-const addBookingDialog = $("add-booking-dialog");
-const addBookingForm = $("add-booking-form");
-const paymentDialog = $("record-payment-dialog");
+const $ = (id) => document.getElementById(id);
 
 let bookings = [];
 let bookingsLoaded = false;
-let displayedMonth = new Date();
-displayedMonth.setDate(1);
-
 let selectedPaymentBooking = null;
 let savingManualBooking = false;
 let savingPayment = false;
-
+let currentTab = "overview";
 let currentLanguage =
   localStorage.getItem("osAdminLanguage") === "ar"
     ? "ar"
     : "en";
 
-/* ==========================================
-   TRANSLATIONS
-   ========================================== */
+let displayedMonth = new Date();
+displayedMonth.setDate(1);
+
+let selectedReportMonth = "";
 
 const translations = {
   en: {
-    adminLogin: "Admin Login",
-    loginSubtitle: "Sign in to manage your apartment.",
+    management: "Management Dashboard",
+    login: "Sign In",
     email: "Email",
     password: "Password",
-    signIn: "Sign in",
-    logout: "Log out",
-    dashboard: "Dashboard",
-    subtitle: "Manage your bookings and apartment finances.",
-
-    totalBookings: "Total bookings",
-    upcomingBookings: "Upcoming bookings",
-    guestPayments: "Guest booking totals",
-    hostPayouts: "Estimated host earnings",
-
-    calendar: "Booking calendar",
-    calendarDesc: "Confirmed reservations from Supabase.",
-    booked: "Booked",
-    available: "No booking recorded",
-
-    availability: "Check availability",
-    availabilityDesc: "Check dates against recorded reservations.",
-    checkIn: "Check-in",
-    checkOut: "Check-out",
-    checkDates: "Check dates",
-    availabilityNote:
-      "Check other booking platforms before confirming availability.",
-
-    bookings: "Bookings",
-    bookingsDesc: "Click View breakdown to see financial details.",
-    refresh: "↻ Refresh bookings",
-
-    guest: "Guest",
-    platform: "Platform",
-    status: "Status",
-    payout: "Host earnings",
-    details: "Details",
-    viewBreakdown: "View breakdown",
-    noBookings: "No bookings recorded.",
-
-    breakdown: "Reservation breakdown",
-    close: "Close",
-    hostPayout: "Host earnings",
-    guestPaid: "Guest booking total",
-    roomFee: "Room fee",
-    adjustment: "Nightly rate adjustment",
-    hostFee: "Platform commission / host fee",
-    otherFees: "Other fees",
-    totalHost: "Estimated host earnings",
-    roomAfter: "Room fee after adjustments",
-    guestFee: "Guest service fee",
-    taxes: "Taxes",
-    totalGuest: "Total booking price",
-
-    originalBookingPrice: "Original booking price",
-    originallyPaid: "Originally paid by guest",
-    refundAmount: "Refund amount",
-    refundStatus: "Refund status",
-    refunded: "Refunded",
-    refundPending: "Pending",
-    cancelledReservation: "Cancelled reservation",
-
-    notRecorded: "Not recorded",
-    loading: "Loading bookings...",
-    loadError:
-      "Could not load bookings. Check your Supabase connection and permissions.",
-    notLoaded: "Bookings have not loaded.",
-    invalidDates: "Check-out must be after check-in.",
-    conflict: "These dates overlap an existing reservation.",
-    noConflict:
-      "No conflicting booking recorded. Check all platforms before confirming.",
-    incorrectLogin: "Incorrect email or password.",
-    missingKey: "Add your Supabase publishable key in admin.js first.",
-
+    logout: "Logout",
+    addBooking: "+ Add Booking",
     language: "العربية",
-    guestFallback: "Guest",
-    bookingFallback: "Booking",
+
+    overview: "Overview",
+    bookingsTab: "Bookings & Calendar",
+    finances: "Finances",
+    reports: "Reports & Analytics",
+
+    overviewDesc: "Your apartment at a glance",
+    bookingsDesc: "Manage reservations and guest stays",
+    financesDesc: "Track payments and apartment expenses",
+    reportsDesc: "Understand how your apartment is performing",
+
+    totalBookings: "Total Bookings",
+    upcomingBookings: "Upcoming Bookings",
+    guestTotals: "Guest Booking Totals",
+    hostEarnings: "Estimated Host Earnings",
+    viewDetails: "View details →",
+
+    today: "Today's Overview",
+    todayDesc: "Arrivals, departures and current guests",
+    arriving: "Arriving Today",
+    departing: "Departing Today",
+    staying: "Currently Staying",
+    noToday: "No arrivals or departures today.",
+    arrival: "Arrival",
+    departure: "Departure",
+    currentGuest: "Currently staying",
+
+    quickActions: "Quick Actions",
+    quickDesc: "Common tasks for your family",
+    viewBookings: "View Bookings",
+    viewFinances: "View Finances",
+
+    calendar: "Booking Calendar",
+    calendarDesc: "See who is staying each day",
     confirmed: "Confirmed",
     cancelled: "Cancelled",
     pending: "Pending",
+    available: "Available",
     checkedIn: "Checked in",
 
-    addBooking: "+ Add Booking",
-    addTitle: "Add booking",
-    source: "Booking source",
-    code: "Reservation number (optional)",
-    total: "Total booking price (SAR)",
-    commission: "Platform commission (SAR)",
-    received: "Amount already received (SAR)",
-    notes: "Notes (optional)",
-    saveBooking: "Save booking",
+    allBookings: "All Bookings",
+    allBookingsDesc: "View reservations and payment details",
+    refresh: "Refresh",
+    guest: "Guest",
+    platform: "Platform",
+    checkIn: "Check-in",
+    checkOut: "Check-out",
+    status: "Status",
+    earnings: "Host Earnings",
+    details: "Details",
+    breakdown: "View details",
+    noBookings: "No bookings found.",
 
-    remaining: "Remaining payments",
-    remainingDesc: "Track unpaid balances and record payments.",
-    totalShort: "Total",
-    receivedShort: "Received",
-    due: "Remaining",
+    estimatedEarnings: "Estimated Earnings",
+    paymentsReceived: "Payments Received",
+    paymentsRemaining: "Payments Remaining",
+    recordedExpenses: "Recorded Expenses",
+
+    remainingTitle: "Remaining Payments",
+    remainingDesc:
+      "Guest balances that still need to be collected",
+    total: "Total",
+    received: "Received",
+    remaining: "Remaining",
     action: "Action",
-    record: "Record payment",
-    additional: "Additional payment received (SAR)",
-    savePayment: "Save payment",
-    noRemaining: "No outstanding payments recorded.",
+    recordPayment: "Record Payment",
+    noRemaining: "No outstanding tracked payments.",
 
-    invalidMoney:
-      "Check the amounts. Received cannot exceed the total.",
-    invalidCommission:
-      "Commission cannot exceed the booking price.",
-    duplicate:
-      "A booking with this reservation number already exists.",
-    overlap:
-      "These dates overlap an existing active reservation.",
+    expenses: "Apartment Expenses",
+    expensesDesc:
+      "Cleaning, maintenance, utilities and supplies",
+    addExpense: "+ Add Expense",
+    expensesSetup:
+      "Expense tracking will be available after setup.",
+
+    monthlyPerformance: "Monthly Performance",
+    monthlyDesc:
+      "Estimated earnings, expenses and profit",
+    monthlyEarnings: "Monthly Earnings",
+    monthlyExpenses: "Monthly Expenses",
+    estimatedProfit: "Estimated Profit",
+    occupancy: "Occupancy Rate",
+    earningsChart: "Earnings by Month",
+    earningsChartDesc:
+      "Compare your apartment's monthly performance",
+    platformChart: "Bookings by Platform",
+    platformChartDesc:
+      "See where your reservations come from",
+
+    notConfigured: "Not set up yet",
+    expensesUnavailable:
+      "Add the expenses database to calculate profit.",
+    noChartData: "No confirmed booking data to display.",
+
+    saveBooking: "Save Booking",
+    savePayment: "Save Payment",
+    close: "Close",
+    notes: "Notes",
+    guestName: "Guest Name",
+    confirmationCode: "Confirmation Code",
+    bookingAmount: "Total Booking Amount (SAR)",
+    commission: "Platform Commission (SAR)",
+    amountReceived: "Amount Received (SAR)",
+    paymentAmount: "Payment Amount (SAR)",
+    remainingBalance: "Remaining Balance",
+    bookingDetails: "Booking Details",
+    paymentDetails: "Payment Details",
+
+    originalPrice: "Original booking price",
+    discount: "Discount",
+    accommodation: "Accommodation total",
+    occupancyTax: "Occupancy tax",
+    otherFees: "Other fees",
+    guestTotal: "Guest booking total",
+    platformCommission: "Platform commission",
+    hostTotal: "Estimated host earnings",
+    receivedSoFar: "Amount received",
+    balanceDue: "Balance due",
+    refund: "Refund amount",
+    refundStatus: "Refund status",
+    financialStatus: "Payment status",
+    code: "Confirmation code",
+    dates: "Stay dates",
+
+    byPlatform: "Estimated earnings by platform",
+    activeReservations: "Active reservations",
+    cancelledReservations: "Cancelled reservations",
+    notRecorded: "Not recorded",
+
+    loading: "Loading bookings...",
+    loadError: "Could not load bookings: ",
+    loginError: "Could not sign in: ",
+    saveError: "Could not save: ",
     saving: "Saving...",
     bookingSaved: "Booking saved successfully.",
     paymentSaved: "Payment recorded successfully.",
-    paymentError: "Could not save the payment.",
-    bookingError: "Could not save the booking.",
-    signInRequired: "Please sign in again.",
-    noData: "Bookings must finish loading before you can save.",
-    balance: "Remaining balance",
-    paymentTooHigh:
-      "Payment must be greater than zero and no more than the remaining balance.",
-    paymentChanged:
-      "The payment record changed. Refresh and try again.",
+    bookingConflict:
+      "These dates overlap an existing confirmed booking.",
+    duplicateCode:
+      "This confirmation code already exists for that platform.",
+    invalidDates:
+      "Check-out must be after check-in.",
+    invalidAmounts:
+      "Please check the amounts entered.",
+    paymentTooLarge:
+      "Payment exceeds the remaining balance.",
+    missingPayment:
+      "This booking does not have a tracked remaining balance.",
+    stalePayment:
+      "This booking was updated elsewhere. Refresh and try again.",
+    refreshNeeded:
+      "Bookings must finish loading before you can add a reservation.",
+    sessionExpired:
+      "Your session has expired. Please sign in again.",
 
-    weekdays: [
-      "Sun", "Mon", "Tue", "Wed",
-      "Thu", "Fri", "Sat"
-    ]
+    jan: "January",
+    feb: "February",
+    mar: "March",
+    apr: "April",
+    may: "May",
+    jun: "June",
+    jul: "July",
+    aug: "August",
+    sep: "September",
+    oct: "October",
+    nov: "November",
+    dec: "December",
+
+    sun: "Sun",
+    mon: "Mon",
+    tue: "Tue",
+    wed: "Wed",
+    thu: "Thu",
+    fri: "Fri",
+    sat: "Sat"
   },
 
   ar: {
-    adminLogin: "تسجيل دخول الإدارة",
-    loginSubtitle: "سجّل الدخول لإدارة الشقة.",
+    management: "لوحة إدارة الشقق",
+    login: "تسجيل الدخول",
     email: "البريد الإلكتروني",
     password: "كلمة المرور",
-    signIn: "تسجيل الدخول",
     logout: "تسجيل الخروج",
-    dashboard: "لوحة التحكم",
-    subtitle: "إدارة الحجوزات والحسابات المالية للشقة.",
+    addBooking: "+ إضافة حجز",
+    language: "English",
+
+    overview: "الرئيسية",
+    bookingsTab: "الحجوزات والتقويم",
+    finances: "المالية",
+    reports: "التقارير والتحليلات",
+
+    overviewDesc: "نظرة عامة على الشقة",
+    bookingsDesc: "إدارة الحجوزات وإقامات الضيوف",
+    financesDesc: "متابعة المدفوعات ومصاريف الشقة",
+    reportsDesc: "متابعة أداء الشقة",
 
     totalBookings: "إجمالي الحجوزات",
     upcomingBookings: "الحجوزات القادمة",
-    guestPayments: "إجمالي قيمة حجوزات الضيوف",
-    hostPayouts: "صافي مستحقات المضيف التقديري",
+    guestTotals: "إجمالي قيمة الحجوزات",
+    hostEarnings: "الأرباح المتوقعة",
+    viewDetails: "عرض التفاصيل ←",
+
+    today: "ملخص اليوم",
+    todayDesc: "الوصول والمغادرة والضيوف الحاليون",
+    arriving: "الوصول اليوم",
+    departing: "المغادرة اليوم",
+    staying: "المقيمون حاليًا",
+    noToday: "لا يوجد وصول أو مغادرة اليوم.",
+    arrival: "وصول",
+    departure: "مغادرة",
+    currentGuest: "مقيم حاليًا",
+
+    quickActions: "إجراءات سريعة",
+    quickDesc: "المهام اليومية للعائلة",
+    viewBookings: "عرض الحجوزات",
+    viewFinances: "عرض المالية",
 
     calendar: "تقويم الحجوزات",
-    calendarDesc: "الحجوزات المؤكدة المسجلة في النظام.",
-    booked: "محجوز",
-    available: "لا يوجد حجز مسجل",
-
-    availability: "التحقق من التوفر",
-    availabilityDesc: "التحقق من توفر التواريخ المطلوبة.",
-    checkIn: "تاريخ الدخول",
-    checkOut: "تاريخ الخروج",
-    checkDates: "التحقق من التواريخ",
-    availabilityNote:
-      "تحقق من منصات الحجز الأخرى قبل تأكيد التوفر.",
-
-    bookings: "الحجوزات",
-    bookingsDesc: "اضغط على عرض التفاصيل لمعرفة تفاصيل المبالغ.",
-    refresh: "↻ تحديث الحجوزات",
-
-    guest: "الضيف",
-    platform: "المنصة",
-    status: "الحالة",
-    payout: "مستحقات المضيف",
-    details: "التفاصيل",
-    viewBreakdown: "عرض التفاصيل",
-    noBookings: "لا توجد حجوزات مسجلة.",
-
-    breakdown: "التفاصيل المالية للحجز",
-    close: "إغلاق",
-    hostPayout: "مستحقات المضيف",
-    guestPaid: "إجمالي قيمة حجز الضيف",
-    roomFee: "رسوم الإقامة",
-    adjustment: "تعديل سعر الليلة",
-    hostFee: "عمولة المنصة أو رسوم المضيف",
-    otherFees: "رسوم أخرى",
-    totalHost: "صافي مستحقات المضيف التقديري",
-    roomAfter: "رسوم الإقامة بعد التعديلات",
-    guestFee: "رسوم خدمة الضيف",
-    taxes: "الضرائب",
-    totalGuest: "إجمالي سعر الحجز",
-
-    originalBookingPrice: "سعر الحجز الأصلي",
-    originallyPaid: "المبلغ الذي دفعه الضيف سابقاً",
-    refundAmount: "مبلغ الاسترداد",
-    refundStatus: "حالة الاسترداد",
-    refunded: "تم الاسترداد",
-    refundPending: "قيد الانتظار",
-    cancelledReservation: "حجز ملغي",
-
-    notRecorded: "غير مسجل",
-    loading: "جارٍ تحميل الحجوزات...",
-    loadError:
-      "تعذر تحميل الحجوزات. تحقق من اتصال Supabase والصلاحيات.",
-    notLoaded: "لم يتم تحميل الحجوزات.",
-    invalidDates: "يجب أن يكون تاريخ الخروج بعد تاريخ الدخول.",
-    conflict: "هذه التواريخ تتداخل مع حجز موجود.",
-    noConflict:
-      "لا يوجد حجز متعارض مسجل. تحقق من جميع المنصات قبل التأكيد.",
-    incorrectLogin: "البريد الإلكتروني أو كلمة المرور غير صحيحة.",
-    missingKey: "أضف مفتاح Supabase العام في ملف admin.js أولاً.",
-
-    language: "English",
-    guestFallback: "ضيف",
-    bookingFallback: "حجز",
+    calendarDesc: "معرفة الضيوف المقيمين يوميًا",
     confirmed: "مؤكد",
     cancelled: "ملغي",
     pending: "قيد الانتظار",
+    available: "متاح",
     checkedIn: "تم تسجيل الدخول",
 
-    addBooking: "+ إضافة حجز",
-    addTitle: "إضافة حجز",
-    source: "مصدر الحجز",
-    code: "رقم الحجز (اختياري)",
-    total: "إجمالي قيمة الحجز (ريال)",
-    commission: "عمولة المنصة (ريال)",
-    received: "المبلغ المستلم حتى الآن (ريال)",
-    notes: "ملاحظات (اختياري)",
-    saveBooking: "حفظ الحجز",
+    allBookings: "جميع الحجوزات",
+    allBookingsDesc: "تفاصيل الحجوزات والمدفوعات",
+    refresh: "تحديث",
+    guest: "الضيف",
+    platform: "المنصة",
+    checkIn: "تاريخ الوصول",
+    checkOut: "تاريخ المغادرة",
+    status: "الحالة",
+    earnings: "أرباح المضيف",
+    details: "التفاصيل",
+    breakdown: "عرض التفاصيل",
+    noBookings: "لا توجد حجوزات.",
 
-    remaining: "المبالغ المتبقية",
-    remainingDesc: "متابعة المبالغ المستحقة وتسجيل الدفعات.",
-    totalShort: "الإجمالي",
-    receivedShort: "المستلم",
-    due: "المتبقي",
+    estimatedEarnings: "الأرباح المتوقعة",
+    paymentsReceived: "المدفوعات المستلمة",
+    paymentsRemaining: "المدفوعات المتبقية",
+    recordedExpenses: "المصاريف المسجلة",
+
+    remainingTitle: "المدفوعات المتبقية",
+    remainingDesc:
+      "المبالغ المتبقية المطلوب تحصيلها من الضيوف",
+    total: "الإجمالي",
+    received: "المستلم",
+    remaining: "المتبقي",
     action: "الإجراء",
-    record: "تسجيل دفعة",
-    additional: "دفعة إضافية مستلمة (ريال)",
-    savePayment: "حفظ الدفعة",
-    noRemaining: "لا توجد مبالغ مستحقة مسجلة.",
+    recordPayment: "تسجيل دفعة",
+    noRemaining: "لا توجد دفعات متبقية مسجلة.",
 
-    invalidMoney:
-      "تحقق من المبالغ. المستلم لا يمكن أن يتجاوز الإجمالي.",
-    invalidCommission:
-      "العمولة لا يمكن أن تتجاوز قيمة الحجز.",
-    duplicate: "يوجد حجز بنفس رقم الحجز.",
-    overlap: "التواريخ تتعارض مع حجز نشط موجود.",
-    saving: "جارٍ الحفظ...",
+    expenses: "مصاريف الشقة",
+    expensesDesc: "النظافة والصيانة والفواتير والمستلزمات",
+    addExpense: "+ إضافة مصروف",
+    expensesSetup:
+      "سيتم تفعيل تسجيل المصاريف بعد الإعداد.",
+
+    monthlyPerformance: "الأداء الشهري",
+    monthlyDesc: "الأرباح والمصاريف والربح المتوقع",
+    monthlyEarnings: "أرباح الشهر",
+    monthlyExpenses: "مصاريف الشهر",
+    estimatedProfit: "الربح المتوقع",
+    occupancy: "نسبة الإشغال",
+    earningsChart: "الأرباح حسب الشهر",
+    earningsChartDesc: "مقارنة الأرباح الشهرية",
+    platformChart: "الحجوزات حسب المنصة",
+    platformChartDesc: "مصادر الحجوزات",
+
+    notConfigured: "لم يتم الإعداد",
+    expensesUnavailable:
+      "يجب إضافة قاعدة بيانات المصاريف لحساب الربح.",
+    noChartData: "لا توجد بيانات حجوزات مؤكدة.",
+
+    saveBooking: "حفظ الحجز",
+    savePayment: "حفظ الدفعة",
+    close: "إغلاق",
+    notes: "ملاحظات",
+    guestName: "اسم الضيف",
+    confirmationCode: "رقم تأكيد الحجز",
+    bookingAmount: "إجمالي الحجز (ريال)",
+    commission: "عمولة المنصة (ريال)",
+    amountReceived: "المبلغ المستلم (ريال)",
+    paymentAmount: "مبلغ الدفعة (ريال)",
+    remainingBalance: "المبلغ المتبقي",
+    bookingDetails: "تفاصيل الحجز",
+    paymentDetails: "تفاصيل الدفع",
+
+    originalPrice: "السعر الأصلي",
+    discount: "الخصم",
+    accommodation: "قيمة الإقامة",
+    occupancyTax: "ضريبة الإشغال",
+    otherFees: "رسوم أخرى",
+    guestTotal: "إجمالي حجز الضيف",
+    platformCommission: "عمولة المنصة",
+    hostTotal: "أرباح المضيف المتوقعة",
+    receivedSoFar: "المبلغ المستلم",
+    balanceDue: "المبلغ المتبقي",
+    refund: "المبلغ المسترد",
+    refundStatus: "حالة الاسترداد",
+    financialStatus: "حالة الدفع",
+    code: "رقم الحجز",
+    dates: "تواريخ الإقامة",
+
+    byPlatform: "الأرباح المتوقعة حسب المنصة",
+    activeReservations: "الحجوزات النشطة",
+    cancelledReservations: "الحجوزات الملغاة",
+    notRecorded: "غير مسجل",
+
+    loading: "جاري تحميل الحجوزات...",
+    loadError: "تعذر تحميل الحجوزات: ",
+    loginError: "تعذر تسجيل الدخول: ",
+    saveError: "تعذر الحفظ: ",
+    saving: "جاري الحفظ...",
     bookingSaved: "تم حفظ الحجز بنجاح.",
     paymentSaved: "تم تسجيل الدفعة بنجاح.",
-    paymentError: "تعذر حفظ الدفعة.",
-    bookingError: "تعذر حفظ الحجز.",
-    signInRequired: "يرجى تسجيل الدخول مرة أخرى.",
-    noData: "انتظر حتى يكتمل تحميل الحجوزات.",
-    balance: "المبلغ المتبقي",
-    paymentTooHigh:
-      "يجب أن تكون الدفعة أكبر من صفر وألا تتجاوز المبلغ المتبقي.",
-    paymentChanged:
-      "تم تعديل سجل الدفعة. حدّث الصفحة وحاول مرة أخرى.",
+    bookingConflict:
+      "هذه التواريخ تتعارض مع حجز مؤكد آخر.",
+    duplicateCode:
+      "رقم الحجز موجود مسبقًا لهذه المنصة.",
+    invalidDates:
+      "يجب أن يكون تاريخ المغادرة بعد الوصول.",
+    invalidAmounts:
+      "يرجى التأكد من المبالغ المدخلة.",
+    paymentTooLarge:
+      "مبلغ الدفعة أكبر من المبلغ المتبقي.",
+    missingPayment:
+      "لا يوجد مبلغ متبقٍ مسجل لهذا الحجز.",
+    stalePayment:
+      "تم تحديث الحجز من جهاز آخر. يرجى التحديث.",
+    refreshNeeded:
+      "انتظر اكتمال تحميل الحجوزات قبل إضافة حجز.",
+    sessionExpired:
+      "انتهت الجلسة. يرجى تسجيل الدخول مرة أخرى.",
 
-    weekdays: [
-      "الأحد", "الاثنين", "الثلاثاء", "الأربعاء",
-      "الخميس", "الجمعة", "السبت"
-    ]
+    jan: "يناير",
+    feb: "فبراير",
+    mar: "مارس",
+    apr: "أبريل",
+    may: "مايو",
+    jun: "يونيو",
+    jul: "يوليو",
+    aug: "أغسطس",
+    sep: "سبتمبر",
+    oct: "أكتوبر",
+    nov: "نوفمبر",
+    dec: "ديسمبر",
+
+    sun: "الأحد",
+    mon: "الاثنين",
+    tue: "الثلاثاء",
+    wed: "الأربعاء",
+    thu: "الخميس",
+    fri: "الجمعة",
+    sat: "السبت"
   }
 };
 
@@ -305,624 +396,157 @@ function t(key) {
 }
 
 function setText(id, value) {
-  if ($(id)) $(id).textContent = value;
-}
-
-function setSelectorText(selector, value) {
-  const element = document.querySelector(selector);
+  const element = $(id);
   if (element) element.textContent = value;
 }
 
-/* ==========================================
-   HELPERS
-   ========================================== */
-
-function dateString(date) {
-  return [
-    date.getFullYear(),
-    String(date.getMonth() + 1).padStart(2, "0"),
-    String(date.getDate()).padStart(2, "0")
-  ].join("-");
+function setButtonText(id, value) {
+  setText(id, value);
 }
 
 function money(value) {
   if (
     value === null ||
     value === undefined ||
-    value === "" ||
-    !Number.isFinite(Number(value))
+    value === ""
   ) {
     return t("notRecorded");
   }
 
-  return Number(value).toLocaleString("en-SA", {
-    minimumFractionDigits: 2,
-    maximumFractionDigits: 2
-  }) + " SAR";
+  const number = Number(value);
+
+  if (!Number.isFinite(number)) {
+    return t("notRecorded");
+  }
+
+  return (
+    number.toLocaleString(
+      currentLanguage === "ar" ? "ar-SA" : "en-SA",
+      {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2
+      }
+    ) + " SAR"
+  );
 }
 
 function cents(value) {
   return Math.round(Number(value) * 100);
 }
 
+function dateString(date) {
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+  const day = String(date.getDate()).padStart(2, "0");
+
+  return `${year}-${month}-${day}`;
+}
+
+function parseDate(value) {
+  if (!value || !/^\d{4}-\d{2}-\d{2}$/.test(value)) {
+    return null;
+  }
+
+  const [year, month, day] = value.split("-").map(Number);
+  const date = new Date(year, month - 1, day);
+
+  if (
+    date.getFullYear() !== year ||
+    date.getMonth() !== month - 1 ||
+    date.getDate() !== day
+  ) {
+    return null;
+  }
+
+  return date;
+}
+
+function formatDate(value) {
+  const date = parseDate(value);
+  if (!date) return "—";
+
+  return date.toLocaleDateString(
+    currentLanguage === "ar" ? "ar-SA" : "en-GB",
+    {
+      day: "numeric",
+      month: "short",
+      year: "numeric"
+    }
+  );
+}
+
+function monthName(monthIndex) {
+  const keys = [
+    "jan", "feb", "mar", "apr",
+    "may", "jun", "jul", "aug",
+    "sep", "oct", "nov", "dec"
+  ];
+
+  return t(keys[monthIndex]);
+}
+
+function firstName(name) {
+  return String(name || t("guest"))
+    .trim()
+    .split(/\s+/)[0];
+}
+
+function normalizedStatus(booking) {
+  return String(booking.status || "")
+    .trim()
+    .toLowerCase()
+    .replace(/[\s-]+/g, "_");
+}
+
 function activeBooking(booking) {
-  return [
-    "confirmed",
-    "checked_in",
-    "checked-in",
-    "checked in"
-  ].includes(
-    String(booking.status || "").trim().toLowerCase()
+  return ["confirmed", "checked_in"].includes(
+    normalizedStatus(booking)
   );
 }
 
 function cancelledBooking(booking) {
   return ["cancelled", "canceled"].includes(
-    String(booking.status || "").trim().toLowerCase()
+    normalizedStatus(booking)
   );
+}
+
+function translateStatus(status) {
+  const normalized = String(status || "")
+    .toLowerCase()
+    .replace(/[\s-]+/g, "_");
+
+  if (normalized === "confirmed") return t("confirmed");
+  if (normalized === "checked_in") return t("checkedIn");
+  if (["cancelled", "canceled"].includes(normalized)) {
+    return t("cancelled");
+  }
+
+  if (normalized === "pending") return t("pending");
+
+  return status || "—";
+}
+
+function statusClass(status) {
+  const normalized = String(status || "")
+    .toLowerCase()
+    .replace(/[\s-]+/g, "_");
+
+  if (["confirmed", "checked_in"].includes(normalized)) {
+    return "status-confirmed";
+  }
+
+  if (["cancelled", "canceled"].includes(normalized)) {
+    return "status-cancelled";
+  }
+
+  return "status-pending";
 }
 
 function overlaps(startA, endA, startB, endB) {
   return startA < endB && endA > startB;
 }
 
-function sumField(field) {
-  let total = 0;
-  let recorded = 0;
-
-  const active = bookings.filter(activeBooking);
-
-  for (const booking of active) {
-    const value = booking[field];
-
-    if (
-      value !== null &&
-      value !== undefined &&
-      value !== "" &&
-      Number.isFinite(Number(value))
-    ) {
-      total += Number(value);
-      recorded++;
-    }
-  }
-
-  return {
-    total,
-    recorded,
-    complete: recorded === active.length
-  };
-}
-
-function displayTotal(field) {
-  const result = sumField(field);
-
-  if (result.recorded === 0) {
-    return t("notRecorded");
-  }
-
-  return money(result.total) +
-    (result.complete ? "" : " *");
-}
-
-/* ==========================================
-   LOAD BOOKINGS
-   ========================================== */
-
-async function loadBookings() {
-  dashboardMessage.textContent = t("loading");
-  bookingsLoaded = false;
-
-  try {
-    const all = [];
-    const pageSize = 500;
-
-    for (let offset = 0; ; offset += pageSize) {
-      const { data, error } = await supabaseClient
-        .from("Bookings")
-        .select(
-          "id,guest_name,platform,check_in,check_out,status," +
-          "amount,original_price,discount_amount," +
-          "accommodation_total,guest_total,occupancy_tax," +
-          "platform_commission,other_fees," +
-          "original_guest_payment,refund_amount,refund_status," +
-          "financial_status,confirmation_code,notes"
-        )
-        .order("check_in", { ascending: true })
-        .range(offset, offset + pageSize - 1);
-
-      if (error) throw error;
-
-      all.push(...data);
-
-      if (data.length < pageSize) break;
-    }
-
-    bookings = all;
-    bookingsLoaded = true;
-    dashboardMessage.textContent = "";
-
-    renderStatistics();
-    renderCalendar();
-    renderTable();
-    renderRemainingPayments();
-
-  } catch (error) {
-    console.error("Supabase loading error:", error);
-
-    bookings = [];
-    bookingsLoaded = false;
-    dashboardMessage.textContent = t("loadError");
-
-    $("bookings-table-body").replaceChildren();
-    $("remaining-payments-body").replaceChildren();
-    calendarGrid.replaceChildren();
-
-    [
-      "total-bookings",
-      "upcoming-bookings",
-      "guest-payments",
-      "host-payouts",
-      "remaining-total"
-    ].forEach(id => setText(id, "—"));
-  }
-}
-
-/* ==========================================
-   DASHBOARD STATISTICS
-   ========================================== */
-
-function renderStatistics() {
-  const today = dateString(new Date());
-  const active = bookings.filter(activeBooking);
-
-  setText("total-bookings", String(bookings.length));
-
-  setText(
-    "upcoming-bookings",
-    String(
-      active.filter(b => b.check_in >= today).length
-    )
-  );
-
-  // Booking totals are not necessarily collected payments.
-  setText(
-    "guest-payments",
-    displayTotal("guest_total")
-  );
-
-  setText(
-    "host-payouts",
-    displayTotal("amount")
-  );
-}
-
-/* ==========================================
-   BOOKING STATUS
-   ========================================== */
-
-function translateStatus(status) {
-  const normalized =
-    String(status || "").trim().toLowerCase();
-
-  if (["cancelled", "canceled"].includes(normalized)) {
-    return t("cancelled");
-  }
-
-  if (normalized === "confirmed") {
-    return t("confirmed");
-  }
-
-  if (normalized === "pending") {
-    return t("pending");
-  }
-
-  if (
-    ["checked_in", "checked-in", "checked in"]
-      .includes(normalized)
-  ) {
-    return t("checkedIn");
-  }
-
-  return status || "—";
-}
-
-/* ==========================================
-   BOOKINGS TABLE
-   ========================================== */
-
-function renderTable() {
-  const tbody = $("bookings-table-body");
-  tbody.replaceChildren();
-
-  if (!bookings.length) {
-    const row = document.createElement("tr");
-    const cell = document.createElement("td");
-
-    cell.colSpan = 7;
-    cell.textContent = t("noBookings");
-
-    row.appendChild(cell);
-    tbody.appendChild(row);
-    return;
-  }
-
-  bookings.forEach((booking, index) => {
-    const row = document.createElement("tr");
-
-    const values = [
-      booking.guest_name || t("guestFallback"),
-      booking.platform || "—",
-      booking.check_in || "—",
-      booking.check_out || "—",
-      translateStatus(booking.status),
-      cancelledBooking(booking)
-        ? "—"
-        : money(booking.amount)
-    ];
-
-    values.forEach(value => {
-      const cell = document.createElement("td");
-      cell.textContent = value;
-      row.appendChild(cell);
-    });
-
-    const detailsCell = document.createElement("td");
-    const button = document.createElement("button");
-
-    button.type = "button";
-    button.className = "breakdown-btn";
-    button.textContent = t("viewBreakdown");
-
-    button.addEventListener("click", () => {
-      showBreakdown(index);
-    });
-
-    detailsCell.appendChild(button);
-    row.appendChild(detailsCell);
-    tbody.appendChild(row);
-  });
-}
-
-/* ==========================================
-   FINANCIAL BREAKDOWN HELPERS
-   ========================================== */
-
-function addBreakdownRow(label, value, options = {}) {
-  const row = document.createElement("div");
-  row.className = "breakdown-row";
-
-  if (options.highlight) {
-    row.classList.add("highlight");
-  }
-
-  const name = document.createElement("span");
-  name.textContent = label;
-
-  const amount = document.createElement("span");
-  const formatted = money(value);
-
-  amount.textContent =
-    options.negative && formatted !== t("notRecorded")
-      ? "−" + formatted
-      : formatted;
-
-  row.append(name, amount);
-  breakdownContent.appendChild(row);
-}
-
-function addBreakdownTextRow(label, value, options = {}) {
-  const row = document.createElement("div");
-  row.className = "breakdown-row";
-
-  if (options.highlight) {
-    row.classList.add("highlight");
-  }
-
-  const name = document.createElement("span");
-  name.textContent = label;
-
-  const content = document.createElement("span");
-  content.textContent = value;
-
-  row.append(name, content);
-  breakdownContent.appendChild(row);
-}
-
-function addBreakdownHeading(text) {
-  const heading = document.createElement("h3");
-  heading.textContent = text;
-  heading.style.marginTop = "22px";
-  heading.style.marginBottom = "12px";
-
-  breakdownContent.appendChild(heading);
-}
-
-/* ==========================================
-   VIEW RESERVATION BREAKDOWN
-   ========================================== */
-
-function showBreakdown(index) {
-  const booking = bookings[index];
-  if (!booking) return;
-
-  setText(
-    "breakdown-guest",
-    `${booking.guest_name || t("guestFallback")} · ` +
-    `${booking.platform || t("bookingFallback")}`
-  );
-
-  breakdownContent.replaceChildren();
-
-  if (cancelledBooking(booking)) {
-    addBreakdownHeading(t("cancelledReservation"));
-
-    addBreakdownRow(
-      t("originalBookingPrice"),
-      booking.original_price
-    );
-
-    addBreakdownRow(
-      t("originallyPaid"),
-      booking.original_guest_payment
-    );
-
-    addBreakdownRow(
-      t("refundAmount"),
-      booking.refund_amount
-    );
-
-    const refundStatus = String(
-      booking.refund_status || ""
-    ).trim().toLowerCase();
-
-    let refundLabel = t("notRecorded");
-
-    if (refundStatus === "refunded") {
-      refundLabel = t("refunded");
-    } else if (refundStatus === "pending") {
-      refundLabel = t("refundPending");
-    } else if (booking.refund_status) {
-      refundLabel = booking.refund_status;
-    }
-
-    addBreakdownTextRow(
-      t("refundStatus"),
-      refundLabel,
-      { highlight: true }
-    );
-
-  } else {
-    addBreakdownHeading(t("hostPayout"));
-
-    addBreakdownRow(
-      t("roomFee"),
-      booking.original_price
-    );
-
-    addBreakdownRow(
-      t("adjustment"),
-      booking.discount_amount,
-      { negative: true }
-    );
-
-    addBreakdownRow(
-      t("hostFee"),
-      booking.platform_commission,
-      { negative: true }
-    );
-
-    addBreakdownRow(
-      t("otherFees"),
-      booking.other_fees,
-      { negative: true }
-    );
-
-    addBreakdownRow(
-      t("totalHost"),
-      booking.amount,
-      { highlight: true }
-    );
-
-    addBreakdownHeading(t("guestPaid"));
-
-    addBreakdownRow(
-      t("roomAfter"),
-      booking.accommodation_total
-    );
-
-    addBreakdownRow(
-      t("guestFee"),
-      null
-    );
-
-    addBreakdownRow(
-      t("taxes"),
-      booking.occupancy_tax
-    );
-
-    addBreakdownRow(
-      t("totalGuest"),
-      booking.guest_total,
-      { highlight: true }
-    );
-
-    // Payment tracking only for bookings with
-    // a recognized payment status.
-    const remaining = outstandingBalance(booking);
-
-    if (remaining !== null) {
-      addBreakdownHeading(t("remaining"));
-
-      addBreakdownRow(
-        t("receivedShort"),
-        amountReceived(booking)
-      );
-
-      addBreakdownRow(
-        t("due"),
-        remaining,
-        { highlight: true }
-      );
-    }
-  }
-
-  breakdownDialog.showModal();
-}
-
-$("close-breakdown").addEventListener("click", () => {
-  breakdownDialog.close();
-});
-
-$("close-breakdown-bottom").addEventListener("click", () => {
-  breakdownDialog.close();
-});
-
-/* ==========================================
-   BOOKING CALENDAR
-   ========================================== */
-
-function renderCalendar() {
-  calendarGrid.replaceChildren();
-
-  calendarMonth.textContent =
-    displayedMonth.toLocaleDateString(
-      currentLanguage === "ar"
-        ? "ar-SA-u-ca-gregory"
-        : "en-US",
-      {
-        month: "long",
-        year: "numeric"
-      }
-    );
-
-  if (!bookingsLoaded) return;
-
-  const year = displayedMonth.getFullYear();
-  const month = displayedMonth.getMonth();
-
-  const offset = new Date(year, month, 1).getDay();
-  const days = new Date(year, month + 1, 0).getDate();
-
-  for (let i = 0; i < offset; i++) {
-    const blank = document.createElement("div");
-    blank.className = "calendar-day outside";
-    calendarGrid.appendChild(blank);
-  }
-
-  for (let day = 1; day <= days; day++) {
-    const date = dateString(
-      new Date(year, month, day)
-    );
-
-    const occupied = bookings.some(booking =>
-      activeBooking(booking) &&
-      booking.check_in <= date &&
-      date < booking.check_out
-    );
-
-    const cell = document.createElement("div");
-    cell.className = "calendar-day";
-
-    if (occupied) {
-      cell.classList.add("booked");
-    }
-
-    if (date === dateString(new Date())) {
-      cell.classList.add("today");
-    }
-
-    const number = document.createElement("span");
-    number.className = "day-number";
-    number.textContent = String(day);
-
-    const note = document.createElement("span");
-    note.className = "day-note";
-    note.textContent = occupied ? t("booked") : "—";
-
-    cell.append(number, note);
-    calendarGrid.appendChild(cell);
-  }
-}
-
-$("prev-month").addEventListener("click", () => {
-  displayedMonth.setMonth(
-    displayedMonth.getMonth() - 1
-  );
-  renderCalendar();
-});
-
-$("next-month").addEventListener("click", () => {
-  displayedMonth.setMonth(
-    displayedMonth.getMonth() + 1
-  );
-  renderCalendar();
-});
-
-/* ==========================================
-   AVAILABILITY CHECKER
-   ========================================== */
-
-$("availability-form").addEventListener(
-  "submit",
-  event => {
-    event.preventDefault();
-
-    const result = $("availability-result");
-    result.className = "availability-result";
-
-    if (!bookingsLoaded) {
-      result.textContent = t("notLoaded");
-      result.classList.add("warning");
-      return;
-    }
-
-    const start = $("check-in-date").value;
-    const end = $("check-out-date").value;
-
-    if (!start || !end || start >= end) {
-      result.textContent = t("invalidDates");
-      result.classList.add("warning");
-      return;
-    }
-
-    const conflict = bookings.some(booking =>
-      activeBooking(booking) &&
-      overlaps(
-        start,
-        end,
-        booking.check_in,
-        booking.check_out
-      )
-    );
-
-    result.textContent =
-      conflict ? t("conflict") : t("noConflict");
-
-    result.classList.add(
-      conflict ? "warning" : "success"
-    );
-  }
-);
-
-$("check-in-date").addEventListener(
-  "change",
-  event => {
-    $("check-out-date").min = event.target.value;
-  }
-);
-
-$("refresh-bookings-btn").addEventListener(
-  "click",
-  loadBookings
-);
-
-/* ==========================================
-   REMAINING PAYMENTS
-   ========================================== */
-
-function amountReceived(booking) {
-  const value = booking.original_guest_payment;
-
+function safeNumber(value) {
   if (
     value === null ||
     value === undefined ||
@@ -931,44 +555,75 @@ function amountReceived(booking) {
     return null;
   }
 
-  const number = Number(value);
+  const result = Number(value);
+  return Number.isFinite(result) ? result : null;
+}
 
-  return Number.isFinite(number)
-    ? number
-    : null;
+function activeBookings() {
+  return bookings.filter(activeBooking);
+}
+
+function sumField(field) {
+  const records = activeBookings();
+  let total = 0;
+  let recorded = 0;
+
+  for (const booking of records) {
+    const amount = safeNumber(booking[field]);
+
+    if (amount !== null) {
+      total += amount;
+      recorded++;
+    }
+  }
+
+  return {
+    total: Math.round(total * 100) / 100,
+    recorded,
+    complete: recorded === records.length
+  };
+}
+
+function displayTotal(field) {
+  const result = sumField(field);
+
+  if (!result.complete) {
+    return result.recorded
+      ? `${money(result.total)} *`
+      : "—";
+  }
+
+  return money(result.total);
+}
+
+function amountReceived(booking) {
+  return safeNumber(booking.original_guest_payment);
 }
 
 function outstandingBalance(booking) {
-  if (!activeBooking(booking)) {
-    return null;
-  }
+  if (!activeBooking(booking)) return null;
 
-  const total = Number(booking.guest_total);
+  const total = safeNumber(booking.guest_total);
   const received = amountReceived(booking);
 
-  if (
-    booking.guest_total === null ||
-    booking.guest_total === undefined ||
-    booking.guest_total === "" ||
-    !Number.isFinite(total) ||
-    received === null
-  ) {
+  if (total === null || received === null) {
     return null;
   }
 
-  // Avoid assuming platform payments are unpaid.
-  // Only calculate balances for bookings whose
-  // payment tracking is explicitly recorded.
   const financialStatus = String(
     booking.financial_status || ""
-  ).trim().toLowerCase();
+  )
+    .trim()
+    .toLowerCase();
 
-  if (![
+  const trackedStatuses = [
     "partially_paid",
     "pending",
     "unpaid",
     "paid"
-  ].includes(financialStatus)) {
+  ];
+
+  if (!trackedStatuses.includes(financialStatus)) {
     return null;
   }
 
@@ -978,118 +633,1262 @@ function outstandingBalance(booking) {
   ) / 100;
 }
 
-function renderRemainingPayments() {
-  const tbody = $("remaining-payments-body");
-  tbody.replaceChildren();
+function createElement(tag, className, text) {
+  const element = document.createElement(tag);
 
-  const outstanding = bookings
-    .map(booking => ({
+  if (className) element.className = className;
+
+  if (text !== undefined && text !== null) {
+    element.textContent = String(text);
+  }
+
+  return element;
+}
+
+function showMessage(message, isError = false) {
+  const element = $("dashboard-message");
+  if (!element) return;
+
+  element.textContent = message;
+  element.style.color = isError
+    ? "var(--danger)"
+    : "var(--success)";
+}
+
+/* =====================================================
+   NAVIGATION
+   ===================================================== */
+
+function switchTab(tab) {
+  const validTabs = [
+    "overview",
+    "bookings",
+    "finances",
+    "reports"
+  ];
+
+  if (!validTabs.includes(tab)) return;
+
+  currentTab = tab;
+
+  document.querySelectorAll(".tab-btn").forEach((button) => {
+    const active = button.dataset.tab === tab;
+
+    button.classList.toggle("active", active);
+    button.setAttribute(
+      "aria-selected",
+      active ? "true" : "false"
+    );
+  });
+
+  document.querySelectorAll(".tab-content").forEach((section) => {
+    const active = section.id === `tab-${tab}`;
+
+    section.hidden = !active;
+    section.classList.toggle("active", active);
+  });
+}
+
+document.querySelectorAll(".tab-btn").forEach((button) => {
+  button.addEventListener("click", () => {
+    switchTab(button.dataset.tab);
+  });
+});
+
+$("quick-view-bookings")?.addEventListener(
+  "click",
+  () => switchTab("bookings")
+);
+
+$("quick-view-finances")?.addEventListener(
+  "click",
+  () => switchTab("finances")
+);
+
+/* =====================================================
+   SUPABASE — LOAD BOOKINGS
+   ===================================================== */
+
+async function loadBookings() {
+  bookingsLoaded = false;
+  showMessage(t("loading"));
+
+  const allBookings = [];
+  const pageSize = 500;
+  let offset = 0;
+
+  try {
+    while (true) {
+      const { data, error } = await supabaseClient
+        .from("Bookings")
+        .select(
+          [
+            "id",
+            "guest_name",
+            "platform",
+            "check_in",
+            "check_out",
+            "status",
+            "amount",
+            "original_price",
+            "discount_amount",
+            "accommodation_total",
+            "guest_total",
+            "occupancy_tax",
+            "platform_commission",
+            "other_fees",
+            "original_guest_payment",
+            "refund_amount",
+            "refund_status",
+            "financial_status",
+            "confirmation_code",
+            "notes"
+          ].join(",")
+        )
+        .order("check_in", { ascending: true })
+        .range(offset, offset + pageSize - 1);
+
+      if (error) throw error;
+
+      allBookings.push(...(data || []));
+
+      if (!data || data.length < pageSize) break;
+
+      offset += pageSize;
+    }
+
+    bookings = allBookings;
+    bookingsLoaded = true;
+
+    renderEverything();
+    showMessage("");
+  } catch (error) {
+    bookings = [];
+    bookingsLoaded = false;
+
+    renderEverything();
+    showMessage(t("loadError") + error.message, true);
+  }
+}
+
+function renderEverything() {
+  renderStatistics();
+  renderToday();
+  renderCalendar();
+  renderTable();
+  renderRemainingPayments();
+  renderFinanceSummary();
+  renderReports();
+}
+
+/* =====================================================
+   DASHBOARD STATISTICS
+   ===================================================== */
+
+function renderStatistics() {
+  setText("total-bookings", bookings.length);
+
+  const today = dateString(new Date());
+
+  const upcoming = activeBookings().filter(
+    (booking) => booking.check_in >= today
+  ).length;
+
+  setText("upcoming-bookings", upcoming);
+  setText("guest-payments", displayTotal("guest_total"));
+  setText("host-payouts", displayTotal("amount"));
+}
+
+/* =====================================================
+   TODAY'S OVERVIEW
+   ===================================================== */
+
+function renderToday() {
+  const today = dateString(new Date());
+  const records = activeBookings();
+
+  const arriving = records.filter(
+    (booking) => booking.check_in === today
+  );
+
+  const departing = records.filter(
+    (booking) => booking.check_out === today
+  );
+
+  const staying = records.filter(
+    (booking) =>
+      booking.check_in <= today &&
+      booking.check_out > today
+  );
+
+  setText("today-arrivals", arriving.length);
+  setText("today-departures", departing.length);
+  setText("today-staying", staying.length);
+
+  const container = $("today-guest-list");
+  if (!container) return;
+
+  container.replaceChildren();
+
+  const items = [
+    ...arriving.map((booking) => ({
       booking,
-      remaining: outstandingBalance(booking)
-    }))
-    .filter(item =>
-      item.remaining !== null &&
-      item.remaining > 0
+      label: t("arrival")
+    })),
+    ...departing.map((booking) => ({
+      booking,
+      label: t("departure")
+    })),
+    ...staying
+      .filter(
+        (booking) => booking.check_in !== today
+      )
+      .map((booking) => ({
+        booking,
+        label: t("currentGuest")
+      }))
+  ];
+
+  if (!items.length) {
+    container.append(
+      createElement("p", "", t("noToday"))
+    );
+    return;
+  }
+
+  items.forEach(({ booking, label }) => {
+    const row = createElement(
+      "div",
+      "today-guest-item"
     );
 
-  const totalRemaining = outstanding.reduce(
-    (sum, item) => sum + cents(item.remaining),
+    const name = createElement(
+      "strong",
+      "",
+      booking.guest_name || "—"
+    );
+
+    const info = createElement(
+      "span",
+      "",
+      `${label} • ${booking.platform || "—"}`
+    );
+
+    row.append(name, info);
+    container.append(row);
+  });
+}
+
+/* =====================================================
+   BOOKING CALENDAR
+   ===================================================== */
+
+function renderCalendar() {
+  const grid = $("calendar-grid");
+  if (!grid) return;
+
+  grid.replaceChildren();
+
+  const year = displayedMonth.getFullYear();
+  const month = displayedMonth.getMonth();
+
+  setText(
+    "calendar-month",
+    `${monthName(month)} ${year}`
+  );
+
+  const firstWeekday = new Date(year, month, 1).getDay();
+  const daysInMonth = new Date(
+    year,
+    month + 1,
     0
-  ) / 100;
+  ).getDate();
+
+  for (let i = 0; i < firstWeekday; i++) {
+    const empty = createElement(
+      "div",
+      "calendar-day empty"
+    );
+    empty.setAttribute("aria-hidden", "true");
+    grid.append(empty);
+  }
+
+  const today = dateString(new Date());
+
+  for (let day = 1; day <= daysInMonth; day++) {
+    const date = dateString(
+      new Date(year, month, day)
+    );
+
+    const matching = activeBookings().filter(
+      (booking) =>
+        booking.check_in <= date &&
+        booking.check_out > date
+    );
+
+    const cell = createElement(
+      "div",
+      "calendar-day"
+    );
+
+    if (matching.length) {
+      cell.classList.add("booked");
+    }
+
+    if (date === today) {
+      cell.classList.add("today");
+    }
+
+    cell.append(
+      createElement(
+        "span",
+        "calendar-day-number",
+        day
+      )
+    );
+
+    matching.forEach((booking) => {
+      const button = createElement(
+        "button",
+        "calendar-guest",
+        firstName(booking.guest_name)
+      );
+
+      button.type = "button";
+      button.title = booking.guest_name || "";
+      button.setAttribute(
+        "aria-label",
+        `${booking.guest_name}, ${formatDate(booking.check_in)} – ${formatDate(booking.check_out)}`
+      );
+
+      button.addEventListener("click", () => {
+        const index = bookings.indexOf(booking);
+        showBreakdown(index);
+      });
+
+      cell.append(button);
+    });
+
+    grid.append(cell);
+  }
+}
+
+$("prev-month")?.addEventListener("click", () => {
+  displayedMonth.setMonth(
+    displayedMonth.getMonth() - 1
+  );
+
+  renderCalendar();
+});
+
+$("next-month")?.addEventListener("click", () => {
+  displayedMonth.setMonth(
+    displayedMonth.getMonth() + 1
+  );
+
+  renderCalendar();
+});
+
+/* =====================================================
+   BOOKINGS TABLE
+   ===================================================== */
+
+function renderTable() {
+  const tbody = $("bookings-table-body");
+  if (!tbody) return;
+
+  tbody.replaceChildren();
+
+  if (!bookings.length) {
+    const row = createElement("tr");
+    const cell = createElement(
+      "td",
+      "",
+      t("noBookings")
+    );
+
+    cell.colSpan = 7;
+    row.append(cell);
+    tbody.append(row);
+    return;
+  }
+
+  const sorted = [...bookings].sort(
+    (a, b) =>
+      String(b.check_in || "").localeCompare(
+        String(a.check_in || "")
+      )
+  );
+
+  sorted.forEach((booking) => {
+    const row = createElement("tr");
+
+    const fields = [
+      booking.guest_name || "—",
+      booking.platform || "—",
+      formatDate(booking.check_in),
+      formatDate(booking.check_out)
+    ];
+
+    fields.forEach((value) => {
+      row.append(createElement("td", "", value));
+    });
+
+    const statusCell = createElement("td");
+
+    const badge = createElement(
+      "span",
+      `status-badge ${statusClass(booking.status)}`,
+      translateStatus(booking.status)
+    );
+
+    statusCell.append(badge);
+    row.append(statusCell);
+
+    row.append(
+      createElement(
+        "td",
+        "",
+        money(booking.amount)
+      )
+    );
+
+    const actionCell = createElement("td");
+
+    const button = createElement(
+      "button",
+      "",
+      t("breakdown")
+    );
+
+    button.type = "button";
+    button.addEventListener("click", () => {
+      showBreakdown(bookings.indexOf(booking));
+    });
+
+    actionCell.append(button);
+    row.append(actionCell);
+    tbody.append(row);
+  });
+}
+
+/* =====================================================
+   BOOKING DETAILS DIALOG
+   ===================================================== */
+
+function addBreakdownHeading(label) {
+  const heading = createElement(
+    "h3",
+    "breakdown-heading",
+    label
+  );
+
+  $("breakdown-content").append(heading);
+}
+
+function addBreakdownRow(
+  label,
+  value,
+  options = {}
+) {
+  const row = createElement(
+    "div",
+    options.total
+      ? "breakdown-row breakdown-total"
+      : "breakdown-row"
+  );
+
+  const left = createElement("span", "", label);
+  const right = createElement(
+    "strong",
+    "",
+    money(value)
+  );
+
+  row.append(left, right);
+  $("breakdown-content").append(row);
+}
+
+function addBreakdownTextRow(label, value) {
+  const row = createElement(
+    "div",
+    "breakdown-row"
+  );
+
+  row.append(
+    createElement("span", "", label),
+    createElement(
+      "strong",
+      "",
+      value === null ||
+      value === undefined ||
+      value === ""
+        ? "—"
+        : value
+    )
+  );
+
+  $("breakdown-content").append(row);
+}
+
+function showBreakdown(index) {
+  const booking = bookings[index];
+  if (!booking) return;
+
+  const content = $("breakdown-content");
+  const dialog = $("breakdown-dialog");
+
+  if (!content || !dialog) return;
+
+  content.replaceChildren();
+
+  setText(
+    "breakdown-guest",
+    booking.guest_name || t("bookingDetails")
+  );
+
+  addBreakdownTextRow(
+    t("platform"),
+    booking.platform
+  );
+
+  addBreakdownTextRow(
+    t("code"),
+    booking.confirmation_code
+  );
+
+  addBreakdownTextRow(
+    t("dates"),
+    `${formatDate(booking.check_in)} – ${formatDate(booking.check_out)}`
+  );
+
+  addBreakdownTextRow(
+    t("status"),
+    translateStatus(booking.status)
+  );
+
+  if (cancelledBooking(booking)) {
+    addBreakdownHeading(t("paymentDetails"));
+
+    addBreakdownRow(
+      t("originalPrice"),
+      booking.original_price
+    );
+
+    addBreakdownRow(
+      t("receivedSoFar"),
+      booking.original_guest_payment
+    );
+
+    addBreakdownRow(
+      t("refund"),
+      booking.refund_amount
+    );
+
+    addBreakdownTextRow(
+      t("refundStatus"),
+      booking.refund_status
+    );
+  } else {
+    addBreakdownHeading(t("bookingDetails"));
+
+    addBreakdownRow(
+      t("originalPrice"),
+      booking.original_price
+    );
+
+    addBreakdownRow(
+      t("discount"),
+      booking.discount_amount
+    );
+
+    addBreakdownRow(
+      t("accommodation"),
+      booking.accommodation_total
+    );
+
+    addBreakdownRow(
+      t("occupancyTax"),
+      booking.occupancy_tax
+    );
+
+    addBreakdownRow(
+      t("otherFees"),
+      booking.other_fees
+    );
+
+    addBreakdownRow(
+      t("guestTotal"),
+      booking.guest_total
+    );
+
+    addBreakdownHeading(t("hostEarnings"));
+
+    addBreakdownRow(
+      t("platformCommission"),
+      booking.platform_commission
+    );
+
+    addBreakdownRow(
+      t("hostTotal"),
+      booking.amount,
+      { total: true }
+    );
+
+    const balance = outstandingBalance(booking);
+
+    if (balance !== null) {
+      addBreakdownHeading(t("paymentDetails"));
+
+      addBreakdownRow(
+        t("receivedSoFar"),
+        booking.original_guest_payment
+      );
+
+      addBreakdownRow(
+        t("balanceDue"),
+        balance,
+        { total: true }
+      );
+    }
+  }
+
+  if (booking.notes) {
+    addBreakdownHeading(t("notes"));
+
+    content.append(
+      createElement("p", "", booking.notes)
+    );
+  }
+
+  dialog.showModal();
+}
+
+$("close-breakdown")?.addEventListener(
+  "click",
+  () => $("breakdown-dialog").close()
+);
+
+$("close-breakdown-bottom")?.addEventListener(
+  "click",
+  () => $("breakdown-dialog").close()
+);
+
+/* =====================================================
+   FINANCE SUMMARY
+   ===================================================== */
+
+function renderFinanceSummary() {
+  setText(
+    "finance-earnings",
+    displayTotal("amount")
+  );
+
+  const tracked = activeBookings().filter(
+    (booking) =>
+      outstandingBalance(booking) !== null
+  );
+
+  const received = tracked.reduce(
+    (sum, booking) =>
+      sum + (amountReceived(booking) || 0),
+    0
+  );
+
+  const remaining = tracked.reduce(
+    (sum, booking) =>
+      sum + outstandingBalance(booking),
+    0
+  );
+
+  const untrackedCount =
+    activeBookings().length - tracked.length;
+
+  setText(
+    "finance-received",
+    tracked.length
+      ? `${money(received)}${untrackedCount ? " *" : ""}`
+      : "—"
+  );
+
+  setText(
+    "finance-remaining",
+    tracked.length
+      ? `${money(remaining)}${untrackedCount ? " *" : ""}`
+      : "—"
+  );
+
+  // No expenses table is connected yet.
+  setText(
+    "finance-expenses",
+    t("notConfigured")
+  );
+}
+
+/* =====================================================
+   REMAINING PAYMENTS
+   ===================================================== */
+
+function renderRemainingPayments() {
+  const tbody = $("remaining-payments-body");
+  if (!tbody) return;
+
+  tbody.replaceChildren();
+
+  const unpaid = activeBookings().filter(
+    (booking) => outstandingBalance(booking) > 0
+  );
+
+  const totalRemaining = unpaid.reduce(
+    (sum, booking) =>
+      sum + outstandingBalance(booking),
+    0
+  );
 
   setText(
     "remaining-total",
     money(totalRemaining)
   );
 
-  if (!outstanding.length) {
-    const row = document.createElement("tr");
-    const cell = document.createElement("td");
+  if (!unpaid.length) {
+    const row = createElement("tr");
+    const cell = createElement(
+      "td",
+      "",
+      t("noRemaining")
+    );
 
     cell.colSpan = 5;
-    cell.textContent = t("noRemaining");
-
-    row.appendChild(cell);
-    tbody.appendChild(row);
+    row.append(cell);
+    tbody.append(row);
     return;
   }
 
-  outstanding.forEach(({ booking, remaining }) => {
-    const row = document.createElement("tr");
+  unpaid.forEach((booking) => {
+    const row = createElement("tr");
 
-    const values = [
-      booking.guest_name || t("guestFallback"),
+    [
+      booking.guest_name || "—",
       money(booking.guest_total),
-      money(amountReceived(booking)),
-      money(remaining)
-    ];
-
-    values.forEach(value => {
-      const cell = document.createElement("td");
-      cell.textContent = value;
-      row.appendChild(cell);
+      money(booking.original_guest_payment),
+      money(outstandingBalance(booking))
+    ].forEach((value) => {
+      row.append(createElement("td", "", value));
     });
 
-    const actionCell = document.createElement("td");
-    const button = document.createElement("button");
+    const cell = createElement("td");
+
+    const button = createElement(
+      "button",
+      "",
+      t("recordPayment")
+    );
 
     button.type = "button";
-    button.className = "remaining-payment-btn";
-    button.textContent = t("record");
 
     button.addEventListener("click", () => {
-      selectedPaymentBooking = booking;
-
-      $("payment-message").textContent = "";
-      $("new-payment-amount").value = "";
-
-      updatePaymentDialog();
-      paymentDialog.showModal();
+      openPaymentDialog(booking);
     });
 
-    actionCell.appendChild(button);
-    row.appendChild(actionCell);
-    tbody.appendChild(row);
+    cell.append(button);
+    row.append(cell);
+    tbody.append(row);
   });
 }
 
-/* ==========================================
-   ADD BOOKING
-   ========================================== */
+/* =====================================================
+   EARNINGS DETAILS
+   ===================================================== */
 
-$("open-add-booking").addEventListener(
-  "click",
-  () => {
-    if (!bookingsLoaded) {
-      dashboardMessage.textContent = t("noData");
-      return;
+function showEarningsDetails() {
+  const dialog = $("earnings-dialog");
+  const content = $("earnings-breakdown-content");
+
+  if (!dialog || !content) return;
+
+  content.replaceChildren();
+
+  const records = activeBookings();
+  const groups = new Map();
+
+  records.forEach((booking) => {
+    const platform = booking.platform || "Other";
+
+    if (!groups.has(platform)) {
+      groups.set(platform, {
+        total: 0,
+        count: 0,
+        missing: 0
+      });
     }
 
-    addBookingForm.reset();
+    const group = groups.get(platform);
+    const amount = safeNumber(booking.amount);
 
-    $("manual-booking-message").textContent = "";
-    $("manual-check-out").min = "";
+    group.count++;
 
-    updateManualBalancePreview();
-    addBookingDialog.showModal();
-  }
-);
+    if (amount === null) {
+      group.missing++;
+    } else {
+      group.total += amount;
+    }
+  });
 
-$("close-add-booking").addEventListener(
+  const addLine = (label, value) => {
+    const row = createElement(
+      "div",
+      "breakdown-row"
+    );
+
+    row.append(
+      createElement("span", "", label),
+      createElement("strong", "", value)
+    );
+
+    content.append(row);
+  };
+
+  addLine(
+    t("activeReservations"),
+    String(records.length)
+  );
+
+  addLine(
+    t("cancelledReservations"),
+    String(bookings.filter(cancelledBooking).length)
+  );
+
+  [...groups.entries()].forEach(
+    ([platform, group]) => {
+      addLine(
+        `${platform} (${group.count})`,
+        `${money(group.total)}${group.missing ? " *" : ""}`
+      );
+    }
+  );
+
+  addLine(
+    t("hostTotal"),
+    displayTotal("amount")
+  );
+
+  dialog.showModal();
+}
+
+$("earnings-card")?.addEventListener(
   "click",
-  () => {
-    addBookingDialog.close();
+  showEarningsDetails
+);
+
+$("earnings-card")?.addEventListener(
+  "keydown",
+  (event) => {
+    if (
+      event.key === "Enter" ||
+      event.key === " "
+    ) {
+      event.preventDefault();
+      showEarningsDetails();
+    }
   }
 );
 
-function updateManualBalancePreview() {
-  const total = Number(
-    $("manual-total").value || 0
+$("close-earnings-dialog")?.addEventListener(
+  "click",
+  () => $("earnings-dialog").close()
+);
+
+/* =====================================================
+   MONTHLY REPORTS
+   ===================================================== */
+
+// Earnings are allocated across the nights of a stay.
+// Example: a stay crossing October and November
+// contributes to both months.
+//
+// This is estimated earned revenue, NOT cash received.
+// Actual monthly cash flow needs payment timestamps.
+
+function bookingNights(booking) {
+  const start = parseDate(booking.check_in);
+  const end = parseDate(booking.check_out);
+
+  if (!start || !end || end <= start) return 0;
+
+  return Math.round(
+    (Date.UTC(
+      end.getFullYear(),
+      end.getMonth(),
+      end.getDate()
+    ) -
+      Date.UTC(
+        start.getFullYear(),
+        start.getMonth(),
+        start.getDate()
+      )) /
+      86400000
+  );
+}
+
+function monthlyEarningsMap() {
+  const totals = new Map();
+
+  activeBookings().forEach((booking) => {
+    const earnings = safeNumber(booking.amount);
+    const nights = bookingNights(booking);
+
+    if (earnings === null || nights <= 0) return;
+
+    const start = parseDate(booking.check_in);
+    const perNight = earnings / nights;
+
+    for (let day = 0; day < nights; day++) {
+      const night = new Date(
+        start.getFullYear(),
+        start.getMonth(),
+        start.getDate() + day
+      );
+
+      const key = `${night.getFullYear()}-${String(
+        night.getMonth() + 1
+      ).padStart(2, "0")}`;
+
+      totals.set(
+        key,
+        (totals.get(key) || 0) + perNight
+      );
+    }
+  });
+
+  return totals;
+}
+
+function monthlyOccupancy(monthKey) {
+  const [year, month] = monthKey.split("-").map(Number);
+
+  if (!year || !month) return null;
+
+  const days = new Date(year, month, 0).getDate();
+  let occupied = 0;
+
+  for (let day = 1; day <= days; day++) {
+    const date = dateString(
+      new Date(year, month - 1, day)
+    );
+
+    if (
+      activeBookings().some(
+        (booking) =>
+          booking.check_in <= date &&
+          booking.check_out > date
+      )
+    ) {
+      occupied++;
+    }
+  }
+
+  return Math.round((occupied / days) * 100);
+}
+
+function reportMonthOptions() {
+  const select = $("report-month");
+  if (!select) return;
+
+  const map = monthlyEarningsMap();
+  const now = new Date();
+
+  const currentKey = `${now.getFullYear()}-${String(
+    now.getMonth() + 1
+  ).padStart(2, "0")}`;
+
+  const months = new Set([
+    ...map.keys(),
+    currentKey
+  ]);
+
+  const sorted = [...months].sort().reverse();
+
+  if (
+    !selectedReportMonth ||
+    !months.has(selectedReportMonth)
+  ) {
+    selectedReportMonth = currentKey;
+  }
+
+  select.replaceChildren();
+
+  sorted.forEach((key) => {
+    const [year, month] = key.split("-").map(Number);
+
+    const option = createElement(
+      "option",
+      "",
+      `${monthName(month - 1)} ${year}`
+    );
+
+    option.value = key;
+    select.append(option);
+  });
+
+  select.value = selectedReportMonth;
+}
+
+function renderReports() {
+  reportMonthOptions();
+
+  const earnings = monthlyEarningsMap();
+
+  const monthly =
+    earnings.get(selectedReportMonth) || 0;
+
+  setText(
+    "monthly-earnings",
+    money(monthly)
   );
 
-  const received = Number(
-    $("manual-received").value || 0
+  // No expense data exists yet, so profit is unknown.
+  setText(
+    "monthly-expenses",
+    t("notConfigured")
   );
+
+  setText(
+    "monthly-profit",
+    "—"
+  );
+
+  const occupancy = monthlyOccupancy(
+    selectedReportMonth
+  );
+
+  setText(
+    "monthly-occupancy",
+    occupancy === null ? "—" : `${occupancy}%`
+  );
+
+  renderEarningsChart(earnings);
+  renderPlatformChart();
+}
+
+$("report-month")?.addEventListener(
+  "change",
+  (event) => {
+    selectedReportMonth = event.target.value;
+    renderReports();
+  }
+);
+
+/* =====================================================
+   SIMPLE CHARTS — NO EXTRA LIBRARY NEEDED
+   ===================================================== */
+
+function renderEarningsChart(earningsMap) {
+  const container = $("monthly-earnings-chart");
+  if (!container) return;
+
+  container.replaceChildren();
+
+  const entries = [...earningsMap.entries()]
+    .sort(([a], [b]) => a.localeCompare(b))
+    .slice(-12);
+
+  if (!entries.length) {
+    container.append(
+      createElement("p", "", t("noChartData"))
+    );
+    return;
+  }
+
+  const max = Math.max(
+    ...entries.map(([, amount]) => amount),
+    1
+  );
+
+  const chart = createElement("div");
+  chart.style.display = "flex";
+  chart.style.alignItems = "flex-end";
+  chart.style.justifyContent = "space-around";
+  chart.style.gap = "12px";
+  chart.style.minHeight = "240px";
+  chart.style.overflowX = "auto";
+
+  entries.forEach(([key, amount]) => {
+    const [year, month] = key.split("-").map(Number);
+
+    const group = createElement("div");
+    group.style.flex = "1 0 52px";
+    group.style.minWidth = "52px";
+    group.style.textAlign = "center";
+
+    const amountLabel = createElement(
+      "div",
+      "",
+      Math.round(amount).toLocaleString(
+        currentLanguage === "ar"
+          ? "ar-SA"
+          : "en-SA"
+      )
+    );
+
+    amountLabel.style.fontSize = "11px";
+    amountLabel.style.marginBottom = "8px";
+    amountLabel.style.fontWeight = "600";
+
+    const bar = createElement(
+      "div",
+      "chart-bar"
+    );
+
+    bar.style.height = `${Math.max(
+      3,
+      (amount / max) * 160
+    )}px`;
+
+    bar.style.width = "70%";
+    bar.style.margin = "0 auto";
+    bar.title = money(amount);
+
+    const label = createElement(
+      "div",
+      "chart-label",
+      `${monthName(month - 1).slice(0, 3)} ${String(year).slice(-2)}`
+    );
+
+    label.style.marginTop = "8px";
+
+    group.append(amountLabel, bar, label);
+    chart.append(group);
+  });
+
+  container.append(chart);
+}
+
+function renderPlatformChart() {
+  const container = $("platform-chart");
+  if (!container) return;
+
+  container.replaceChildren();
+
+  const counts = new Map();
+
+  activeBookings().forEach((booking) => {
+    const platform = booking.platform || "Other";
+
+    counts.set(
+      platform,
+      (counts.get(platform) || 0) + 1
+    );
+  });
+
+  if (!counts.size) {
+    container.append(
+      createElement("p", "", t("noChartData"))
+    );
+    return;
+  }
+
+  const total = [...counts.values()].reduce(
+    (sum, count) => sum + count,
+    0
+  );
+
+  const colors = [
+    "#4b5130",
+    "#b69a65",
+    "#7c8a64",
+    "#9c8063",
+    "#697d75"
+  ];
+
+  [...counts.entries()].forEach(
+    ([platform, count], index) => {
+      const wrapper = createElement("div");
+      wrapper.style.marginBottom = "22px";
+
+      const heading = createElement("div");
+      heading.style.display = "flex";
+      heading.style.justifyContent = "space-between";
+      heading.style.gap = "10px";
+      heading.style.marginBottom = "7px";
+
+      heading.append(
+        createElement("strong", "", platform),
+        createElement(
+          "span",
+          "",
+          `${count} (${Math.round(
+            (count / total) * 100
+          )}%)`
+        )
+      );
+
+      const track = createElement("div");
+      track.style.height = "13px";
+      track.style.background = "#e7e5dc";
+      track.style.borderRadius = "999px";
+      track.style.overflow = "hidden";
+
+      const fill = createElement("div");
+      fill.style.width = `${(count / total) * 100}%`;
+      fill.style.height = "100%";
+      fill.style.background =
+        colors[index % colors.length];
+
+      track.append(fill);
+      wrapper.append(heading, track);
+      container.append(wrapper);
+    }
+  );
+}
+
+/* =====================================================
+   ADD MANUAL BOOKING
+   ===================================================== */
+
+function openBookingDialog() {
+  if (!bookingsLoaded) {
+    showMessage(t("refreshNeeded"), true);
+    return;
+  }
+
+  const form = $("add-booking-form");
+  form.reset();
+
+  setText("manual-booking-message", "");
+  setText("manual-balance-preview", "");
+
+  $("manual-commission").value = "0";
+  $("manual-received").value = "0";
+
+  updateBalancePreview();
+  $("add-booking-dialog").showModal();
+}
+
+$("open-add-booking")?.addEventListener(
+  "click",
+  openBookingDialog
+);
+
+$("quick-add-booking")?.addEventListener(
+  "click",
+  openBookingDialog
+);
+
+$("close-add-booking")?.addEventListener(
+  "click",
+  () => $("add-booking-dialog").close()
+);
+
+function updateBalancePreview() {
+  const total = safeNumber($("manual-total").value);
+  const received = safeNumber(
+    $("manual-received").value
+  );
+
+  if (total === null || received === null) {
+    setText("manual-balance-preview", "");
+    return;
+  }
 
   const remaining = Math.max(
     0,
@@ -1098,129 +1897,103 @@ function updateManualBalancePreview() {
 
   setText(
     "manual-balance-preview",
-    t("balance") + ": " + money(remaining)
+    `${t("remainingBalance")}: ${money(remaining)}`
   );
 }
 
-["manual-total", "manual-received"].forEach(id => {
-  $(id).addEventListener(
+["manual-total", "manual-received"].forEach((id) => {
+  $(id)?.addEventListener(
     "input",
-    updateManualBalancePreview
+    updateBalancePreview
   );
 });
 
-$("manual-check-in").addEventListener(
-  "change",
-  () => {
-    $("manual-check-out").min =
-      $("manual-check-in").value;
-  }
-);
-
-addBookingForm.addEventListener(
+$("add-booking-form")?.addEventListener(
   "submit",
-  async event => {
+  async (event) => {
     event.preventDefault();
 
     if (savingManualBooking) return;
 
-    const message = $("manual-booking-message");
-    message.textContent = "";
-
-    if (!bookingsLoaded) {
-      message.textContent = t("noData");
-      return;
-    }
-
     const guest = $("manual-guest").value.trim();
     const platform = $("manual-platform").value;
     const code = $("manual-code").value.trim();
-
     const checkIn = $("manual-check-in").value;
     const checkOut = $("manual-check-out").value;
 
-    const total = Number(
-      $("manual-total").value
-    );
-
+    const total = Number($("manual-total").value);
     const commission = Number(
       $("manual-commission").value
     );
-
     const received = Number(
       $("manual-received").value
     );
 
     const notes = $("manual-notes").value.trim();
+    const message = $("manual-booking-message");
+
+    message.textContent = "";
+
+    if (!bookingsLoaded) {
+      message.textContent = t("refreshNeeded");
+      return;
+    }
 
     if (
-      !checkIn ||
-      !checkOut ||
-      checkIn >= checkOut
+      !guest ||
+      !parseDate(checkIn) ||
+      !parseDate(checkOut) ||
+      checkOut <= checkIn
     ) {
       message.textContent = t("invalidDates");
       return;
     }
 
     if (
-      !guest ||
       !Number.isFinite(total) ||
       !Number.isFinite(commission) ||
       !Number.isFinite(received) ||
       total < 0 ||
       commission < 0 ||
       received < 0 ||
+      cents(commission) > cents(total) ||
       cents(received) > cents(total)
     ) {
-      message.textContent = t("invalidMoney");
+      message.textContent = t("invalidAmounts");
       return;
     }
 
-    if (cents(commission) > cents(total)) {
-      message.textContent = t("invalidCommission");
-      return;
-    }
-
-    const conflict = bookings.some(booking =>
-      activeBooking(booking) &&
-      overlaps(
-        checkIn,
-        checkOut,
-        booking.check_in,
-        booking.check_out
-      )
+    const conflict = activeBookings().some(
+      (booking) =>
+        overlaps(
+          checkIn,
+          checkOut,
+          booking.check_in,
+          booking.check_out
+        )
     );
 
     if (conflict) {
-      message.textContent = t("overlap");
+      message.textContent = t("bookingConflict");
       return;
     }
 
-    if (
-      code &&
-      bookings.some(booking =>
-        booking.platform === platform &&
-        String(
-          booking.confirmation_code || ""
-        ) === code
-      )
-    ) {
-      message.textContent = t("duplicate");
-      return;
+    if (code) {
+      const duplicate = bookings.some(
+        (booking) =>
+          String(booking.platform || "")
+            .toLowerCase() === platform.toLowerCase() &&
+          String(booking.confirmation_code || "")
+            .toLowerCase() === code.toLowerCase()
+      );
+
+      if (duplicate) {
+        message.textContent = t("duplicateCode");
+        return;
+      }
     }
 
-    const totalCents = cents(total);
-    const commissionCents = cents(commission);
-    const receivedCents = cents(received);
-
-    const financialStatus =
-      receivedCents === totalCents
-        ? "paid"
-        : receivedCents === 0
-          ? "unpaid"
-          : "partially_paid";
-
-    const newBooking = {
+    const booking = {
       guest_name: guest,
       platform,
       confirmation_code: code || null,
@@ -1228,175 +2001,169 @@ addBookingForm.addEventListener(
       check_out: checkOut,
       status: "confirmed",
 
-      original_price: totalCents / 100,
+      original_price: total,
       discount_amount: 0,
-      accommodation_total: totalCents / 100,
-      guest_total: totalCents / 100,
+      accommodation_total: total,
+      guest_total: total,
 
-      original_guest_payment:
-        receivedCents / 100,
-
-      platform_commission:
-        commissionCents / 100,
-
+      original_guest_payment: received,
+      platform_commission: commission,
       occupancy_tax: 0,
       other_fees: 0,
 
       amount:
-        (totalCents - commissionCents) / 100,
+        (cents(total) - cents(commission)) / 100,
 
-      financial_status: financialStatus,
+      financial_status:
+        cents(received) >= cents(total)
+          ? "paid"
+          : cents(received) === 0
+            ? "unpaid"
+            : "partially_paid",
+
       notes: notes || null
     };
 
     savingManualBooking = true;
 
-    $("save-manual-booking").disabled = true;
-    $("save-manual-booking").textContent =
-      t("saving");
+    const saveButton = $("save-manual-booking");
+    saveButton.disabled = true;
+    saveButton.textContent = t("saving");
 
     try {
-      const {
-        data: authData,
-        error: authError
-      } = await supabaseClient.auth.getUser();
+      const { data: authData, error: authError } =
+        await supabaseClient.auth.getUser();
 
       if (authError || !authData.user) {
-        throw new Error(t("signInRequired"));
+        throw new Error(t("sessionExpired"));
       }
 
       const { error } = await supabaseClient
         .from("Bookings")
-        .insert(newBooking);
+        .insert(booking);
 
       if (error) throw error;
 
-      addBookingDialog.close();
+      $("add-booking-dialog").close();
 
       await loadBookings();
 
-      dashboardMessage.textContent =
-        t("bookingSaved");
-
+      if (bookingsLoaded) {
+        showMessage(t("bookingSaved"));
+        switchTab("bookings");
+      }
     } catch (error) {
-      console.error(
-        "Manual booking error:",
-        error
-      );
-
       message.textContent =
-        error.message || t("bookingError");
-
+        t("saveError") + error.message;
     } finally {
       savingManualBooking = false;
-
-      $("save-manual-booking").disabled = false;
-      $("save-manual-booking").textContent =
-        t("saveBooking");
+      saveButton.disabled = false;
+      saveButton.textContent = t("saveBooking");
     }
   }
 );
 
-/* ==========================================
+/* =====================================================
    RECORD ADDITIONAL PAYMENT
-   ========================================== */
+   ===================================================== */
 
-function updatePaymentDialog() {
-  if (!selectedPaymentBooking) return;
+function openPaymentDialog(booking) {
+  const balance = outstandingBalance(booking);
+
+  if (balance === null || balance <= 0) {
+    showMessage(t("missingPayment"), true);
+    return;
+  }
+
+  selectedPaymentBooking = booking;
 
   setText(
     "payment-guest",
-    selectedPaymentBooking.guest_name ||
-      t("guestFallback")
-  );
-
-  const remaining = outstandingBalance(
-    selectedPaymentBooking
+    booking.guest_name || "—"
   );
 
   setText(
     "payment-balance",
-    t("balance") + ": " + money(remaining)
+    money(balance)
   );
 
-  $("new-payment-amount").max =
-    remaining === null
-      ? ""
-      : String(remaining);
+  setText("payment-message", "");
+
+  $("record-payment-form").reset();
+  $("new-payment-amount").max = balance.toFixed(2);
+
+  $("record-payment-dialog").showModal();
 }
 
-$("close-payment-dialog").addEventListener(
+$("close-payment-dialog")?.addEventListener(
   "click",
-  () => {
-    paymentDialog.close();
-  }
+  () => $("record-payment-dialog").close()
 );
 
-$("record-payment-form").addEventListener(
+$("record-payment-form")?.addEventListener(
   "submit",
-  async event => {
+  async (event) => {
     event.preventDefault();
 
-    if (
-      savingPayment ||
-      !selectedPaymentBooking
-    ) {
+    if (savingPayment || !selectedPaymentBooking) {
       return;
     }
 
-    const message = $("payment-message");
-    message.textContent = "";
-
     const booking = selectedPaymentBooking;
-    const remaining = outstandingBalance(booking);
+    const balance = outstandingBalance(booking);
 
     const payment = Number(
       $("new-payment-amount").value
     );
 
+    const message = $("payment-message");
+    message.textContent = "";
+
     if (
-      remaining === null ||
+      balance === null ||
       !Number.isFinite(payment) ||
-      cents(payment) <= 0 ||
-      cents(payment) > cents(remaining)
+      cents(payment) <= 0
     ) {
-      message.textContent =
-        t("paymentTooHigh");
+      message.textContent = t("invalidAmounts");
       return;
     }
 
+    if (cents(payment) > cents(balance)) {
+      message.textContent = t("paymentTooLarge");
+      return;
+    }
+
+    const previous = amountReceived(booking);
+    const total = safeNumber(booking.guest_total);
+
+    if (previous === null || total === null) {
+      message.textContent = t("missingPayment");
+      return;
+    }
+
+    const newReceived =
+      (cents(previous) + cents(payment)) / 100;
+
     savingPayment = true;
 
-    $("save-payment").disabled = true;
-    $("save-payment").textContent =
-      t("saving");
+    const saveButton = $("save-payment");
+    saveButton.disabled = true;
+    saveButton.textContent = t("saving");
 
     try {
-      const {
-        data: authData,
-        error: authError
-      } = await supabaseClient.auth.getUser();
+      const { data: authData, error: authError } =
+        await supabaseClient.auth.getUser();
 
       if (authError || !authData.user) {
-        throw new Error(t("signInRequired"));
+        throw new Error(t("sessionExpired"));
       }
-
-      const previous = amountReceived(booking);
-
-      const newReceivedCents =
-        cents(previous) + cents(payment);
-
-      const totalCents =
-        cents(booking.guest_total);
 
       const { data, error } = await supabaseClient
         .from("Bookings")
         .update({
-          original_guest_payment:
-            newReceivedCents / 100,
-
+          original_guest_payment: newReceived,
           financial_status:
-            newReceivedCents >= totalCents
+            cents(newReceived) >= cents(total)
               ? "paid"
               : "partially_paid"
         })
@@ -1407,75 +2174,486 @@ $("record-payment-form").addEventListener(
       if (error) throw error;
 
       if (!data || data.length !== 1) {
-        throw new Error(t("paymentChanged"));
+        throw new Error(t("stalePayment"));
       }
 
-      paymentDialog.close();
       selectedPaymentBooking = null;
+      $("record-payment-dialog").close();
 
       await loadBookings();
 
-      dashboardMessage.textContent =
-        t("paymentSaved");
-
+      if (bookingsLoaded) {
+        showMessage(t("paymentSaved"));
+        switchTab("finances");
+      }
     } catch (error) {
-      console.error(
-        "Payment update error:",
-        error
-      );
-
       message.textContent =
-        error.message || t("paymentError");
-
+        t("saveError") + error.message;
     } finally {
       savingPayment = false;
-
-      $("save-payment").disabled = false;
-      $("save-payment").textContent =
-        t("savePayment");
+      saveButton.disabled = false;
+      saveButton.textContent = t("savePayment");
     }
   }
 );
 
-/* ==========================================
+/* =====================================================
+   EXPENSES — RESERVED FOR NEXT DEVELOPMENT STEP
+   ===================================================== */
+
+// Expense saving is intentionally disabled until
+// the Supabase Expenses table and security policies
+// are created.
+//
+// Do not store expense records only in localStorage:
+// family members need shared, reliable data.
+
+if ($("open-add-expense")) {
+  $("open-add-expense").disabled = true;
+}
+
+$("close-expense-dialog")?.addEventListener(
+  "click",
+  () => $("add-expense-dialog").close()
+);
+
+/* =====================================================
+   LANGUAGE SWITCHING
+   ===================================================== */
+
+function setLabelForInput(inputId, labelText) {
+  const input = $(inputId);
+  if (!input) return;
+
+  const label = input.closest("label");
+
+  if (!label) return;
+
+  // Preserve the input itself while updating label text.
+  [...label.childNodes].forEach((node) => {
+    if (node.nodeType === Node.TEXT_NODE) {
+      node.textContent = "";
+    }
+  });
+
+  label.insertBefore(
+    document.createTextNode(labelText + " "),
+    label.firstChild
+  );
+}
+
+function translateSectionHeader(section, title, desc) {
+  if (!section) return;
+
+  const header = section.querySelector(
+    ":scope > .section-header"
+  );
+
+  if (!header) return;
+
+  const heading = header.querySelector("h2");
+  const paragraph = header.querySelector("p");
+
+  if (heading) heading.textContent = t(title);
+  if (paragraph) paragraph.textContent = t(desc);
+}
+
+function translatePanel(panelId, title, desc) {
+  const panel = $(panelId);
+  if (!panel) return;
+
+  const header = panel.querySelector(
+    ":scope > .section-header"
+  );
+
+  if (!header) return;
+
+  const heading = header.querySelector("h2");
+  const paragraph = header.querySelector("p");
+
+  if (heading) heading.textContent = t(title);
+  if (paragraph) paragraph.textContent = t(desc);
+}
+
+function translateTableHeadings(tbodyId, keys) {
+  const tbody = $(tbodyId);
+  if (!tbody) return;
+
+  const table = tbody.closest("table");
+  if (!table) return;
+
+  const headings = table.querySelectorAll("thead th");
+
+  keys.forEach((key, index) => {
+    if (headings[index]) {
+      headings[index].textContent = t(key);
+    }
+  });
+}
+
+function setLanguage(language) {
+  currentLanguage = language === "ar" ? "ar" : "en";
+
+  localStorage.setItem(
+    "osAdminLanguage",
+    currentLanguage
+  );
+
+  document.documentElement.lang = currentLanguage;
+  document.documentElement.dir =
+    currentLanguage === "ar" ? "rtl" : "ltr";
+
+  setText("language-toggle", t("language"));
+
+  const loginTitle = document.querySelector(
+    ".login-card h1"
+  );
+
+  const loginSubtitle = document.querySelector(
+    ".login-card > p"
+  );
+
+  if (loginTitle) loginTitle.textContent = "OS Apartments";
+  if (loginSubtitle) {
+    loginSubtitle.textContent = t("management");
+  }
+
+  const brandSubtitle = document.querySelector(
+    ".brand p"
+  );
+
+  if (brandSubtitle) {
+    brandSubtitle.textContent = t("management");
+  }
+
+  setLabelForInput("email", t("email"));
+  setLabelForInput("password", t("password"));
+
+  const loginButton = document.querySelector(
+    '#login-form button[type="submit"]'
+  );
+
+  if (loginButton) loginButton.textContent = t("login");
+
+  setButtonText("logout-btn", t("logout"));
+  setButtonText("open-add-booking", t("addBooking"));
+  setButtonText("quick-add-booking", t("addBooking"));
+  setButtonText("quick-view-bookings", t("viewBookings"));
+  setButtonText("quick-view-finances", t("viewFinances"));
+  setButtonText("refresh-bookings-btn", t("refresh"));
+
+  const tabKeys = {
+    overview: "overview",
+    bookings: "bookingsTab",
+    finances: "finances",
+    reports: "reports"
+  };
+
+  document.querySelectorAll(".tab-btn").forEach(
+    (button) => {
+      button.textContent = t(
+        tabKeys[button.dataset.tab]
+      );
+    }
+  );
+
+  translateSectionHeader(
+    $("tab-overview"),
+    "overview",
+    "overviewDesc"
+  );
+
+  translateSectionHeader(
+    $("tab-bookings"),
+    "bookingsTab",
+    "bookingsDesc"
+  );
+
+  translateSectionHeader(
+    $("tab-finances"),
+    "finances",
+    "financesDesc"
+  );
+
+  translateSectionHeader(
+    $("tab-reports"),
+    "reports",
+    "reportsDesc"
+  );
+
+  const overviewCards = document.querySelectorAll(
+    "#tab-overview .stats-grid .stat-card"
+  );
+
+  [
+    "totalBookings",
+    "upcomingBookings",
+    "guestTotals",
+    "hostEarnings"
+  ].forEach((key, index) => {
+    const span = overviewCards[index]?.querySelector(
+      "span"
+    );
+
+    if (span) span.textContent = t(key);
+  });
+
+  const earningsHint = $("earnings-card")?.querySelector(
+    "small"
+  );
+
+  if (earningsHint) {
+    earningsHint.textContent = t("viewDetails");
+  }
+
+  translatePanel(
+    "today-panel",
+    "today",
+    "todayDesc"
+  );
+
+  translatePanel(
+    "quick-actions-panel",
+    "quickActions",
+    "quickDesc"
+  );
+
+  const todayLabels = document.querySelectorAll(
+    ".today-card span"
+  );
+
+  ["arriving", "departing", "staying"].forEach(
+    (key, index) => {
+      if (todayLabels[index]) {
+        todayLabels[index].textContent = t(key);
+      }
+    }
+  );
+
+  const bookingPanels = document.querySelectorAll(
+    "#tab-bookings > .panel"
+  );
+
+  [
+    ["calendar", "calendarDesc"],
+    ["allBookings", "allBookingsDesc"]
+  ].forEach(([title, desc], index) => {
+    const header = bookingPanels[index]?.querySelector(
+      ".section-header"
+    );
+
+    if (!header) return;
+
+    const h2 = header.querySelector("h2");
+    const p = header.querySelector("p");
+
+    if (h2) h2.textContent = t(title);
+    if (p) p.textContent = t(desc);
+  });
+
+  const legend = document.querySelectorAll(
+    ".calendar-legend span"
+  );
+
+  if (legend[0]) {
+    legend[0].textContent = t("confirmed");
+  }
+
+  if (legend[1]) {
+    legend[1].textContent = t("available");
+  }
+
+  const weekdays = document.querySelectorAll(
+    ".calendar-weekdays span"
+  );
+
+  [
+    "sun", "mon", "tue", "wed",
+    "thu", "fri", "sat"
+  ].forEach((key, index) => {
+    if (weekdays[index]) {
+      weekdays[index].textContent = t(key);
+    }
+  });
+
+  translateTableHeadings(
+    "bookings-table-body",
+    [
+      "guest",
+      "platform",
+      "checkIn",
+      "checkOut",
+      "status",
+      "earnings",
+      "details"
+    ]
+  );
+
+  const financeCards = document.querySelectorAll(
+    "#tab-finances > .finance-grid .stat-card"
+  );
+
+  [
+    "estimatedEarnings",
+    "paymentsReceived",
+    "paymentsRemaining",
+    "recordedExpenses"
+  ].forEach((key, index) => {
+    const span = financeCards[index]?.querySelector(
+      "span"
+    );
+
+    if (span) span.textContent = t(key);
+  });
+
+  setText("remaining-title", t("remainingTitle"));
+  setText("remaining-description", t("remainingDesc"));
+
+  [
+    ["remaining-guest-heading", "guest"],
+    ["remaining-total-heading", "total"],
+    ["remaining-paid-heading", "received"],
+    ["remaining-due-heading", "remaining"],
+    ["remaining-action-heading", "action"]
+  ].forEach(([id, key]) => {
+    setText(id, t(key));
+  });
+
+  translatePanel(
+    "expenses-panel",
+    "expenses",
+    "expensesDesc"
+  );
+
+  setText("open-add-expense", t("addExpense"));
+  setText("expenses-message", t("expensesSetup"));
+
+  translateTableHeadings(
+    "expenses-table-body",
+    [
+      "dates",
+      "expenses",
+      "notes",
+      "total"
+    ]
+  );
+
+  const reportPanels = document.querySelectorAll(
+    "#tab-reports > .panel"
+  );
+
+  [
+    ["monthlyPerformance", "monthlyDesc"],
+    ["earningsChart", "earningsChartDesc"],
+    ["platformChart", "platformChartDesc"]
+  ].forEach(([title, desc], index) => {
+    const header = reportPanels[index]?.querySelector(
+      ".section-header"
+    );
+
+    if (!header) return;
+
+    const h2 = header.querySelector("h2");
+    const p = header.querySelector("p");
+
+    if (h2) h2.textContent = t(title);
+    if (p) p.textContent = t(desc);
+  });
+
+  const monthlyCards = document.querySelectorAll(
+    "#tab-reports .finance-grid .stat-card"
+  );
+
+  [
+    "monthlyEarnings",
+    "monthlyExpenses",
+    "estimatedProfit",
+    "occupancy"
+  ].forEach((key, index) => {
+    const span = monthlyCards[index]?.querySelector(
+      "span"
+    );
+
+    if (span) span.textContent = t(key);
+  });
+
+  const addBookingHeading = document.querySelector(
+    "#add-booking-dialog .dialog-header h2"
+  );
+
+  if (addBookingHeading) {
+    addBookingHeading.textContent = t("addBooking");
+  }
+
+  [
+    ["manual-guest", "guestName"],
+    ["manual-platform", "platform"],
+    ["manual-code", "confirmationCode"],
+    ["manual-check-in", "checkIn"],
+    ["manual-check-out", "checkOut"],
+    ["manual-total", "bookingAmount"],
+    ["manual-commission", "commission"],
+    ["manual-received", "amountReceived"],
+    ["manual-notes", "notes"],
+    ["new-payment-amount", "paymentAmount"]
+  ].forEach(([id, key]) => {
+    setLabelForInput(id, t(key));
+  });
+
+  setText("save-manual-booking", t("saveBooking"));
+  setText("save-payment", t("savePayment"));
+  setText("close-breakdown-bottom", t("close"));
+
+  const paymentHeading = document.querySelector(
+    "#record-payment-dialog .dialog-header h2"
+  );
+
+  if (paymentHeading) {
+    paymentHeading.textContent = t("recordPayment");
+  }
+
+  const earningsHeading = document.querySelector(
+    "#earnings-dialog .dialog-header h2"
+  );
+
+  if (earningsHeading) {
+    earningsHeading.textContent = t("hostEarnings");
+  }
+
+  renderEverything();
+}
+
+/* =====================================================
    AUTHENTICATION
-   ========================================== */
+   ===================================================== */
 
 function showDashboard() {
-  loginSection.hidden = true;
-  dashboardSection.hidden = false;
+  $("login-section").hidden = true;
+  $("dashboard-section").hidden = false;
 
+  switchTab(currentTab);
   loadBookings();
 }
 
 function showLogin() {
-  loginSection.hidden = false;
-  dashboardSection.hidden = true;
+  $("dashboard-section").hidden = true;
+  $("login-section").hidden = false;
 
   bookings = [];
   bookingsLoaded = false;
-
-  if (addBookingDialog.open) {
-    addBookingDialog.close();
-  }
-
-  if (paymentDialog.open) {
-    paymentDialog.close();
-  }
-
-  if (breakdownDialog.open) {
-    breakdownDialog.close();
-  }
+  selectedPaymentBooking = null;
 }
 
-loginForm.addEventListener(
+$("login-form")?.addEventListener(
   "submit",
-  async event => {
+  async (event) => {
     event.preventDefault();
-    loginError.textContent = "";
 
-    const email = $("email").value;
+    const email = $("email").value.trim();
     const password = $("password").value;
+    const errorElement = $("login-error");
+
+    errorElement.textContent = "";
 
     const { error } =
       await supabaseClient.auth.signInWithPassword({
@@ -1484,8 +2662,8 @@ loginForm.addEventListener(
       });
 
     if (error) {
-      loginError.textContent =
-        t("incorrectLogin");
+      errorElement.textContent =
+        t("loginError") + error.message;
       return;
     }
 
@@ -1493,23 +2671,22 @@ loginForm.addEventListener(
   }
 );
 
-$("logout-btn").addEventListener(
+$("logout-btn")?.addEventListener(
   "click",
   async () => {
-    await supabaseClient.auth.signOut();
+    const { error } =
+      await supabaseClient.auth.signOut();
+
+    if (error) {
+      showMessage(error.message, true);
+      return;
+    }
+
     showLogin();
   }
 );
 
 async function checkSession() {
-  if (
-    SUPABASE_KEY ===
-    "PASTE_YOUR_SUPABASE_PUBLISHABLE_KEY_HERE"
-  ) {
-    loginError.textContent = t("missingKey");
-    return;
-  }
-
   const { data, error } =
     await supabaseClient.auth.getUser();
 
@@ -1520,285 +2697,18 @@ async function checkSession() {
   }
 }
 
-/* ==========================================
-   LANGUAGE SWITCHER
-   ========================================== */
+/* =====================================================
+   REFRESH
+   ===================================================== */
 
-function setLanguage(lang) {
-  currentLanguage =
-    lang === "ar" ? "ar" : "en";
-
-  localStorage.setItem(
-    "osAdminLanguage",
-    currentLanguage
-  );
-
-  document.documentElement.lang =
-    currentLanguage;
-
-  document.documentElement.dir =
-    currentLanguage === "ar"
-      ? "rtl"
-      : "ltr";
-
-  setText("language-toggle", t("language"));
-
-  // LOGIN
-  setSelectorText(
-    ".login-card h1",
-    t("adminLogin")
-  );
-
-  setSelectorText(
-    ".login-card .admin-subtitle",
-    t("loginSubtitle")
-  );
-
-  setSelectorText(
-    'label[for="email"]',
-    t("email")
-  );
-
-  setSelectorText(
-    'label[for="password"]',
-    t("password")
-  );
-
-  setSelectorText(
-    '#login-form button[type="submit"]',
-    t("signIn")
-  );
-
-  // HEADER
-  setText("logout-btn", t("logout"));
-
-  setSelectorText(
-    ".admin-header h1",
-    t("dashboard")
-  );
-
-  setSelectorText(
-    ".admin-header .admin-subtitle",
-    t("subtitle")
-  );
-
-  setText("open-add-booking", t("addBooking"));
-
-  // STATISTICS
-  const statLabels =
-    document.querySelectorAll(".stat-card span");
-
-  [
-    t("totalBookings"),
-    t("upcomingBookings"),
-    t("guestPayments"),
-    t("hostPayouts")
-  ].forEach((label, i) => {
-    if (statLabels[i]) {
-      statLabels[i].textContent = label;
-    }
-  });
-
-  // SECTION HEADINGS
-  const headings =
-    document.querySelectorAll(
-      ".panel .section-header h2"
-    );
-
-  const descriptions =
-    document.querySelectorAll(
-      ".panel .section-header p"
-    );
-
-  [
-    t("calendar"),
-    t("availability"),
-    t("bookings"),
-    t("remaining")
-  ].forEach((value, i) => {
-    if (headings[i]) {
-      headings[i].textContent = value;
-    }
-  });
-
-  [
-    t("calendarDesc"),
-    t("availabilityDesc"),
-    t("bookingsDesc"),
-    t("remainingDesc")
-  ].forEach((value, i) => {
-    if (descriptions[i]) {
-      descriptions[i].textContent = value;
-    }
-  });
-
-  setText("refresh-bookings-btn", t("refresh"));
-
-  // AVAILABILITY
-  setSelectorText(
-    'label[for="check-in-date"]',
-    t("checkIn")
-  );
-
-  setSelectorText(
-    'label[for="check-out-date"]',
-    t("checkOut")
-  );
-
-  setSelectorText(
-    "#availability-form button",
-    t("checkDates")
-  );
-
-  setSelectorText(
-    ".fine-print",
-    t("availabilityNote")
-  );
-
-  // BOOKINGS TABLE
-  const tableHeaders =
-    document.querySelectorAll(
-      ".panel thead th"
-    );
-
-  [
-    t("guest"),
-    t("platform"),
-    t("checkIn"),
-    t("checkOut"),
-    t("status"),
-    t("payout"),
-    t("details"),
-    t("guest"),
-    t("totalShort"),
-    t("receivedShort"),
-    t("due"),
-    t("action")
-  ].forEach((value, i) => {
-    if (tableHeaders[i]) {
-      tableHeaders[i].textContent = value;
-    }
-  });
-
-  // BREAKDOWN
-  setSelectorText(
-    "#breakdown-dialog .dialog-header h2",
-    t("breakdown")
-  );
-
-  setText(
-    "close-breakdown-bottom",
-    t("close")
-  );
-
-  $("close-breakdown").setAttribute(
-    "aria-label",
-    t("close")
-  );
-
-  // MANUAL BOOKING
-  const formLabels = {
-    "add-booking-title": "addTitle",
-    "manual-guest-label": "guest",
-    "manual-platform-label": "source",
-    "manual-code-label": "code",
-    "manual-check-in-label": "checkIn",
-    "manual-check-out-label": "checkOut",
-    "manual-total-label": "total",
-    "manual-commission-label": "commission",
-    "manual-received-label": "received",
-    "manual-notes-label": "notes",
-    "save-manual-booking": "saveBooking",
-
-    "remaining-title": "remaining",
-    "remaining-description": "remainingDesc",
-    "remaining-guest-heading": "guest",
-    "remaining-total-heading": "totalShort",
-    "remaining-paid-heading": "receivedShort",
-    "remaining-due-heading": "due",
-    "remaining-action-heading": "action",
-
-    "record-payment-title": "record",
-    "new-payment-label": "additional",
-    "save-payment": "savePayment"
-  };
-
-  Object.entries(formLabels).forEach(
-    ([id, key]) => {
-      setText(id, t(key));
-    }
-  );
-
-  // CALENDAR LEGEND
-  const legend =
-    document.querySelectorAll(
-      ".calendar-legend span"
-    );
-
-  if (legend[0]) {
-    const dot = legend[0].querySelector("i");
-    legend[0].replaceChildren();
-
-    if (dot) legend[0].appendChild(dot);
-    legend[0].append(" " + t("booked"));
-  }
-
-  if (legend[1]) {
-    const dot = legend[1].querySelector("i");
-    legend[1].replaceChildren();
-
-    if (dot) legend[1].appendChild(dot);
-    legend[1].append(" " + t("available"));
-  }
-
-  // WEEKDAYS
-  const weekdays =
-    document.querySelectorAll(
-      ".calendar-weekdays span"
-    );
-
-  t("weekdays").forEach((day, i) => {
-    if (weekdays[i]) {
-      weekdays[i].textContent = day;
-    }
-  });
-
-  // REFRESH TRANSLATED DATA
-  const availabilityResult =
-    $("availability-result");
-
-  if (availabilityResult) {
-    availabilityResult.textContent = "";
-  }
-
-  if (bookingsLoaded) {
-    renderStatistics();
-    renderTable();
-    renderRemainingPayments();
-  }
-
-  if (paymentDialog.open) {
-    updatePaymentDialog();
-  }
-
-  updateManualBalancePreview();
-  renderCalendar();
-}
-
-$("language-toggle").addEventListener(
+$("refresh-bookings-btn")?.addEventListener(
   "click",
-  () => {
-    setLanguage(
-      currentLanguage === "en"
-        ? "ar"
-        : "en"
-    );
-  }
+  loadBookings
 );
 
-/* ==========================================
+/* =====================================================
    INITIALIZE
-   ========================================== */
+   ===================================================== */
 
 setLanguage(currentLanguage);
 checkSession();

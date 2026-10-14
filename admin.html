@@ -4,78 +4,83 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>OS Apartments Admin</title>
+
+  <title>OS Apartments | Admin Dashboard</title>
+
   <link rel="stylesheet" href="admin.css">
 </head>
+
 <body>
 
   <!-- LOGIN -->
   <section id="login-section" class="login-section">
     <div class="login-card">
-      <p class="admin-label">OS APARTMENTS</p>
-      <h1>Admin Login</h1>
-      <p class="admin-subtitle">
-        Sign in to manage your apartment.
-      </p>
+
+      <img
+        src="New-logo.png"
+        alt="OS Apartments"
+        class="login-logo"
+      >
+
+      <h1>OS Apartments</h1>
+      <p>Management Dashboard</p>
 
       <form id="login-form">
         <label for="email">Email</label>
         <input
-          id="email"
           type="email"
-          autocomplete="username"
+          id="email"
           required
+          autocomplete="username"
         >
 
         <label for="password">Password</label>
         <input
-          id="password"
           type="password"
-          autocomplete="current-password"
+          id="password"
           required
+          autocomplete="current-password"
         >
 
-        <button type="submit">Sign in</button>
-
-        <p
-          id="login-error"
-          class="error-message"
-          role="alert"
-        ></p>
+        <button type="submit">Sign In</button>
       </form>
+
+      <p id="login-error" role="alert"></p>
+
     </div>
   </section>
 
+
   <!-- DASHBOARD -->
-  <main
-    id="dashboard-section"
-    class="admin-container"
-    hidden
-  >
+  <main id="dashboard-section" hidden>
 
     <!-- HEADER -->
     <header class="admin-header">
-      <div>
-        <p class="admin-label">OS APARTMENTS</p>
 
-        <h1>Dashboard</h1>
+      <div class="brand">
+        <img
+          src="OS-Apartments-logo.jpeg"
+          alt="OS Apartments Logo"
+          class="admin-logo"
+        >
 
-        <p class="admin-subtitle">
-          Manage your bookings and apartment finances.
-        </p>
+        <div>
+          <h1>OS Apartments</h1>
+          <p>Management Dashboard</p>
+        </div>
       </div>
 
       <div class="header-actions">
         <button
           id="open-add-booking"
           type="button"
+          class="primary-btn"
         >
           + Add Booking
         </button>
 
         <button
           id="language-toggle"
-          class="outline-btn"
           type="button"
         >
           العربية
@@ -83,578 +88,753 @@
 
         <button
           id="logout-btn"
-          class="outline-btn"
           type="button"
         >
-          Log out
+          Logout
         </button>
       </div>
+
     </header>
 
-    <p
-      id="dashboard-message"
-      class="error-message"
-      role="status"
-    ></p>
 
-    <!-- SUMMARY CARDS -->
-    <section class="stats-grid">
+    <!-- TOP NAVIGATION -->
+    <nav class="dashboard-tabs" aria-label="Dashboard sections">
 
-      <div class="stat-card">
-        <span>Total bookings</span>
-        <strong id="total-bookings">—</strong>
-      </div>
-
-      <div class="stat-card">
-        <span>Upcoming bookings</span>
-        <strong id="upcoming-bookings">—</strong>
-      </div>
-
-      <div class="stat-card">
-        <span>Guest payments</span>
-        <strong id="guest-payments">—</strong>
-      </div>
-
-      <div class="stat-card featured">
-        <span>Host payouts</span>
-        <strong id="host-payouts">—</strong>
-      </div>
-
-    </section>
-
-    <!-- BOOKING CALENDAR -->
-    <section class="panel">
-
-      <div class="section-header">
-        <div>
-          <h2>Booking calendar</h2>
-          <p>Confirmed reservations from Supabase.</p>
-        </div>
-
-        <div class="calendar-controls">
-          <button
-            type="button"
-            id="prev-month"
-            class="outline-btn"
-            aria-label="Previous month"
-          >
-            ‹
-          </button>
-
-          <strong
-            id="calendar-month"
-            aria-live="polite"
-          ></strong>
-
-          <button
-            type="button"
-            id="next-month"
-            class="outline-btn"
-            aria-label="Next month"
-          >
-            ›
-          </button>
-        </div>
-      </div>
-
-      <div class="calendar-legend">
-        <span>
-          <i class="legend-dot booked"></i>
-          Booked
-        </span>
-
-        <span>
-          <i class="legend-dot available"></i>
-          No booking recorded
-        </span>
-      </div>
-
-      <div class="calendar-weekdays" aria-hidden="true">
-        <span>Sun</span>
-        <span>Mon</span>
-        <span>Tue</span>
-        <span>Wed</span>
-        <span>Thu</span>
-        <span>Fri</span>
-        <span>Sat</span>
-      </div>
-
-      <div
-        id="calendar-grid"
-        class="calendar-grid"
-        role="grid"
-        aria-label="Booking calendar"
-      ></div>
-
-    </section>
-
-    <!-- AVAILABILITY CHECKER -->
-    <section class="panel">
-
-      <div class="section-header">
-        <div>
-          <h2>Check availability</h2>
-          <p>
-            Check dates against recorded reservations.
-          </p>
-        </div>
-      </div>
-
-      <form
-        id="availability-form"
-        class="availability-form"
+      <button
+        type="button"
+        class="tab-btn active"
+        data-tab="overview"
+        aria-selected="true"
       >
+        Overview
+      </button>
 
+      <button
+        type="button"
+        class="tab-btn"
+        data-tab="bookings"
+        aria-selected="false"
+      >
+        Bookings & Calendar
+      </button>
+
+      <button
+        type="button"
+        class="tab-btn"
+        data-tab="finances"
+        aria-selected="false"
+      >
+        Finances
+      </button>
+
+      <button
+        type="button"
+        class="tab-btn"
+        data-tab="reports"
+        aria-selected="false"
+      >
+        Reports
+      </button>
+
+    </nav>
+
+    <p id="dashboard-message" role="status"></p>
+
+
+    <!-- OVERVIEW TAB -->
+    <section
+      id="tab-overview"
+      class="tab-content active"
+    >
+
+      <div class="section-header">
         <div>
-          <label for="check-in-date">
+          <h2>Overview</h2>
+          <p>Your apartment at a glance</p>
+        </div>
+      </div>
+
+      <!-- SUMMARY CARDS -->
+      <div class="stats-grid">
+
+        <div class="stat-card">
+          <span>Total Bookings</span>
+          <h3 id="total-bookings">—</h3>
+        </div>
+
+        <div class="stat-card">
+          <span>Upcoming Bookings</span>
+          <h3 id="upcoming-bookings">—</h3>
+        </div>
+
+        <div class="stat-card">
+          <span>Guest Booking Totals</span>
+          <h3 id="guest-payments">—</h3>
+        </div>
+
+        <div
+          class="stat-card clickable-card"
+          id="earnings-card"
+          role="button"
+          tabindex="0"
+          aria-label="View estimated host earnings details"
+        >
+          <span>Estimated Host Earnings</span>
+          <h3 id="host-payouts">—</h3>
+          <small>View details →</small>
+        </div>
+
+      </div>
+
+
+      <!-- TODAY'S OVERVIEW -->
+      <section class="panel" id="today-panel">
+
+        <div class="section-header">
+          <div>
+            <h2>Today's Overview</h2>
+            <p>Arrivals, departures and current guests</p>
+          </div>
+        </div>
+
+        <div class="today-grid">
+
+          <div class="today-card">
+            <span>Arriving Today</span>
+            <h3 id="today-arrivals">0</h3>
+          </div>
+
+          <div class="today-card">
+            <span>Departing Today</span>
+            <h3 id="today-departures">0</h3>
+          </div>
+
+          <div class="today-card">
+            <span>Currently Staying</span>
+            <h3 id="today-staying">0</h3>
+          </div>
+
+        </div>
+
+        <div id="today-guest-list"></div>
+
+      </section>
+
+
+      <!-- QUICK ACTIONS -->
+      <section class="panel" id="quick-actions-panel">
+
+        <div class="section-header">
+          <div>
+            <h2>Quick Actions</h2>
+            <p>Common tasks for your family</p>
+          </div>
+        </div>
+
+        <div class="quick-actions">
+          <button
+            type="button"
+            id="quick-add-booking"
+            class="primary-btn"
+          >
+            + Add Booking
+          </button>
+
+          <button
+            type="button"
+            id="quick-view-bookings"
+          >
+            View Bookings
+          </button>
+
+          <button
+            type="button"
+            id="quick-view-finances"
+          >
+            View Finances
+          </button>
+        </div>
+
+      </section>
+
+    </section>
+
+
+    <!-- BOOKINGS TAB -->
+    <section
+      id="tab-bookings"
+      class="tab-content"
+      hidden
+    >
+
+      <div class="section-header">
+        <div>
+          <h2>Bookings & Calendar</h2>
+          <p>Manage reservations and guest stays</p>
+        </div>
+      </div>
+
+
+      <!-- CALENDAR -->
+      <section class="panel">
+
+        <div class="section-header">
+          <div>
+            <h2>Booking Calendar</h2>
+            <p>See who is staying each day</p>
+          </div>
+
+          <div class="calendar-controls">
+            <button id="prev-month" type="button" aria-label="Previous month">
+              ‹
+            </button>
+
+            <h3 id="calendar-month"></h3>
+
+            <button id="next-month" type="button" aria-label="Next month">
+              ›
+            </button>
+          </div>
+        </div>
+
+        <div class="calendar-legend">
+          <span class="legend-booked">Confirmed</span>
+          <span class="legend-available">Available</span>
+        </div>
+
+        <div class="calendar-weekdays">
+          <span>Sun</span>
+          <span>Mon</span>
+          <span>Tue</span>
+          <span>Wed</span>
+          <span>Thu</span>
+          <span>Fri</span>
+          <span>Sat</span>
+        </div>
+
+        <div id="calendar-grid" class="calendar-grid"></div>
+
+      </section>
+
+
+      <!-- BOOKINGS TABLE -->
+      <section class="panel">
+
+        <div class="section-header">
+          <div>
+            <h2>All Bookings</h2>
+            <p>View reservations and payment details</p>
+          </div>
+
+          <button
+            type="button"
+            id="refresh-bookings-btn"
+          >
+            Refresh
+          </button>
+        </div>
+
+        <div class="table-wrapper">
+          <table class="bookings-table">
+
+            <thead>
+              <tr>
+                <th>Guest</th>
+                <th>Platform</th>
+                <th>Check-in</th>
+                <th>Check-out</th>
+                <th>Status</th>
+                <th>Host Earnings</th>
+                <th>Details</th>
+              </tr>
+            </thead>
+
+            <tbody id="bookings-table-body"></tbody>
+
+          </table>
+        </div>
+
+      </section>
+
+    </section>
+
+
+    <!-- FINANCES TAB -->
+    <section
+      id="tab-finances"
+      class="tab-content"
+      hidden
+    >
+
+      <div class="section-header">
+        <div>
+          <h2>Finances</h2>
+          <p>Track payments and apartment expenses</p>
+        </div>
+      </div>
+
+
+      <!-- FINANCIAL SUMMARY -->
+      <div class="finance-grid">
+
+        <div class="stat-card">
+          <span>Estimated Earnings</span>
+          <h3 id="finance-earnings">—</h3>
+        </div>
+
+        <div class="stat-card">
+          <span>Payments Received</span>
+          <h3 id="finance-received">—</h3>
+        </div>
+
+        <div class="stat-card">
+          <span>Payments Remaining</span>
+          <h3 id="finance-remaining">—</h3>
+        </div>
+
+        <div class="stat-card">
+          <span>Recorded Expenses</span>
+          <h3 id="finance-expenses">—</h3>
+        </div>
+
+      </div>
+
+
+      <!-- REMAINING PAYMENTS -->
+      <section class="panel" id="remaining-payments-panel">
+
+        <div class="section-header">
+          <div>
+            <h2 id="remaining-title">Remaining Payments</h2>
+            <p id="remaining-description">
+              Guest balances that still need to be collected
+            </p>
+          </div>
+
+          <strong id="remaining-total">—</strong>
+        </div>
+
+        <div class="table-wrapper">
+          <table>
+            <thead>
+              <tr>
+                <th id="remaining-guest-heading">Guest</th>
+                <th id="remaining-total-heading">Total</th>
+                <th id="remaining-paid-heading">Received</th>
+                <th id="remaining-due-heading">Remaining</th>
+                <th id="remaining-action-heading">Action</th>
+              </tr>
+            </thead>
+
+            <tbody id="remaining-payments-body"></tbody>
+          </table>
+        </div>
+
+      </section>
+
+
+      <!-- EXPENSES -->
+      <section class="panel" id="expenses-panel">
+
+        <div class="section-header">
+          <div>
+            <h2>Apartment Expenses</h2>
+            <p>Cleaning, maintenance, utilities and supplies</p>
+          </div>
+
+          <button
+            type="button"
+            id="open-add-expense"
+            class="primary-btn"
+            disabled
+            title="Available after the expenses database is configured"
+          >
+            + Add Expense
+          </button>
+        </div>
+
+        <p id="expenses-message">
+          Expense tracking will be available after setup.
+        </p>
+
+        <div class="table-wrapper">
+          <table>
+            <thead>
+              <tr>
+                <th>Date</th>
+                <th>Category</th>
+                <th>Description</th>
+                <th>Amount</th>
+              </tr>
+            </thead>
+
+            <tbody id="expenses-table-body"></tbody>
+          </table>
+        </div>
+
+      </section>
+
+    </section>
+
+
+    <!-- REPORTS TAB -->
+    <section
+      id="tab-reports"
+      class="tab-content"
+      hidden
+    >
+
+      <div class="section-header">
+        <div>
+          <h2>Reports & Analytics</h2>
+          <p>Understand how your apartment is performing</p>
+        </div>
+      </div>
+
+
+      <!-- MONTHLY SUMMARY -->
+      <section class="panel">
+
+        <div class="section-header">
+          <div>
+            <h2>Monthly Performance</h2>
+            <p>Estimated earnings, expenses and profit</p>
+          </div>
+
+          <select id="report-month" aria-label="Select report month">
+            <option value="">Select month</option>
+          </select>
+        </div>
+
+        <div class="finance-grid">
+
+          <div class="stat-card">
+            <span>Monthly Earnings</span>
+            <h3 id="monthly-earnings">—</h3>
+          </div>
+
+          <div class="stat-card">
+            <span>Monthly Expenses</span>
+            <h3 id="monthly-expenses">—</h3>
+          </div>
+
+          <div class="stat-card">
+            <span>Estimated Profit</span>
+            <h3 id="monthly-profit">—</h3>
+          </div>
+
+          <div class="stat-card">
+            <span>Occupancy Rate</span>
+            <h3 id="monthly-occupancy">—</h3>
+          </div>
+
+        </div>
+
+      </section>
+
+
+      <!-- CHARTS -->
+      <section class="panel">
+        <div class="section-header">
+          <div>
+            <h2>Earnings by Month</h2>
+            <p>Compare your apartment's monthly performance</p>
+          </div>
+        </div>
+
+        <div id="monthly-earnings-chart" class="chart-container">
+          <p>Charts will appear after analytics setup.</p>
+        </div>
+      </section>
+
+
+      <section class="panel">
+        <div class="section-header">
+          <div>
+            <h2>Bookings by Platform</h2>
+            <p>See where your reservations come from</p>
+          </div>
+        </div>
+
+        <div id="platform-chart" class="chart-container">
+          <p>Platform analytics will appear after setup.</p>
+        </div>
+      </section>
+
+    </section>
+
+
+    <!-- ADD BOOKING DIALOG -->
+    <dialog id="add-booking-dialog" class="admin-dialog">
+
+      <div class="dialog-header">
+        <h2>Add Booking</h2>
+
+        <button
+          type="button"
+          id="close-add-booking"
+          aria-label="Close"
+        >
+          ×
+        </button>
+      </div>
+
+      <form id="add-booking-form">
+
+        <div class="form-grid">
+
+          <label>
+            Guest Name
+            <input id="manual-guest" type="text" required>
+          </label>
+
+          <label>
+            Platform
+            <select id="manual-platform" required>
+              <option value="Direct">Direct</option>
+              <option value="Booking.com">Booking.com</option>
+              <option value="Airbnb">Airbnb</option>
+              <option value="Gathern">Gathern</option>
+            </select>
+          </label>
+
+          <label>
+            Confirmation Code
+            <input id="manual-code" type="text">
+          </label>
+
+          <label>
             Check-in
+            <input id="manual-check-in" type="date" required>
           </label>
 
-          <input
-            type="date"
-            id="check-in-date"
-            required
-          >
-        </div>
-
-        <div>
-          <label for="check-out-date">
+          <label>
             Check-out
+            <input id="manual-check-out" type="date" required>
           </label>
 
-          <input
-            type="date"
-            id="check-out-date"
-            required
-          >
+          <label>
+            Total Booking Amount (SAR)
+            <input
+              id="manual-total"
+              type="number"
+              min="0"
+              step="0.01"
+              required
+            >
+          </label>
+
+          <label>
+            Platform Commission (SAR)
+            <input
+              id="manual-commission"
+              type="number"
+              min="0"
+              step="0.01"
+              value="0"
+              required
+            >
+          </label>
+
+          <label>
+            Amount Received (SAR)
+            <input
+              id="manual-received"
+              type="number"
+              min="0"
+              step="0.01"
+              value="0"
+              required
+            >
+          </label>
+
         </div>
 
-        <button type="submit">
-          Check dates
+        <label>
+          Notes
+          <textarea id="manual-notes" rows="3"></textarea>
+        </label>
+
+        <p id="manual-balance-preview"></p>
+        <p id="manual-booking-message" role="status"></p>
+
+        <button
+          type="submit"
+          id="save-manual-booking"
+          class="primary-btn"
+        >
+          Save Booking
         </button>
 
       </form>
 
-      <p
-        id="availability-result"
-        class="availability-result"
-        role="status"
-      ></p>
+    </dialog>
 
-      <p class="fine-print">
-        Check other booking platforms before confirming availability.
-      </p>
 
-    </section>
+    <!-- RECORD PAYMENT DIALOG -->
+    <dialog id="record-payment-dialog" class="admin-dialog">
 
-    <!-- BOOKINGS TABLE -->
-    <section class="panel">
-
-      <div class="section-header">
-        <div>
-          <h2>Bookings</h2>
-          <p>
-            Click View breakdown to see financial details.
-          </p>
-        </div>
+      <div class="dialog-header">
+        <h2>Record Payment</h2>
 
         <button
-          id="refresh-bookings-btn"
           type="button"
+          id="close-payment-dialog"
+          aria-label="Close"
         >
-          ↻ Refresh bookings
+          ×
         </button>
       </div>
 
-      <div class="table-wrapper">
-        <table>
+      <h3 id="payment-guest"></h3>
 
-          <thead>
-            <tr>
-              <th>Guest</th>
-              <th>Platform</th>
-              <th>Check-in</th>
-              <th>Check-out</th>
-              <th>Status</th>
-              <th>Host payout</th>
-              <th>Details</th>
-            </tr>
-          </thead>
+      <p>
+        Remaining Balance:
+        <strong id="payment-balance">—</strong>
+      </p>
 
-          <tbody id="bookings-table-body">
-          </tbody>
+      <form id="record-payment-form">
 
-        </table>
-      </div>
+        <label>
+          Payment Amount (SAR)
+          <input
+            id="new-payment-amount"
+            type="number"
+            min="0.01"
+            step="0.01"
+            required
+          >
+        </label>
 
-    </section>
+        <p id="payment-message" role="status"></p>
 
-    <!-- REMAINING PAYMENTS -->
-    <section
-      id="remaining-payments-panel"
-      class="panel"
-    >
-
-      <div class="section-header">
-        <div>
-          <h2 id="remaining-title">
-            Remaining payments
-          </h2>
-
-          <p id="remaining-description">
-            Track unpaid balances and record payments.
-          </p>
-        </div>
-
-        <strong
-          id="remaining-total"
-          class="remaining-total"
+        <button
+          type="submit"
+          id="save-payment"
+          class="primary-btn"
         >
-          —
-        </strong>
+          Save Payment
+        </button>
+
+      </form>
+
+    </dialog>
+
+
+    <!-- BOOKING BREAKDOWN DIALOG -->
+    <dialog id="breakdown-dialog" class="admin-dialog">
+
+      <div class="dialog-header">
+        <h2 id="breakdown-guest">Booking Details</h2>
+
+        <button
+          type="button"
+          id="close-breakdown"
+          aria-label="Close"
+        >
+          ×
+        </button>
       </div>
 
-      <div class="table-wrapper">
-        <table>
-          <thead>
-            <tr>
-              <th id="remaining-guest-heading">
-                Guest
-              </th>
+      <div id="breakdown-content"></div>
 
-              <th id="remaining-total-heading">
-                Total
-              </th>
+      <button
+        type="button"
+        id="close-breakdown-bottom"
+      >
+        Close
+      </button>
 
-              <th id="remaining-paid-heading">
-                Received
-              </th>
+    </dialog>
 
-              <th id="remaining-due-heading">
-                Remaining
-              </th>
 
-              <th id="remaining-action-heading">
-                Action
-              </th>
-            </tr>
-          </thead>
+    <!-- EARNINGS DETAILS DIALOG -->
+    <dialog id="earnings-dialog" class="admin-dialog">
 
-          <tbody id="remaining-payments-body">
-          </tbody>
-        </table>
+      <div class="dialog-header">
+        <h2>Estimated Host Earnings</h2>
+
+        <button
+          type="button"
+          id="close-earnings-dialog"
+          aria-label="Close"
+        >
+          ×
+        </button>
       </div>
 
-    </section>
+      <div id="earnings-breakdown-content">
+        <p>Financial breakdown will appear here.</p>
+      </div>
+
+    </dialog>
+
+
+    <!-- ADD EXPENSE DIALOG -->
+    <dialog id="add-expense-dialog" class="admin-dialog">
+
+      <div class="dialog-header">
+        <h2>Add Expense</h2>
+
+        <button
+          type="button"
+          id="close-expense-dialog"
+          aria-label="Close"
+        >
+          ×
+        </button>
+      </div>
+
+      <form id="add-expense-form">
+
+        <label>
+          Date
+          <input id="expense-date" type="date" required>
+        </label>
+
+        <label>
+          Category
+          <select id="expense-category" required>
+            <option value="Cleaning">Cleaning</option>
+            <option value="Maintenance">Maintenance</option>
+            <option value="Utilities">Utilities</option>
+            <option value="Supplies">Supplies</option>
+            <option value="Other">Other</option>
+          </select>
+        </label>
+
+        <label>
+          Description
+          <input id="expense-description" type="text">
+        </label>
+
+        <label>
+          Amount (SAR)
+          <input
+            id="expense-amount"
+            type="number"
+            min="0.01"
+            step="0.01"
+            required
+          >
+        </label>
+
+        <p id="expense-message" role="status"></p>
+
+        <button
+          type="submit"
+          id="save-expense"
+          class="primary-btn"
+        >
+          Save Expense
+        </button>
+
+      </form>
+
+    </dialog>
 
   </main>
 
-  <!-- ADD BOOKING DIALOG -->
-  <dialog
-    id="add-booking-dialog"
-    class="breakdown-dialog"
-  >
-
-    <div class="dialog-header">
-      <div>
-        <p class="admin-label">
-          OS APARTMENTS
-        </p>
-
-        <h2 id="add-booking-title">
-          Add booking
-        </h2>
-      </div>
-
-      <button
-        id="close-add-booking"
-        class="outline-btn"
-        type="button"
-        aria-label="Close"
-      >
-        ✕
-      </button>
-    </div>
-
-    <form
-      id="add-booking-form"
-      class="booking-form"
-    >
-
-      <label
-        for="manual-guest"
-        id="manual-guest-label"
-      >
-        Guest name
-      </label>
-
-      <input
-        id="manual-guest"
-        type="text"
-        maxlength="150"
-        required
-      >
-
-      <label
-        for="manual-platform"
-        id="manual-platform-label"
-      >
-        Booking source
-      </label>
-
-      <select
-        id="manual-platform"
-        required
-      >
-        <option value="Direct">Direct</option>
-        <option value="Booking.com">Booking.com</option>
-        <option value="Airbnb">Airbnb</option>
-        <option value="Gathern">Gathern</option>
-      </select>
-
-      <label
-        for="manual-code"
-        id="manual-code-label"
-      >
-        Reservation number (optional)
-      </label>
-
-      <input
-        id="manual-code"
-        type="text"
-        maxlength="100"
-      >
-
-      <div class="booking-form-grid">
-
-        <div>
-          <label
-            for="manual-check-in"
-            id="manual-check-in-label"
-          >
-            Check-in
-          </label>
-
-          <input
-            id="manual-check-in"
-            type="date"
-            required
-          >
-        </div>
-
-        <div>
-          <label
-            for="manual-check-out"
-            id="manual-check-out-label"
-          >
-            Check-out
-          </label>
-
-          <input
-            id="manual-check-out"
-            type="date"
-            required
-          >
-        </div>
-
-      </div>
-
-      <label
-        for="manual-total"
-        id="manual-total-label"
-      >
-        Total booking price (SAR)
-      </label>
-
-      <input
-        id="manual-total"
-        type="number"
-        min="0"
-        step="0.01"
-        required
-      >
-
-      <label
-        for="manual-commission"
-        id="manual-commission-label"
-      >
-        Platform commission (SAR)
-      </label>
-
-      <input
-        id="manual-commission"
-        type="number"
-        min="0"
-        step="0.01"
-        value="0"
-        required
-      >
-
-      <label
-        for="manual-received"
-        id="manual-received-label"
-      >
-        Amount already received (SAR)
-      </label>
-
-      <input
-        id="manual-received"
-        type="number"
-        min="0"
-        step="0.01"
-        value="0"
-        required
-      >
-
-      <label
-        for="manual-notes"
-        id="manual-notes-label"
-      >
-        Notes (optional)
-      </label>
-
-      <textarea
-        id="manual-notes"
-        rows="3"
-        maxlength="1000"
-      ></textarea>
-
-      <p
-        id="manual-balance-preview"
-        class="balance-preview"
-        role="status"
-      ></p>
-
-      <p
-        id="manual-booking-message"
-        class="error-message"
-        role="alert"
-      ></p>
-
-      <button
-        id="save-manual-booking"
-        type="submit"
-      >
-        Save booking
-      </button>
-
-    </form>
-  </dialog>
-
-  <!-- RECORD PAYMENT DIALOG -->
-  <dialog
-    id="record-payment-dialog"
-    class="breakdown-dialog"
-  >
-
-    <div class="dialog-header">
-      <div>
-        <p class="admin-label">
-          OS APARTMENTS
-        </p>
-
-        <h2 id="record-payment-title">
-          Record payment
-        </h2>
-
-        <p
-          id="payment-guest"
-          class="admin-subtitle"
-        ></p>
-      </div>
-
-      <button
-        id="close-payment-dialog"
-        class="outline-btn"
-        type="button"
-        aria-label="Close"
-      >
-        ✕
-      </button>
-    </div>
-
-    <form
-      id="record-payment-form"
-      class="booking-form"
-    >
-
-      <p
-        id="payment-balance"
-        class="balance-preview"
-      ></p>
-
-      <label
-        for="new-payment-amount"
-        id="new-payment-label"
-      >
-        Additional payment received (SAR)
-      </label>
-
-      <input
-        id="new-payment-amount"
-        type="number"
-        min="0.01"
-        step="0.01"
-        required
-      >
-
-      <p
-        id="payment-message"
-        class="error-message"
-        role="alert"
-      ></p>
-
-      <button
-        id="save-payment"
-        type="submit"
-      >
-        Save payment
-      </button>
-
-    </form>
-  </dialog>
-
-  <!-- RESERVATION FINANCIAL BREAKDOWN -->
-  <dialog
-    id="breakdown-dialog"
-    class="breakdown-dialog"
-  >
-
-    <div class="dialog-header">
-      <div>
-        <p class="admin-label">
-          OS APARTMENTS
-        </p>
-
-        <h2>Reservation breakdown</h2>
-
-        <p
-          id="breakdown-guest"
-          class="admin-subtitle"
-        ></p>
-      </div>
-
-      <button
-        id="close-breakdown"
-        class="outline-btn"
-        type="button"
-        aria-label="Close breakdown"
-      >
-        ✕
-      </button>
-    </div>
-
-    <div id="breakdown-content"></div>
-
-    <button
-      id="close-breakdown-bottom"
-      type="button"
-      class="dialog-close"
-    >
-      Close
-    </button>
-
-  </dialog>
 
   <!-- SCRIPTS -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
