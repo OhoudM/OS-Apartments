@@ -1,4 +1,8 @@
 
+/* ==========================================
+   OS APARTMENTS — ADMIN DASHBOARD
+   ========================================== */
+
 :root {
   --bg: #e4ded3;
   --paper: #f7f4ee;
@@ -9,9 +13,13 @@
   --green: #436955;
 }
 
-* { box-sizing: border-box; }
+* {
+  box-sizing: border-box;
+}
 
-[hidden] { display: none !important; }
+[hidden] {
+  display: none !important;
+}
 
 body {
   margin: 0;
@@ -20,7 +28,12 @@ body {
   color: var(--ink);
 }
 
-button, input { font: inherit; }
+button,
+input,
+select,
+textarea {
+  font: inherit;
+}
 
 button {
   cursor: pointer;
@@ -29,11 +42,22 @@ button {
   padding: 12px 16px;
   background: var(--ink);
   color: white;
+  transition: opacity 0.2s ease;
 }
 
-button:hover { opacity: .9; }
+button:hover {
+  opacity: 0.9;
+}
 
-button:focus-visible, input:focus-visible {
+button:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+button:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible {
   outline: 3px solid var(--green);
   outline-offset: 2px;
 }
@@ -43,6 +67,10 @@ button:focus-visible, input:focus-visible {
   border: 1px solid #c3c9c1;
   color: var(--ink);
 }
+
+/* ==========================================
+   MAIN DASHBOARD
+   ========================================== */
 
 .admin-container {
   max-width: 1100px;
@@ -76,6 +104,21 @@ button:focus-visible, input:focus-visible {
   line-height: 1.5;
 }
 
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+#open-add-booking {
+  background: var(--green);
+  white-space: nowrap;
+}
+
+/* ==========================================
+   SUMMARY CARDS
+   ========================================== */
+
 .stats-grid {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
@@ -108,6 +151,10 @@ button:focus-visible, input:focus-visible {
   border-color: #cad9c8;
 }
 
+/* ==========================================
+   PANELS AND HEADINGS
+   ========================================== */
+
 .panel {
   background: var(--paper);
   border: 1px solid var(--line);
@@ -124,7 +171,9 @@ button:focus-visible, input:focus-visible {
   margin-bottom: 22px;
 }
 
-.section-header h2 { margin: 0; }
+.section-header h2 {
+  margin: 0;
+}
 
 .section-header p {
   margin: 6px 0 0;
@@ -156,6 +205,10 @@ button:focus-visible, input:focus-visible {
   line-height: 1.6;
   margin-bottom: 0;
 }
+
+/* ==========================================
+   BOOKING CALENDAR
+   ========================================== */
 
 .calendar-controls {
   display: flex;
@@ -189,8 +242,13 @@ button:focus-visible, input:focus-visible {
   border-radius: 3px;
 }
 
-.legend-dot.booked { background: #e8d0bf; }
-.legend-dot.available { background: #e5eee6; }
+.legend-dot.booked {
+  background: #e8d0bf;
+}
+
+.legend-dot.available {
+  background: #e5eee6;
+}
 
 .calendar-weekdays,
 .calendar-grid {
@@ -231,7 +289,9 @@ button:focus-visible, input:focus-visible {
   outline-offset: -2px;
 }
 
-.day-number { font-weight: bold; }
+.day-number {
+  font-weight: bold;
+}
 
 .day-note {
   display: block;
@@ -239,6 +299,10 @@ button:focus-visible, input:focus-visible {
   color: var(--muted);
   font-size: 11px;
 }
+
+/* ==========================================
+   AVAILABILITY CHECKER
+   ========================================== */
 
 .availability-form {
   display: grid;
@@ -269,17 +333,29 @@ button:focus-visible, input:focus-visible {
   font-weight: bold;
 }
 
-.availability-result.success { color: #326744; }
-.availability-result.warning { color: #9b502e; }
+.availability-result.success {
+  color: #326744;
+}
 
-.table-wrapper { overflow-x: auto; }
+.availability-result.warning {
+  color: #9b502e;
+}
+
+/* ==========================================
+   BOOKINGS TABLE
+   ========================================== */
+
+.table-wrapper {
+  overflow-x: auto;
+}
 
 table {
   width: 100%;
   border-collapse: collapse;
 }
 
-th, td {
+th,
+td {
   text-align: left;
   padding: 14px 10px;
   border-bottom: 1px solid var(--line);
@@ -291,11 +367,41 @@ th {
   font-weight: 600;
 }
 
-.details-btn {
+.details-btn,
+.breakdown-btn {
   white-space: nowrap;
   font-size: 12px;
   padding: 9px 12px;
 }
+
+/* ==========================================
+   REMAINING PAYMENTS — NEW
+   ========================================== */
+
+.remaining-total {
+  font-size: 22px;
+  color: var(--green);
+  overflow-wrap: anywhere;
+}
+
+#remaining-payments-panel {
+  border-color: #cad9c8;
+}
+
+#remaining-payments-body td {
+  vertical-align: middle;
+}
+
+.remaining-payment-btn {
+  white-space: nowrap;
+  padding: 9px 12px;
+  font-size: 12px;
+  background: var(--green);
+}
+
+/* ==========================================
+   LOGIN
+   ========================================== */
 
 .login-section {
   min-height: 100vh;
@@ -311,9 +417,13 @@ th {
   width: min(100%, 420px);
 }
 
-.login-card h1 { margin: 0; }
+.login-card h1 {
+  margin: 0;
+}
 
-.login-card form { margin-top: 25px; }
+.login-card form {
+  margin-top: 25px;
+}
 
 .login-card label {
   display: block;
@@ -322,15 +432,27 @@ th {
   margin-bottom: 8px;
 }
 
-.login-card input { margin-bottom: 17px; }
-.login-card button { width: 100%; }
+.login-card input {
+  margin-bottom: 17px;
+}
+
+.login-card button {
+  width: 100%;
+}
 
 .error-message {
   color: #a33e36;
   font-size: 13px;
+  line-height: 1.5;
 }
 
-.error-message:empty { display: none; }
+.error-message:empty {
+  display: none;
+}
+
+/* ==========================================
+   DIALOGS
+   ========================================== */
 
 .breakdown-dialog {
   width: min(94vw, 540px);
@@ -344,7 +466,7 @@ th {
 }
 
 .breakdown-dialog::backdrop {
-  background: rgba(20, 30, 24, .55);
+  background: rgba(20, 30, 24, 0.55);
 }
 
 .dialog-header {
@@ -355,7 +477,9 @@ th {
   margin-bottom: 24px;
 }
 
-.dialog-header h2 { margin: 0; }
+.dialog-header h2 {
+  margin: 0;
+}
 
 .breakdown-row {
   display: flex;
@@ -384,6 +508,110 @@ th {
   margin-top: 24px;
 }
 
+/* ==========================================
+   MANUAL BOOKING FORM — NEW
+   ========================================== */
+
+.booking-form {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.booking-form label {
+  display: block;
+  font-size: 13px;
+  font-weight: bold;
+  margin-top: 7px;
+}
+
+.booking-form input,
+.booking-form select,
+.booking-form textarea {
+  width: 100%;
+  min-width: 0;
+  padding: 12px;
+  border: 1px solid #cbd2c9;
+  border-radius: 10px;
+  background: white;
+  color: var(--ink);
+}
+
+.booking-form textarea {
+  resize: vertical;
+  min-height: 85px;
+  line-height: 1.5;
+}
+
+.booking-form-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 15px;
+}
+
+.booking-form-grid > div {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.booking-form > button[type="submit"] {
+  margin-top: 12px;
+  width: 100%;
+}
+
+.balance-preview {
+  padding: 14px;
+  background: #e5eee3;
+  border: 1px solid #cad9c8;
+  border-radius: 12px;
+  font-size: 14px;
+  font-weight: bold;
+  line-height: 1.6;
+  margin: 12px 0;
+}
+
+/* ==========================================
+   ARABIC / RTL SUPPORT
+   ========================================== */
+
+html[dir="rtl"] {
+  text-align: right;
+}
+
+html[dir="rtl"] .admin-container,
+html[dir="rtl"] .breakdown-dialog,
+html[dir="rtl"] .booking-form {
+  direction: rtl;
+}
+
+html[dir="rtl"] .breakdown-row {
+  direction: rtl;
+}
+
+html[dir="rtl"] th,
+html[dir="rtl"] td {
+  text-align: right;
+}
+
+html[dir="rtl"] .breakdown-row span:last-child {
+  text-align: left;
+}
+
+html[dir="rtl"] .booking-form input[type="number"],
+html[dir="rtl"] .booking-form input[type="date"] {
+  direction: ltr;
+  text-align: left;
+}
+
+html[dir="rtl"] .calendar-controls {
+  direction: ltr;
+}
+
+/* ==========================================
+   TABLET
+   ========================================== */
+
 @media (max-width: 800px) {
   .stats-grid,
   .finance-grid {
@@ -393,37 +621,56 @@ th {
   .availability-form {
     grid-template-columns: 1fr;
   }
+
+  .header-actions {
+    flex-wrap: wrap;
+  }
 }
 
-.header-actions {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
-
-html[dir="rtl"] {
-  text-align: right;
-}
-
-html[dir="rtl"] .admin-container {
-  direction: rtl;
-}
-
-html[dir="rtl"] .breakdown-row {
-  direction: rtl;
-}
+/* ==========================================
+   MOBILE
+   ========================================== */
 
 @media (max-width: 550px) {
-  .admin-container { padding: 25px 15px; }
+  .admin-container {
+    padding: 25px 15px;
+  }
 
-  .admin-header { align-items: flex-start; }
+  .admin-header {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 18px;
+  }
+
+  .admin-header h1 {
+    font-size: 29px;
+  }
+
+  .header-actions {
+    display: flex;
+    flex-wrap: wrap;
+    width: 100%;
+  }
+
+  .header-actions button {
+    flex: 1;
+    min-width: 0;
+    padding: 11px 9px;
+    font-size: 12px;
+  }
+
+  #open-add-booking {
+    flex-basis: 100%;
+  }
 
   .stats-grid,
   .finance-grid {
     grid-template-columns: 1fr;
   }
 
-  .panel { padding: 16px; }
+  .panel {
+    padding: 16px;
+  }
 
   .section-header {
     align-items: flex-start;
@@ -436,7 +683,9 @@ html[dir="rtl"] .breakdown-row {
   }
 
   .calendar-weekdays,
-  .calendar-grid { gap: 3px; }
+  .calendar-grid {
+    gap: 3px;
+  }
 
   .calendar-day {
     min-height: 55px;
@@ -444,7 +693,23 @@ html[dir="rtl"] .breakdown-row {
     font-size: 12px;
   }
 
-  .day-note { font-size: 9px; }
+  .day-note {
+    font-size: 9px;
+  }
 
-  .breakdown-dialog { padding: 20px; }
+  .breakdown-dialog {
+    padding: 20px;
+  }
+
+  .booking-form-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .remaining-total {
+    font-size: 19px;
+  }
+
+  .login-card {
+    padding: 28px 22px;
+  }
 }

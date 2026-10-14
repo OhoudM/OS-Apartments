@@ -66,13 +66,29 @@
       </div>
 
       <div class="header-actions">
-  <button id="language-toggle" class="outline-btn" type="button">
-    العربية
-  </button>
-  <button id="logout-btn" class="outline-btn" type="button">
-    Log out
-  </button>
-</div>
+        <button
+          id="open-add-booking"
+          type="button"
+        >
+          + Add Booking
+        </button>
+
+        <button
+          id="language-toggle"
+          class="outline-btn"
+          type="button"
+        >
+          العربية
+        </button>
+
+        <button
+          id="logout-btn"
+          class="outline-btn"
+          type="button"
+        >
+          Log out
+        </button>
+      </div>
     </header>
 
     <p
@@ -273,7 +289,330 @@
 
     </section>
 
+    <!-- REMAINING PAYMENTS -->
+    <section
+      id="remaining-payments-panel"
+      class="panel"
+    >
+
+      <div class="section-header">
+        <div>
+          <h2 id="remaining-title">
+            Remaining payments
+          </h2>
+
+          <p id="remaining-description">
+            Track unpaid balances and record payments.
+          </p>
+        </div>
+
+        <strong
+          id="remaining-total"
+          class="remaining-total"
+        >
+          —
+        </strong>
+      </div>
+
+      <div class="table-wrapper">
+        <table>
+          <thead>
+            <tr>
+              <th id="remaining-guest-heading">
+                Guest
+              </th>
+
+              <th id="remaining-total-heading">
+                Total
+              </th>
+
+              <th id="remaining-paid-heading">
+                Received
+              </th>
+
+              <th id="remaining-due-heading">
+                Remaining
+              </th>
+
+              <th id="remaining-action-heading">
+                Action
+              </th>
+            </tr>
+          </thead>
+
+          <tbody id="remaining-payments-body">
+          </tbody>
+        </table>
+      </div>
+
+    </section>
+
   </main>
+
+  <!-- ADD BOOKING DIALOG -->
+  <dialog
+    id="add-booking-dialog"
+    class="breakdown-dialog"
+  >
+
+    <div class="dialog-header">
+      <div>
+        <p class="admin-label">
+          OS APARTMENTS
+        </p>
+
+        <h2 id="add-booking-title">
+          Add booking
+        </h2>
+      </div>
+
+      <button
+        id="close-add-booking"
+        class="outline-btn"
+        type="button"
+        aria-label="Close"
+      >
+        ✕
+      </button>
+    </div>
+
+    <form
+      id="add-booking-form"
+      class="booking-form"
+    >
+
+      <label
+        for="manual-guest"
+        id="manual-guest-label"
+      >
+        Guest name
+      </label>
+
+      <input
+        id="manual-guest"
+        type="text"
+        maxlength="150"
+        required
+      >
+
+      <label
+        for="manual-platform"
+        id="manual-platform-label"
+      >
+        Booking source
+      </label>
+
+      <select
+        id="manual-platform"
+        required
+      >
+        <option value="Direct">Direct</option>
+        <option value="Booking.com">Booking.com</option>
+        <option value="Airbnb">Airbnb</option>
+        <option value="Gathern">Gathern</option>
+      </select>
+
+      <label
+        for="manual-code"
+        id="manual-code-label"
+      >
+        Reservation number (optional)
+      </label>
+
+      <input
+        id="manual-code"
+        type="text"
+        maxlength="100"
+      >
+
+      <div class="booking-form-grid">
+
+        <div>
+          <label
+            for="manual-check-in"
+            id="manual-check-in-label"
+          >
+            Check-in
+          </label>
+
+          <input
+            id="manual-check-in"
+            type="date"
+            required
+          >
+        </div>
+
+        <div>
+          <label
+            for="manual-check-out"
+            id="manual-check-out-label"
+          >
+            Check-out
+          </label>
+
+          <input
+            id="manual-check-out"
+            type="date"
+            required
+          >
+        </div>
+
+      </div>
+
+      <label
+        for="manual-total"
+        id="manual-total-label"
+      >
+        Total booking price (SAR)
+      </label>
+
+      <input
+        id="manual-total"
+        type="number"
+        min="0"
+        step="0.01"
+        required
+      >
+
+      <label
+        for="manual-commission"
+        id="manual-commission-label"
+      >
+        Platform commission (SAR)
+      </label>
+
+      <input
+        id="manual-commission"
+        type="number"
+        min="0"
+        step="0.01"
+        value="0"
+        required
+      >
+
+      <label
+        for="manual-received"
+        id="manual-received-label"
+      >
+        Amount already received (SAR)
+      </label>
+
+      <input
+        id="manual-received"
+        type="number"
+        min="0"
+        step="0.01"
+        value="0"
+        required
+      >
+
+      <label
+        for="manual-notes"
+        id="manual-notes-label"
+      >
+        Notes (optional)
+      </label>
+
+      <textarea
+        id="manual-notes"
+        rows="3"
+        maxlength="1000"
+      ></textarea>
+
+      <p
+        id="manual-balance-preview"
+        class="balance-preview"
+        role="status"
+      ></p>
+
+      <p
+        id="manual-booking-message"
+        class="error-message"
+        role="alert"
+      ></p>
+
+      <button
+        id="save-manual-booking"
+        type="submit"
+      >
+        Save booking
+      </button>
+
+    </form>
+  </dialog>
+
+  <!-- RECORD PAYMENT DIALOG -->
+  <dialog
+    id="record-payment-dialog"
+    class="breakdown-dialog"
+  >
+
+    <div class="dialog-header">
+      <div>
+        <p class="admin-label">
+          OS APARTMENTS
+        </p>
+
+        <h2 id="record-payment-title">
+          Record payment
+        </h2>
+
+        <p
+          id="payment-guest"
+          class="admin-subtitle"
+        ></p>
+      </div>
+
+      <button
+        id="close-payment-dialog"
+        class="outline-btn"
+        type="button"
+        aria-label="Close"
+      >
+        ✕
+      </button>
+    </div>
+
+    <form
+      id="record-payment-form"
+      class="booking-form"
+    >
+
+      <p
+        id="payment-balance"
+        class="balance-preview"
+      ></p>
+
+      <label
+        for="new-payment-amount"
+        id="new-payment-label"
+      >
+        Additional payment received (SAR)
+      </label>
+
+      <input
+        id="new-payment-amount"
+        type="number"
+        min="0.01"
+        step="0.01"
+        required
+      >
+
+      <p
+        id="payment-message"
+        class="error-message"
+        role="alert"
+      ></p>
+
+      <button
+        id="save-payment"
+        type="submit"
+      >
+        Save payment
+      </button>
+
+    </form>
+  </dialog>
 
   <!-- RESERVATION FINANCIAL BREAKDOWN -->
   <dialog
