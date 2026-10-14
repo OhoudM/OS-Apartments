@@ -1253,3 +1253,78 @@ html[dir="rtl"] .breakdown-row strong {
   }
 
 }
+
+
+/* Authentication screens */
+
+.auth-form {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  text-align: start;
+}
+
+.auth-form h2 {
+  color: var(--olive);
+  text-align: center;
+}
+
+.auth-form > p {
+  font-size: 13px;
+}
+
+.password-field {
+  display: flex;
+  align-items: center;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  overflow: hidden;
+  background: white;
+}
+
+.password-field:focus-within {
+  border-color: var(--gold);
+  box-shadow: 0 0 0 3px rgba(182, 154, 101, 0.13);
+}
+
+.password-field input {
+  flex: 1;
+  min-width: 0;
+  border: none;
+  border-radius: 0;
+  box-shadow: none;
+}
+
+.password-field input:focus {
+  border: none;
+  box-shadow: none;
+}
+
+.password-toggle {
+  flex-shrink: 0;
+  border: none;
+  background: transparent;
+  padding: 10px 14px;
+  font-size: 19px;
+}
+
+.auth-link {
+  border: none;
+  background: transparent;
+  color: var(--olive);
+  padding: 5px;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.auth-link:hover {
+  color: var(--gold);
+  background: transparent;
+}
+
+#signup-message,
+#forgot-message,
+#reset-message {
+  font-size: 13px;
+  overflow-wrap: anywhere;
+}
