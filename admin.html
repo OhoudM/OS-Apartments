@@ -13,42 +13,227 @@
 <body>
 
   <!-- LOGIN -->
-  <section id="login-section" class="login-section">
-    <div class="login-card">
+  
+<section id="login-section" class="login-section">
+  <div class="login-card">
 
-      <img
-        src="New-logo.png"
-        alt="OS Apartments"
-        class="login-logo"
-      >
+    <img
+      src="New-logo.png"
+      alt="OS Apartments"
+      class="login-logo"
+    />
 
-      <h1>OS Apartments</h1>
-      <p>Management Dashboard</p>
+    <h1>OS Apartments</h1>
+    <p>Family Management Portal</p>
 
-      <form id="login-form">
-        <label for="email">Email</label>
+    <!-- SIGN IN -->
+    <form id="login-form" class="auth-form">
+      <label>
+        Email
         <input
-          type="email"
           id="email"
+          type="email"
+          autocomplete="email"
           required
-          autocomplete="username"
-        >
+        />
+      </label>
 
-        <label for="password">Password</label>
+      <label for="password">Password</label>
+      <div class="password-field">
         <input
-          type="password"
           id="password"
-          required
+          type="password"
           autocomplete="current-password"
-        >
+          required
+        />
+        <button
+          type="button"
+          class="password-toggle"
+          data-target="password"
+          aria-label="Show password"
+          aria-pressed="false"
+        >👁</button>
+      </div>
 
-        <button type="submit">Sign In</button>
-      </form>
+      <button type="submit" class="primary-btn">
+        Sign In
+      </button>
 
       <p id="login-error" role="alert"></p>
 
-    </div>
-  </section>
+      <button
+        type="button"
+        class="auth-link"
+        id="show-forgot-password"
+      >
+        Forgot Password?
+      </button>
+
+      <button
+        type="button"
+        class="auth-link"
+        id="show-create-account"
+      >
+        Create Account
+      </button>
+    </form>
+
+    <!-- CREATE ACCOUNT -->
+    <form id="signup-form" class="auth-form" hidden>
+      <h2>Create Account</h2>
+
+      <label>
+        Email
+        <input
+          id="signup-email"
+          type="email"
+          autocomplete="email"
+          required
+        />
+      </label>
+
+      <label for="signup-password">
+        Password
+      </label>
+      <div class="password-field">
+        <input
+          id="signup-password"
+          type="password"
+          autocomplete="new-password"
+          minlength="8"
+          required
+        />
+        <button
+          type="button"
+          class="password-toggle"
+          data-target="signup-password"
+          aria-label="Show password"
+          aria-pressed="false"
+        >👁</button>
+      </div>
+
+      <label for="signup-confirm">
+        Confirm Password
+      </label>
+      <div class="password-field">
+        <input
+          id="signup-confirm"
+          type="password"
+          autocomplete="new-password"
+          minlength="8"
+          required
+        />
+        <button
+          type="button"
+          class="password-toggle"
+          data-target="signup-confirm"
+          aria-label="Show password"
+          aria-pressed="false"
+        >👁</button>
+      </div>
+
+      <button type="submit" class="primary-btn">
+        Create Account
+      </button>
+
+      <p id="signup-message" role="status"></p>
+
+      <button
+        type="button"
+        class="auth-link"
+        id="back-to-login-from-signup"
+      >
+        Back to Sign In
+      </button>
+    </form>
+
+    <!-- FORGOT PASSWORD -->
+    <form id="forgot-form" class="auth-form" hidden>
+      <h2>Reset Password</h2>
+
+      <p>
+        Enter your email address to receive
+        a password reset link.
+      </p>
+
+      <label>
+        Email
+        <input
+          id="forgot-email"
+          type="email"
+          autocomplete="email"
+          required
+        />
+      </label>
+
+      <button type="submit" class="primary-btn">
+        Send Reset Link
+      </button>
+
+      <p id="forgot-message" role="status"></p>
+
+      <button
+        type="button"
+        class="auth-link"
+        id="back-to-login-from-forgot"
+      >
+        Back to Sign In
+      </button>
+    </form>
+
+    <!-- SET NEW PASSWORD -->
+    <form id="reset-form" class="auth-form" hidden>
+      <h2>Choose New Password</h2>
+
+      <label for="reset-password">
+        New Password
+      </label>
+      <div class="password-field">
+        <input
+          id="reset-password"
+          type="password"
+          autocomplete="new-password"
+          minlength="8"
+          required
+        />
+        <button
+          type="button"
+          class="password-toggle"
+          data-target="reset-password"
+          aria-label="Show password"
+          aria-pressed="false"
+        >👁</button>
+      </div>
+
+      <label for="reset-confirm">
+        Confirm New Password
+      </label>
+      <div class="password-field">
+        <input
+          id="reset-confirm"
+          type="password"
+          autocomplete="new-password"
+          minlength="8"
+          required
+        />
+        <button
+          type="button"
+          class="password-toggle"
+          data-target="reset-confirm"
+          aria-label="Show password"
+          aria-pressed="false"
+        >👁</button>
+      </div>
+
+      <button type="submit" class="primary-btn">
+        Save New Password
+      </button>
+
+      <p id="reset-message" role="status"></p>
+    </form>
+
+  </div>
+</section>
 
 
   <!-- DASHBOARD -->
@@ -59,7 +244,7 @@
 
       <div class="brand">
         <img
-          src="OS-Apartments-logo.jpeg"
+          src="New-logo.png"
           alt="OS Apartments Logo"
           class="admin-logo"
         >
