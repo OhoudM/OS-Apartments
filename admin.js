@@ -798,6 +798,81 @@ async function loadBookings() {
   }
 }
 
+
+/* =========================================
+   LOAD EXPENSES FROM SUPABASE
+   ========================================= */
+
+let expenses = [];
+
+async function loadExpenses() {
+  const { data, error } = await supabaseClient
+    .from("Expenses")
+    .select("*")
+    .order("expense_date", { ascending: false });
+
+  if (error) {
+    console.error("Could not load expenses:", error);
+    showMessage("Could not load expenses: " + error.message, true);
+    return;
+  }
+
+  expenses = data || [];
+  renderExpenses();
+}
+
+function renderExpenses() {
+  const tbody = $("expenses-table-body");
+  if (!tbody) return;
+
+  tbody.replaceChildren();
+
+  let total = 0;
+
+  expenses.forEach(expense => {
+    const amount = Number(expense.amount) || 0;
+    total += amount;
+
+    const row = document.createElement("tr");
+
+    const values = [
+      expense.expense_date,
+      expense.category,
+      expense.description || "—",
+      money(amount)
+    ];
+
+    values.forEach(value => {
+      const cell = document.createElement("td");
+      cell.textContent = value;
+      row.appendChild(cell);
+    });
+
+    tbody.appendChild(row);
+  });
+
+  if (!expenses.length) {
+    const row = document.createElement("tr");
+    const cell = document.createElement("td");
+
+    cell.colSpan = 4;
+    cell.textContent =
+      currentLanguage === "ar"
+        ? "لا توجد مصاريف مسجلة"
+        : "No expenses recorded";
+
+    row.appendChild(cell);
+    tbody.appendChild(row);
+  }
+
+  // Update the expenses summary card.
+  const totalElement = $("total-expenses");
+
+  if (totalElement) {
+    totalElement.textContent = money(total);
+  }
+}
+
 function renderEverything() {
   renderStatistics();
   renderToday();
@@ -2274,8 +2349,13 @@ $("add-expense-form")?.addEventListener("submit", async (event) => {
 
     if (error) throw error;
 
-    $("add-expense-dialog").close();
-    showMessage("Expense saved successfully!");
+   $("add-expense-dialog").close();
+await loadExpenses();
+showMessage(
+  currentLanguage === "ar"
+    ? "تم حفظ المصروف بنجاح"
+    : "Expense saved successfully!"
+);
   } catch (error) {
     message.textContent = error.message;
   } finally {
@@ -3057,8 +3137,9 @@ async function showDashboard() {
     $("login-section").hidden = true;
     $("dashboard-section").hidden = false;
 
-    switchTab(currentTab);
-    await loadBookings();
+   switchTab(currentTab);
+await loadBookings();
+await loadExpenses();
   } catch (err) {
     if (request !== authVersion) return;
 
