@@ -2689,7 +2689,7 @@ let authVersion = 0;
 
 const authWords = {
   en: {
-    portal: "Family Management Portal",
+    portal: "Property Management Dashboard",
     email: "Email",
     password: "Password",
     signIn: "Sign In",
@@ -2724,7 +2724,7 @@ const authWords = {
     other: "Other"
   },
   ar: {
-    portal: "بوابة إدارة العائلة",
+    portal: "لوحة إدارة الشقق",
     email: "البريد الإلكتروني",
     password: "كلمة المرور",
     signIn: "تسجيل الدخول",
