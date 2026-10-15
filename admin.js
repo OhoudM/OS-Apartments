@@ -60,7 +60,6 @@ const translations = {
     currentGuest: "Currently staying",
 
     quickActions: "Quick Actions",
-    quickDesc: "Common tasks for your family",
     viewBookings: "View Bookings",
     viewFinances: "View Finances",
 
@@ -2293,7 +2292,6 @@ $("add-expense-form")?.addEventListener("submit", async (event) => {
     button.disabled = false;
   }
 });
-
 
 $("close-expense-dialog")?.addEventListener(
   "click",
