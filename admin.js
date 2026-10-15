@@ -2262,6 +2262,7 @@ $("close-expense-dialog")?.addEventListener(
    LANGUAGE HELPERS
    ===================================================== */
 
+
 function setLabelForInput(inputId, labelText) {
   const input = $(inputId);
   if (!input) return;
@@ -2269,8 +2270,14 @@ function setLabelForInput(inputId, labelText) {
   const label = input.closest("label");
   if (!label) return;
 
-  // Preserve the input while updating the label text.
-  [...label.childNodes].forEach((node) => {
+  const labelSpan = label.querySelector("span");
+
+  if (labelSpan) {
+    labelSpan.textContent = labelText;
+    return;
+  }
+
+  Array.from(label.childNodes).forEach((node) => {
     if (node.nodeType === Node.TEXT_NODE) {
       node.textContent = "";
     }
