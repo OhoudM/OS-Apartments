@@ -1478,34 +1478,38 @@ html[dir="rtl"] .breakdown-row strong {
 }
 
 
-/* =========================================
-   OS APARTMENTS — LOGO SIZE UPDATE
-   ========================================= */
+/* =====================================
+   OS APARTMENTS — LOGO FIX
+   ===================================== */
 
-/* Login page logo */
+/* Bigger login logo */
 .login-logo {
-  width: 240px;
-  height: auto;
+  width: 320px;
+  height: 220px;
   max-width: 100%;
-  object-fit: contain;
+  object-fit: cover;
+  object-position: center;
 }
 
-/* Dashboard header logo */
+/* Bigger dashboard logo */
 .admin-logo {
-  width: 145px;
-  height: auto;
-  object-fit: contain;
+  width: 150px;
+  height: 115px;
+  object-fit: cover;
+  object-position: center;
   flex-shrink: 0;
 }
 
-/* Mobile screens */
+/* Mobile adjustments */
 @media (max-width: 600px) {
   .login-logo {
-    width: 200px;
+    width: 260px;
+    height: 180px;
   }
 
   .admin-logo {
-    width: 110px;
+    width: 115px;
+    height: 90px;
   }
 }
 
