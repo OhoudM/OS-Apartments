@@ -3483,3 +3483,73 @@ $("language-toggle")?.addEventListener("click", () => {
 
 setLanguage(currentLanguage);
 checkSession();
+
+
+/* =========================================
+   OS APARTMENTS — LIGHT / DARK MODE
+   ========================================= */
+
+(function () {
+  const storageKey = "osApartmentsTheme";
+
+  function applyTheme(theme) {
+    document.documentElement.setAttribute(
+      "data-theme",
+      theme
+    );
+
+    localStorage.setItem(storageKey, theme);
+
+    document.querySelectorAll(".theme-toggle").forEach(button => {
+      const isDark = theme === "dark";
+
+      button.textContent = isDark
+        ? "☀️ Light Mode"
+        : "🌙 Dark Mode";
+
+      button.setAttribute("aria-pressed", String(isDark));
+    });
+  }
+
+  function createThemeButton(parent) {
+    if (!parent) return;
+
+    const button = document.createElement("button");
+    button.type = "button";
+    button.className = "theme-toggle";
+
+    button.addEventListener("click", () => {
+      const currentTheme =
+        document.documentElement.getAttribute("data-theme");
+
+      applyTheme(currentTheme === "dark" ? "light" : "dark");
+    });
+
+    parent.appendChild(button);
+  }
+
+  function initializeTheme() {
+    createThemeButton(
+      document.querySelector(".admin-header .header-actions")
+    );
+
+    createThemeButton(
+      document.querySelector("#login-section .login-card")
+    );
+
+    applyTheme(
+      localStorage.getItem(storageKey) === "dark"
+        ? "dark"
+        : "light"
+    );
+  }
+
+  if (document.readyState === "loading") {
+    document.addEventListener(
+      "DOMContentLoaded",
+      initializeTheme
+    );
+  } else {
+    initializeTheme();
+  }
+})();

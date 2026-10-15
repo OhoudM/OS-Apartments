@@ -2445,3 +2445,108 @@ html[dir="rtl"] .breakdown-row strong {
     height: 75px;
   }
 }
+
+/* =========================================
+   DARK MODE — OS APARTMENTS
+   ========================================= */
+html[data-theme="dark"] {
+  color-scheme: dark;
+  --background: #171b17;
+  --surface: #242a23;
+  --surface-soft: #2d342b;
+  --olive: #77865a;
+  --olive-dark: #aebd8e;
+  --olive-light: #34402e;
+  --gold: #d5b87f;
+  --gold-light: #453d2e;
+  --text: #f0f1e9;
+  --text-muted: #b6bcae;
+  --border: #454b40;
+  --success: #86c9a0;
+  --success-bg: #253e30;
+  --danger: #f0a1a3;
+  --danger-bg: #4b292d;
+  --warning: #e6bf72;
+  --warning-bg: #483b27;
+  --shadow: 0 8px 30px rgba(0,0,0,.18);
+}
+html[data-theme="dark"] #login-section {
+  background: radial-gradient(circle at top left, rgba(213,184,127,.10), transparent 42%), var(--background);
+}
+html[data-theme="dark"] #login-section .login-card,
+html[data-theme="dark"] .stat-card,
+html[data-theme="dark"] .panel,
+html[data-theme="dark"] .admin-dialog,
+html[data-theme="dark"] .dashboard-tabs,
+html[data-theme="dark"] .today-guest-item,
+html[data-theme="dark"] table,
+html[data-theme="dark"] input,
+html[data-theme="dark"] select,
+html[data-theme="dark"] textarea,
+html[data-theme="dark"] .password-field {
+  background: var(--surface);
+  color: var(--text);
+}
+html[data-theme="dark"] #login-section .auth-form input,
+html[data-theme="dark"] #login-section .password-field {
+  background: var(--surface);
+  color: var(--text);
+}
+html[data-theme="dark"] .today-card,
+html[data-theme="dark"] .calendar-day,
+html[data-theme="dark"] .chart-container,
+html[data-theme="dark"] th {
+  background: var(--surface-soft);
+}
+html[data-theme="dark"] tbody tr:hover,
+html[data-theme="dark"] .tab-btn:hover:not(.active),
+html[data-theme="dark"] button:hover:not(:disabled):not(.primary-btn) {
+  background: var(--surface-soft);
+}
+html[data-theme="dark"] .clickable-card {
+  background: linear-gradient(135deg,var(--surface),var(--surface-soft));
+}
+html[data-theme="dark"] .calendar-day.booked {
+  background: var(--success-bg);
+}
+html[data-theme="dark"] .status-confirmed,
+html[data-theme="dark"] .status-checked_in,
+html[data-theme="dark"] .status-checked-in { background: var(--success-bg); }
+html[data-theme="dark"] .status-cancelled,
+html[data-theme="dark"] .status-canceled { background: var(--danger-bg); }
+html[data-theme="dark"] .status-pending,
+html[data-theme="dark"] .status-unconfirmed { background: var(--warning-bg); }
+html[data-theme="dark"] .primary-btn,
+html[data-theme="dark"] button[type="submit"],
+html[data-theme="dark"] .tab-btn.active,
+html[data-theme="dark"] .tab-btn[aria-selected="true"] {
+  background: #586640;
+  border-color: #586640;
+  color: #fff;
+}
+html[data-theme="dark"] .primary-btn:hover:not(:disabled),
+html[data-theme="dark"] button[type="submit"]:hover:not(:disabled) {
+  background: #69794e;
+  border-color: #69794e;
+  color: #fff;
+}
+html[data-theme="dark"] .admin-dialog::backdrop {
+  background: rgba(0,0,0,.7);
+}
+.theme-toggle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  white-space: nowrap;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 10px 14px;
+  background: var(--surface);
+  color: var(--text);
+  font-size: 13px;
+  font-weight: 600;
+}
+#login-section .theme-toggle {
+  margin: 16px auto 0;
+}
