@@ -425,15 +425,14 @@ function money(value) {
     return t("notRecorded");
   }
 
-  return (
-    number.toLocaleString(
-      currentLanguage === "ar" ? "ar-SA" : "en-SA",
-      {
-        minimumFractionDigits: 2,
-        maximumFractionDigits: 2
-      }
-    ) + " SAR"
-  );
+  
+return (
+  number.toLocaleString("en-US", {
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2
+  }) + " SAR"
+);
+
 }
 
 function cents(value) {
@@ -2350,7 +2349,7 @@ function setLanguage(language) {
     currentLanguage
   );
 
-  document.documentElement.lang = currentLanguage;
+ document.documentElement.style.fontVariantNumeric = "lining-nums";
   document.documentElement.dir =
     currentLanguage === "ar" ? "rtl" : "ltr";
 
