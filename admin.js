@@ -2243,9 +2243,57 @@ $("record-payment-form")?.addEventListener(
 // Do not store expense records only in localStorage:
 // family members need shared, reliable data.
 
-if ($("open-add-expense")) {
-  $("open-add-expense").disabled = true;
-}
+
+$("open-add-expense")?.addEventListener("click", () => {
+  $("expense-message").textContent = "";
+  $("add-expense-form").reset();
+  $("expense-date").value = dateString(new Date());
+  $("add-expense-dialog").showModal();
+});
+
+
+$("add-expense-form")?.addEventListener("submit", async (event) => {
+  event.preventDefault();
+
+  const button = $("save-expense");
+  const message = $("expense-message");
+
+  const expense = {
+    expense_date: $("expense-date").value,
+    category: $("expense-category").value,
+    description: $("expense-description").value.trim() || null,
+    amount: Number($("expense-amount").value)
+  };
+
+  if (
+    !expense.expense_date ||
+    !expense.category ||
+    !Number.isFinite(expense.amount) ||
+    expense.amount <= 0
+  ) {
+    message.textContent = "Please enter valid expense details.";
+    return;
+  }
+
+  button.disabled = true;
+  message.textContent = "";
+
+  try {
+    const { error } = await supabaseClient
+      .from("Expenses")
+      .insert(expense);
+
+    if (error) throw error;
+
+    $("add-expense-dialog").close();
+    showMessage("Expense saved successfully!");
+  } catch (error) {
+    message.textContent = error.message;
+  } finally {
+    button.disabled = false;
+  }
+});
+
 
 $("close-expense-dialog")?.addEventListener(
   "click",
