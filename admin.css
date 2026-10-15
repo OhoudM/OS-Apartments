@@ -1477,3 +1477,35 @@ html[dir="rtl"] .breakdown-row strong {
   }
 }
 
+
+/* =========================================
+   OS APARTMENTS — LOGO SIZE UPDATE
+   ========================================= */
+
+/* Login page logo */
+.login-logo {
+  width: 240px;
+  height: auto;
+  max-width: 100%;
+  object-fit: contain;
+}
+
+/* Dashboard header logo */
+.admin-logo {
+  width: 145px;
+  height: auto;
+  object-fit: contain;
+  flex-shrink: 0;
+}
+
+/* Mobile screens */
+@media (max-width: 600px) {
+  .login-logo {
+    width: 200px;
+  }
+
+  .admin-logo {
+    width: 110px;
+  }
+}
+
