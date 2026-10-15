@@ -1513,3 +1513,39 @@ html[dir="rtl"] .breakdown-row strong {
   }
 }
 
+
+/* =========================================
+   OS APARTMENTS — LOGIN PAGE REFINEMENT
+   ========================================= */
+
+/* Hide the repeated brand heading on login only */
+#login-section .login-card h1 {
+  display: none;
+}
+
+/* Keep the subtitle underneath the logo */
+#login-section #portal-subtitle {
+  font-size: 17px;
+  font-weight: 400;
+  margin-top: 12px;
+  margin-bottom: 32px;
+}
+
+/* Normal-sized form labels */
+#login-section label {
+  font-size: 15px;
+  font-weight: 500;
+  line-height: 1.5;
+}
+
+/* Keep input text comfortable to read */
+#login-section input {
+  font-size: 16px;
+}
+
+/* Preserve the logo size */
+#login-section .login-logo {
+  width: 240px;
+  height: auto;
+  object-fit: contain;
+}
