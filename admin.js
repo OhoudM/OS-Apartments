@@ -866,7 +866,7 @@ function renderExpenses() {
   }
 
   // Update the expenses summary card.
-  const totalElement = $("total-expenses");
+  const totalElement = $("finance-expenses");
 
   if (totalElement) {
     totalElement.textContent = money(total);
