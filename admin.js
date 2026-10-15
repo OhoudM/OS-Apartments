@@ -2815,7 +2815,6 @@ const extraLabels = {
     arrivingToday: "Arriving Today",
     departingToday: "Departing Today",
     currentlyStaying: "Currently Staying",
-    quickActionsDesc: "Common tasks for your family",
     bookingCalendar: "Booking Calendar",
     bookingsTableDesc: "View reservations and payment details",
     apartmentExpenses: "Apartment Expenses",
