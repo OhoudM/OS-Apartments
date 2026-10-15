@@ -2509,11 +2509,27 @@ function setLanguage(language) {
     "todayDesc"
   );
 
-  translatePanel(
-    "quick-actions-panel",
-    "quickActions",
-    "quickDesc"
+  
+const quickActionsPanel = $("quick-actions-panel");
+
+if (quickActionsPanel) {
+  const description = quickActionsPanel.querySelector(
+    ".section-header p"
   );
+
+  if (description) {
+    description.remove();
+  }
+
+  const heading = quickActionsPanel.querySelector(
+    ".section-header h2"
+  );
+
+  if (heading) {
+    heading.textContent = t("quickActions");
+  }
+}
+
 
   const todayLabels = document.querySelectorAll(
     ".today-card span"
@@ -2815,6 +2831,7 @@ const extraLabels = {
     arrivingToday: "Arriving Today",
     departingToday: "Departing Today",
     currentlyStaying: "Currently Staying",
+    quickActionsDesc: "Common tasks for your family",
     bookingCalendar: "Booking Calendar",
     bookingsTableDesc: "View reservations and payment details",
     apartmentExpenses: "Apartment Expenses",
