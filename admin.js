@@ -2712,3 +2712,31 @@ $("refresh-bookings-btn")?.addEventListener(
 
 setLanguage(currentLanguage);
 checkSession();
+
+
+/* =========================================
+   SHOW / HIDE PASSWORD
+   ========================================= */
+
+document.querySelectorAll(".password-toggle").forEach((button) => {
+  button.addEventListener("click", () => {
+    const inputId = button.dataset.target;
+    const input = document.getElementById(inputId);
+
+    if (!input) return;
+
+    const isVisible = input.type === "text";
+
+    input.type = isVisible ? "password" : "text";
+    button.textContent = isVisible ? "👁" : "🙈";
+    button.setAttribute(
+      "aria-label",
+      isVisible ? "Show password" : "Hide password"
+    );
+    button.setAttribute(
+      "aria-pressed",
+      String(!isVisible)
+    );
+  });
+});
+

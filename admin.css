@@ -1341,3 +1341,67 @@ html[dir="rtl"] .breakdown-row strong {
     min-height: 55px;
   }
 }
+
+
+/* =========================================
+   MOBILE LOGIN FIX
+   ========================================= */
+
+@media (max-width: 600px) {
+  #login-section {
+    width: 100%;
+    min-height: 100dvh;
+    padding: 14px;
+    align-items: center;
+  }
+
+  #login-section .login-card {
+    width: 100%;
+    max-width: 420px;
+    padding: 24px 20px;
+    border-radius: 18px;
+  }
+
+  #login-section .login-logo {
+    width: 95px;
+    height: 95px;
+    margin-bottom: 10px;
+  }
+
+  #login-section .login-card > h1 {
+    font-size: 23px;
+  }
+
+  #login-section .login-card > p {
+    margin-bottom: 20px;
+    font-size: 12px;
+  }
+
+  #login-section .auth-form {
+    gap: 12px;
+  }
+
+  #login-section .password-field {
+    width: 100%;
+    height: 46px;
+  }
+
+  #login-section .password-field input {
+    flex: 1 1 auto;
+    width: 1%;
+    min-width: 0;
+    height: 100%;
+  }
+
+  #login-section .password-toggle {
+    flex: 0 0 46px;
+    width: 46px;
+    height: 44px;
+  }
+
+  #login-section .auth-form > .primary-btn {
+    width: 100%;
+    min-height: 46px;
+  }
+}
+
