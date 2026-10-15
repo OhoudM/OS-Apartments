@@ -5,23 +5,6 @@ const supabaseClient = window.supabase.createClient(
     SUPABASE_KEY
 );
 
-
-/* =====================================================
-   OS APARTMENTS — ADMIN DASHBOARD
-   PART 1: SETUP AND ENGLISH TRANSLATIONS
-   ===================================================== */
-
-const SUPABASE_URL =
-  "https://ptpdexboeaummnywwgyv.supabase.co";
-
-const SUPABASE_KEY =
-  "sb_publishable_JrsJrxQ86TCBZWRc9g7HTg_bsLXaYJ8";
-
-const supabaseClient = window.supabase.createClient(
-  SUPABASE_URL,
-  SUPABASE_KEY
-);
-
 const $ = (id) => document.getElementById(id);
 
 let bookings = [];
