@@ -1479,16 +1479,6 @@ function showEarningsDetails() {
     content.append(row);
   };
 
-  addLine(
-    t("activeReservations"),
-    String(records.length)
-  );
-
-  addLine(
-    t("cancelledReservations"),
-    String(bookings.filter(cancelledBooking).length)
-  );
-
   [...groups.entries()].forEach(
     ([platform, group]) => {
       addLine(
@@ -1718,6 +1708,8 @@ function renderEarningsChart(earningsMap) {
   const container = $("monthly-earnings-chart");
   if (!container) return;
 
+  container.dir = "ltr";
+
   container.replaceChildren();
 
   const entries = [...earningsMap.entries()]
@@ -1755,11 +1747,7 @@ function renderEarningsChart(earningsMap) {
     const amountLabel = createElement(
       "div",
       "",
-      Math.round(amount).toLocaleString(
-        currentLanguage === "ar"
-          ? "ar-SA"
-          : "en-SA"
-      )
+      Math.round(amount).toLocaleString("en-US")
     );
 
     amountLabel.style.fontSize = "11px";
@@ -1783,7 +1771,9 @@ function renderEarningsChart(earningsMap) {
     const label = createElement(
       "div",
       "chart-label",
-      `${monthName(month - 1).slice(0, 3)} ${String(year).slice(-2)}`
+   `${new Date(year, month - 1, 1).toLocaleString("en-US", {
+  month: "short"
+})} ${String(year).slice(-2)}`
     );
 
     label.style.marginTop = "8px";
