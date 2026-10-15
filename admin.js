@@ -3093,6 +3093,7 @@ function showLogin() {
   showAuthView("login-form");
 }
 
+
 async function approvedFamily(user) {
   const { data, error } = await supabaseClient
     .from("family_members")
@@ -3100,10 +3101,20 @@ async function approvedFamily(user) {
     .eq("user_id", user.id)
     .maybeSingle();
 
-  if (error) throw error;
+  if (error) {
+    console.error("Family approval check failed:", error);
+    throw error;
+  }
+
+  console.log("Family approval diagnostic:", {
+    recordFound: data !== null,
+    approved: data?.approved,
+    isApproved: data?.approved === true
+  });
 
   return data?.approved === true;
 }
+
 
 async function showDashboard() {
   const request = ++authVersion;
