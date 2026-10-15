@@ -2568,3 +2568,64 @@ html[data-theme="dark"] .theme-toggle::after {
 #login-section .theme-toggle {
   margin: 16px auto 0;
 }
+
+
+/* ==========================================
+   OS APARTMENTS — BRANDING REFINEMENT
+   ========================================== */
+
+/* Dashboard branding */
+.dashboard-brand {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 6px;
+}
+
+.dashboard-brand .admin-logo {
+  display: block;
+  width: 185px !important;
+  height: auto !important;
+  max-width: 100%;
+  object-fit: contain !important;
+}
+
+.dashboard-brand-subtitle {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 400;
+  color: #77776e;
+}
+
+/* Larger login logo */
+.login-logo {
+  width: 310px !important;
+  height: auto !important;
+  max-width: 100%;
+  object-fit: contain !important;
+}
+
+/* Dark mode — brighter logo and subtitle */
+[data-theme="dark"] .dashboard-brand .admin-logo,
+[data-theme="dark"] .login-logo {
+  filter: brightness(1.2) contrast(1.12);
+}
+
+[data-theme="dark"] .dashboard-brand-subtitle {
+  color: #d7d4cc;
+}
+
+/* Mobile adjustments */
+@media (max-width: 600px) {
+  .dashboard-brand .admin-logo {
+    width: 145px !important;
+  }
+
+  .login-logo {
+    width: 250px !important;
+  }
+
+  .dashboard-brand-subtitle {
+    font-size: 14px;
+  }
+}
