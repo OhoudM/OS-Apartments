@@ -2910,3 +2910,54 @@ html[data-theme="dark"] .dashboard-brand .admin-logo {
   padding: 8px;
   filter: none;
 }
+
+/* Expense row management buttons */
+.expense-actions { white-space: nowrap; }
+.expense-actions button { margin-inline-end: 8px; padding: 7px 12px; border-radius: 8px; cursor: pointer; }
+.expense-edit-btn { background: var(--accent, #68734e); color: #fff; border: 1px solid transparent; }
+.expense-delete-btn { background: transparent; color: #c76a6a; border: 1px solid currentColor; }
+.expense-actions button:disabled { opacity: .5; cursor: wait; }
+
+
+.expense-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.expense-edit-btn,
+.expense-delete-btn {
+  padding: 8px 14px;
+  border-radius: 8px;
+  font: inherit;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.expense-edit-btn {
+  background: #697652;
+  color: white;
+  border: 1px solid #697652;
+}
+
+.expense-delete-btn {
+  background: transparent;
+  color: #d97878;
+  border: 1px solid #d97878;
+}
+
+.expense-edit-btn:hover {
+  background: #536040;
+}
+
+.expense-delete-btn:hover {
+  background: rgba(217, 120, 120, 0.12);
+}
+
+.expense-edit-btn:disabled,
+.expense-delete-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}

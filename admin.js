@@ -803,7 +803,10 @@ async function loadBookings() {
    LOAD EXPENSES FROM SUPABASE
    ========================================= */
 
+
 let expenses = [];
+let editingExpenseId = null;
+let savingExpenseChange = false;
 
 async function loadExpenses() {
   const { data, error } = await supabaseClient
@@ -813,7 +816,7 @@ async function loadExpenses() {
 
   if (error) {
     console.error("Could not load expenses:", error);
-    showMessage("Could not load expenses: " + error.message, true);
+    showMessage(error.message, true);
     return;
   }
 
@@ -827,6 +830,21 @@ function renderExpenses() {
 
   tbody.replaceChildren();
 
+  const headerRow = tbody.closest("table")?.querySelector("thead tr");
+
+  if (headerRow && !headerRow.querySelector("[data-expense-actions]")) {
+    const th = document.createElement("th");
+    th.dataset.expenseActions = "true";
+    headerRow.append(th);
+  }
+
+  const heading = headerRow?.querySelector("[data-expense-actions]");
+  if (heading) {
+    heading.textContent = currentLanguage === "ar"
+      ? "الإجراءات"
+      : "Actions";
+  }
+
   let total = 0;
 
   expenses.forEach(expense => {
@@ -835,43 +853,125 @@ function renderExpenses() {
 
     const row = document.createElement("tr");
 
-    const values = [
+    [
       expense.expense_date,
       expense.category,
       expense.description || "—",
       money(amount)
-    ];
-
-    values.forEach(value => {
+    ].forEach(value => {
       const cell = document.createElement("td");
       cell.textContent = value;
-      row.appendChild(cell);
+      row.append(cell);
     });
 
-    tbody.appendChild(row);
+    const actions = document.createElement("td");
+    actions.className = "expense-actions";
+
+    const editButton = document.createElement("button");
+    editButton.type = "button";
+    editButton.className = "expense-edit-btn";
+    editButton.textContent = currentLanguage === "ar"
+      ? "تعديل"
+      : "Edit";
+    editButton.addEventListener("click", () => {
+      openEditExpense(expense);
+    });
+
+    const deleteButton = document.createElement("button");
+    deleteButton.type = "button";
+    deleteButton.className = "expense-delete-btn";
+    deleteButton.textContent = currentLanguage === "ar"
+      ? "حذف"
+      : "Delete";
+    deleteButton.addEventListener("click", () => {
+      deleteExpense(expense, deleteButton);
+    });
+
+    actions.append(editButton, deleteButton);
+    row.append(actions);
+    tbody.append(row);
   });
 
   if (!expenses.length) {
     const row = document.createElement("tr");
     const cell = document.createElement("td");
-
-    cell.colSpan = 4;
-    cell.textContent =
-      currentLanguage === "ar"
-        ? "لا توجد مصاريف مسجلة"
-        : "No expenses recorded";
-
-    row.appendChild(cell);
-    tbody.appendChild(row);
+    cell.colSpan = 5;
+    cell.textContent = currentLanguage === "ar"
+      ? "لا توجد مصاريف مسجلة"
+      : "No expenses recorded";
+    row.append(cell);
+    tbody.append(row);
   }
 
-  // Update the expenses summary card.
-  const totalElement = $("finance-expenses");
+  setText("finance-expenses", money(total));
+}
 
-  if (totalElement) {
-    totalElement.textContent = money(total);
+function openEditExpense(expense) {
+  if (expense.id == null) {
+    showMessage("Expense ID is missing.", true);
+    return;
+  }
+
+  editingExpenseId = expense.id;
+
+  $("add-expense-form").reset();
+  $("expense-date").value = expense.expense_date || "";
+  $("expense-category").value = expense.category || "";
+  $("expense-description").value = expense.description || "";
+  $("expense-amount").value = expense.amount ?? "";
+
+  setText("expense-message", "");
+  setText(
+    "save-expense",
+    currentLanguage === "ar" ? "حفظ التعديلات" : "Save Changes"
+  );
+
+  $("add-expense-dialog").showModal();
+}
+
+async function deleteExpense(expense, button) {
+  if (expense.id == null) {
+    showMessage("Expense ID is missing.", true);
+    return;
+  }
+
+  const description = expense.description || expense.category;
+
+  const confirmed = window.confirm(
+    currentLanguage === "ar"
+      ? `حذف المصروف "${description}" (${money(expense.amount)}) نهائياً؟`
+      : `Permanently delete "${description}" (${money(expense.amount)})?`
+  );
+
+  if (!confirmed) return;
+
+  button.disabled = true;
+
+  try {
+    const { data, error } = await supabaseClient
+      .from("Expenses")
+      .delete()
+      .eq("id", expense.id)
+      .select("id");
+
+    if (error) throw error;
+
+    if (!data?.length) {
+      throw new Error("No record deleted. Check Supabase permissions.");
+    }
+
+    await loadExpenses();
+    showMessage(
+      currentLanguage === "ar"
+        ? "تم حذف المصروف بنجاح"
+        : "Expense deleted successfully."
+    );
+  } catch (error) {
+    showMessage(error.message, true);
+    button.disabled = false;
   }
 }
+
 
 function renderEverything() {
   renderStatistics();
@@ -1423,11 +1523,12 @@ function renderFinanceSummary() {
       : "—"
   );
 
-  // No expenses table is connected yet.
-  setText(
-    "finance-expenses",
-    t("notConfigured")
-  );
+  const expenseTotal = expenses.reduce(
+  (sum, expense) => sum + (Number(expense.amount) || 0),
+  0
+);
+
+setText("finance-expenses", money(expenseTotal));
 }
 
 
@@ -2308,16 +2409,26 @@ $("record-payment-form")?.addEventListener(
 // family members need shared, reliable data.
 
 
+
 $("open-add-expense")?.addEventListener("click", () => {
-  $("expense-message").textContent = "";
+  editingExpenseId = null;
+
   $("add-expense-form").reset();
   $("expense-date").value = dateString(new Date());
+
+  setText("expense-message", "");
+  setText(
+    "save-expense",
+    currentLanguage === "ar" ? "حفظ المصروف" : "Save Expense"
+  );
+
   $("add-expense-dialog").showModal();
 });
 
-
-$("add-expense-form")?.addEventListener("submit", async (event) => {
+$("add-expense-form")?.addEventListener("submit", async event => {
   event.preventDefault();
+
+  if (savingExpenseChange) return;
 
   const button = $("save-expense");
   const message = $("expense-message");
@@ -2339,34 +2450,57 @@ $("add-expense-form")?.addEventListener("submit", async (event) => {
     return;
   }
 
+  savingExpenseChange = true;
   button.disabled = true;
   message.textContent = "";
 
   try {
-    const { error } = await supabaseClient
-      .from("Expenses")
-      .insert(expense);
+    if (editingExpenseId !== null) {
+      const { data, error } = await supabaseClient
+        .from("Expenses")
+        .update(expense)
+        .eq("id", editingExpenseId)
+        .select("id");
 
-    if (error) throw error;
+      if (error) throw error;
 
-   $("add-expense-dialog").close();
-await loadExpenses();
-showMessage(
-  currentLanguage === "ar"
-    ? "تم حفظ المصروف بنجاح"
-    : "Expense saved successfully!"
-);
+      if (!data?.length) {
+        throw new Error("No record updated. Check Supabase permissions.");
+      }
+    } else {
+      const { error } = await supabaseClient
+        .from("Expenses")
+        .insert(expense);
+
+      if (error) throw error;
+    }
+
+    editingExpenseId = null;
+    $("add-expense-dialog").close();
+
+    await loadExpenses();
+
+    showMessage(
+      currentLanguage === "ar"
+        ? "تم حفظ المصروف بنجاح"
+        : "Expense saved successfully!"
+    );
   } catch (error) {
     message.textContent = error.message;
   } finally {
+    savingExpenseChange = false;
     button.disabled = false;
   }
 });
 
-$("close-expense-dialog")?.addEventListener(
-  "click",
-  () => $("add-expense-dialog").close()
-);
+$("close-expense-dialog")?.addEventListener("click", () => {
+  $("add-expense-dialog").close();
+});
+
+$("add-expense-dialog")?.addEventListener("close", () => {
+  editingExpenseId = null;
+});
+
 
 /* =====================================================
    LANGUAGE SWITCHING
@@ -3068,6 +3202,7 @@ setLanguage = function(language) {
    AUTHENTICATION VIEWS
    ===================================================== */
 
+
 function showAuthView(id) {
   [
     "login-form",
@@ -3077,12 +3212,24 @@ function showAuthView(id) {
     "pending-approval"
   ].forEach(name => {
     const el = $(name);
-    if (el) el.hidden = name !== id;
+
+    if (el) {
+      el.hidden = name !== id;
+    }
   });
 
-  $("login-section").hidden = false;
-  $("dashboard-section").hidden = true;
+  const loginSection = $("login-section");
+  const dashboardSection = $("dashboard-section");
+
+  if (loginSection) {
+    loginSection.hidden = false;
+  }
+
+  if (dashboardSection) {
+    dashboardSection.hidden = true;
+  }
 }
+
 
 function showLogin() {
   authVersion++;
