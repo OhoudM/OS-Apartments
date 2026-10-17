@@ -3054,3 +3054,19 @@ html[data-theme="dark"] .dashboard-brand .admin-logo {
   cursor: not-allowed;
 }
 
+/* Center dashboard logo on mobile */
+@media (max-width: 768px) {
+  .dashboard-brand {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    width: 100%;
+  }
+
+  .dashboard-brand .admin-logo {
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+  }
+}
