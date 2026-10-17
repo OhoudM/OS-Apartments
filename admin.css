@@ -2629,3 +2629,8 @@ html[data-theme="dark"] .theme-toggle::after {
     font-size: 14px;
   }
 }
+
+
+[hidden] {
+  display: none !important;
+}
