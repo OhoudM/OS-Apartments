@@ -929,48 +929,93 @@ function openEditExpense(expense) {
   $("add-expense-dialog").showModal();
 }
 
-async function deleteExpense(expense, button) {
+
+let expensePendingDeletion = null;
+let deletingExpense = false;
+
+function deleteExpense(expense) {
   if (expense.id == null) {
     showMessage("Expense ID is missing.", true);
     return;
   }
 
-  const description = expense.description || expense.category;
+  expensePendingDeletion = expense;
 
-  const confirmed = window.confirm(
-    currentLanguage === "ar"
-      ? `حذف المصروف "${description}" (${money(expense.amount)}) نهائياً؟`
-      : `Permanently delete "${description}" (${money(expense.amount)})?`
+  const isArabic = currentLanguage === "ar";
+
+  setText(
+    "delete-expense-title",
+    isArabic ? "حذف المصروف؟" : "Delete Expense?"
   );
 
-  if (!confirmed) return;
+  setText(
+    "delete-expense-description",
+    isArabic
+      ? "هل أنت متأكد من حذف هذا المصروف؟ لا يمكن التراجع عن هذا الإجراء."
+      : "Are you sure you want to delete this expense? This action cannot be undone."
+  );
+
+  setText(
+    "delete-expense-details",
+    `${expense.description || expense.category} — ${money(expense.amount)}`
+  );
+
+  setText("delete-expense-error", "");
+  setText("cancel-delete-expense", isArabic ? "إلغاء" : "Cancel");
+  setText("confirm-delete-expense", isArabic ? "حذف المصروف" : "Delete Expense");
+
+  $("delete-expense-dialog").showModal();
+}
+
+$("cancel-delete-expense")?.addEventListener("click", () => {
+  $("delete-expense-dialog").close();
+});
+
+$("delete-expense-dialog")?.addEventListener("close", () => {
+  expensePendingDeletion = null;
+});
+
+$("confirm-delete-expense")?.addEventListener("click", async () => {
+  if (!expensePendingDeletion || deletingExpense) return;
+
+  deletingExpense = true;
+
+  const button = $("confirm-delete-expense");
+  const expenseId = expensePendingDeletion.id;
 
   button.disabled = true;
+  setText("delete-expense-error", "");
 
   try {
     const { data, error } = await supabaseClient
       .from("Expenses")
       .delete()
-      .eq("id", expense.id)
+      .eq("id", expenseId)
       .select("id");
 
     if (error) throw error;
 
     if (!data?.length) {
-      throw new Error("No record deleted. Check Supabase permissions.");
+      throw new Error("Expense was not deleted. Check Supabase permissions.");
     }
 
+    $("delete-expense-dialog").close();
+
     await loadExpenses();
+
     showMessage(
       currentLanguage === "ar"
         ? "تم حذف المصروف بنجاح"
         : "Expense deleted successfully."
     );
   } catch (error) {
-    showMessage(error.message, true);
+    setText("delete-expense-error", error.message);
+  } finally {
+    deletingExpense = false;
     button.disabled = false;
   }
-}
+});
+
 
 
 function renderEverything() {

@@ -2961,3 +2961,96 @@ html[data-theme="dark"] .dashboard-brand .admin-logo {
   opacity: 0.5;
   cursor: not-allowed;
 }
+
+
+/* Custom expense deletion popup */
+.delete-expense-dialog {
+  position: fixed;
+  inset: 0;
+  margin: auto;
+  width: min(420px, calc(100% - 32px));
+  max-height: calc(100dvh - 32px);
+  padding: 0;
+  border: 1px solid var(--border, #454545);
+  border-radius: 20px;
+  background: var(--card-bg, #252629);
+  color: var(--text, #f5f0e7);
+  box-shadow: 0 20px 70px rgba(0, 0, 0, 0.3);
+}
+
+.delete-expense-dialog::backdrop {
+  background: rgba(0, 0, 0, 0.65);
+  backdrop-filter: blur(4px);
+}
+
+.delete-expense-content {
+  padding: 32px;
+  text-align: center;
+}
+
+.delete-expense-icon {
+  width: 56px;
+  height: 56px;
+  display: grid;
+  place-items: center;
+  margin: 0 auto 20px;
+  border-radius: 50%;
+  background: rgba(194, 95, 95, 0.14);
+  color: #e68b8b;
+  font-size: 28px;
+  font-weight: 700;
+}
+
+.delete-expense-content h2 {
+  margin: 0 0 12px;
+}
+
+.delete-expense-content p {
+  line-height: 1.6;
+}
+
+#delete-expense-details {
+  font-weight: 700;
+  margin: 18px 0;
+}
+
+#delete-expense-error {
+  color: #e68b8b;
+}
+
+.delete-expense-buttons {
+  display: flex;
+  gap: 12px;
+  margin-top: 24px;
+}
+
+.delete-expense-buttons button {
+  flex: 1;
+  padding: 12px;
+  border-radius: 10px;
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+#cancel-delete-expense {
+  background: transparent;
+  border: 1px solid #888;
+  color: inherit;
+}
+
+#confirm-delete-expense {
+  background: #b44e4e;
+  border: 1px solid #b44e4e;
+  color: white;
+}
+
+#confirm-delete-expense:hover {
+  background: #983e3e;
+}
+
+#confirm-delete-expense:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
