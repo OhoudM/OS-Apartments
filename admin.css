@@ -2634,3 +2634,39 @@ html[data-theme="dark"] .theme-toggle::after {
 [hidden] {
   display: none !important;
 }
+
+
+/* Password field - dark mode */
+[data-theme="dark"] .login-card .password-field {
+  display: flex;
+  align-items: stretch;
+  background: #343d4e;
+  border-radius: 14px;
+  overflow: hidden;
+}
+
+[data-theme="dark"] .login-card .password-field input {
+  flex: 1;
+  min-width: 0;
+  background: transparent !important;
+  color: #ffffff !important;
+  border: none !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+}
+
+[data-theme="dark"] .login-card .password-toggle {
+  background: transparent !important;
+  color: #d6c18b !important;
+  border: none !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  width: 60px;
+  flex-shrink: 0;
+  cursor: pointer;
+}
+
+[data-theme="dark"] .login-card .password-field:focus-within {
+  outline: 2px solid #8a9569;
+  outline-offset: 2px;
+}
