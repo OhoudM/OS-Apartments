@@ -967,10 +967,6 @@ function deleteExpense(expense) {
   $("delete-expense-dialog").showModal();
 }
 
-$("cancel-delete-expense")?.addEventListener("click", () => {
-  $("delete-expense-dialog").close();
-});
-
 $("delete-expense-dialog")?.addEventListener("close", () => {
   expensePendingDeletion = null;
 });
@@ -1015,8 +1011,6 @@ $("confirm-delete-expense")?.addEventListener("click", async () => {
     button.disabled = false;
   }
 });
-
-
 
 function renderEverything() {
   renderStatistics();
@@ -3756,3 +3750,18 @@ checkSession();
     initializeTheme();
   }
 })();
+
+
+/* Fix Cancel button for Delete Expense popup */
+document.addEventListener("click", (event) => {
+  if (event.target.closest("#cancel-delete-expense")) {
+    event.preventDefault();
+
+    const dialog = document.getElementById("delete-expense-dialog");
+
+    if (dialog?.open) {
+      dialog.close();
+    }
+  }
+});
+
