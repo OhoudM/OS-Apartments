@@ -971,7 +971,8 @@ $("delete-expense-dialog")?.addEventListener("close", () => {
   expensePendingDeletion = null;
 });
 
-$("confirm-delete-expense")?.addEventListener("click", async () => {
+document.addEventListener("click", async (event) => {
+  if (!event.target.closest("#confirm-delete-expense")) return;
   if (!expensePendingDeletion || deletingExpense) return;
 
   deletingExpense = true;
