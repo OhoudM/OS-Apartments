@@ -3555,7 +3555,58 @@ const originalSetLanguage = setLanguage;
 setLanguage = function(language) {
   originalSetLanguage(language);
   translateNewUI();
+  translateReportLabels();
+  document.querySelectorAll(".theme-toggle").forEach(button => {
+    const dark = document.documentElement.getAttribute("data-theme") === "dark";
+    button.textContent = dark ? (currentLanguage === "ar" ? "☀️ الوضع الفاتح" : "☀️ Light Mode") : (currentLanguage === "ar" ? "🌙 الوضع الداكن" : "🌙 Dark Mode");
+  });
 };
+
+
+function translateReportLabels() {
+  const ar = currentLanguage === "ar";
+  const labels = {
+    "report-revenue-label": ["Operating Revenue", "الإيرادات التشغيلية"],
+    "report-expenses-label": ["Operating Expenses", "المصاريف التشغيلية"],
+    "report-profit-label": ["Net Profit", "صافي الربح"],
+    "monthly-occupancy-label": ["Occupancy Rate", "معدل الإشغال"],
+    "cost-coverage-title": ["Annual Cost Coverage", "تغطية التكاليف السنوية"],
+    "cost-coverage-description": ["Track progress toward your annual operating budget", "متابعة تغطية الميزانية التشغيلية السنوية"],
+    "annual-budget-label": ["Annual Budget", "الميزانية السنوية"],
+    "annual-rent-label": ["Annual Rent", "الإيجار السنوي"],
+    "annual-cleaning-label": ["Cleaning Budget", "ميزانية التنظيف"],
+    "annual-reserve-label": ["Emergency Reserve", "احتياطي الطوارئ"],
+    "monthly-booking-details-title": ["Monthly Booking Details", "تفاصيل الحجوزات الشهرية"],
+    "monthly-booking-details-description": ["Bookings, nights and average apartment pricing", "الحجوزات والليالي ومتوسط الأسعار"],
+    "monthly-bookings-label": ["Total Bookings", "عدد الحجوزات"],
+    "monthly-nights-label": ["Booked Nights", "الليالي المحجوزة"],
+    "monthly-nightly-rate-label": ["Average Nightly Rate", "متوسط العائد لليلة"],
+    "monthly-booking-value-label": ["Average Booking Value", "متوسط قيمة الحجز"],
+    "booking-trends-title": ["Bookings by Month", "الحجوزات حسب الشهر"],
+    "booking-trends-description": ["Compare monthly reservation counts", "مقارنة عدد الحجوزات شهريًا"],
+    "financial-trends-title": ["Revenue vs. Expenses", "الإيرادات مقابل المصاريف"],
+    "financial-trends-description": ["Compare income, costs and profit over time", "مقارنة الإيرادات والتكاليف والأرباح عبر الأشهر"]
+  };
+  for (const [id, pair] of Object.entries(labels)) {
+    const el = document.getElementById(id);
+    if (el) el.textContent = pair[ar ? 1 : 0];
+  }
+  const panelKeys = [
+    ["Monthly Performance", "الأداء الشهري", "Revenue, operating expenses and net profit", "الإيرادات والمصاريف التشغيلية وصافي الربح"],
+    null, null,
+    ["Earnings by Month", "الإيرادات حسب الشهر", "Compare your apartment's monthly performance", "مقارنة أداء الشقة شهريًا"],
+    null, null,
+    ["Bookings by Platform", "الحجوزات حسب المنصة", "See where your reservations come from", "معرفة مصادر حجوزاتك"]
+  ];
+  document.querySelectorAll("#tab-reports > .panel").forEach((panel, i) => {
+    const pair = panelKeys[i];
+    if (!pair) return;
+    const h = panel.querySelector(":scope > .section-header h2");
+    const desc = panel.querySelector(":scope > .section-header p");
+    if (h) h.textContent = pair[ar ? 1 : 0];
+    if (desc) desc.textContent = pair[ar ? 3 : 2];
+  });
+}
 
 /* =====================================================
    AUTHENTICATION VIEWS
@@ -4034,8 +4085,8 @@ checkSession();
       const isDark = theme === "dark";
 
       button.textContent = isDark
-        ? "☀️ Light Mode"
-        : "🌙 Dark Mode";
+        ? (currentLanguage === "ar" ? "☀️ الوضع الفاتح" : "☀️ Light Mode")
+        : (currentLanguage === "ar" ? "🌙 الوضع الداكن" : "🌙 Dark Mode");
 
       button.setAttribute("aria-pressed", String(isDark));
     });
@@ -4044,7 +4095,8 @@ checkSession();
   function createThemeButton(parent) {
     if (!parent) return;
 
-    const button = document.createElement("button");
+    let button = parent.querySelector(".theme-toggle");
+    if (!button) button = document.createElement("button");
     button.type = "button";
     button.className = "theme-toggle";
 
@@ -4055,7 +4107,7 @@ checkSession();
       applyTheme(currentTheme === "dark" ? "light" : "dark");
     });
 
-    parent.appendChild(button);
+    if (!button.isConnected) parent.appendChild(button);
   }
 
   function initializeTheme() {
