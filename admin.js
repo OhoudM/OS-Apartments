@@ -2047,6 +2047,7 @@ function renderReports() {
   renderPlatformChart();
   renderMonthlyBookingsChart(earningsMap, expenseMap);
   renderMonthlyFinancialChart(earningsMap, expenseMap);
+  translateReportLabels();
 }
 
 $("report-month")?.addEventListener(
@@ -3591,21 +3592,34 @@ function translateReportLabels() {
     const el = document.getElementById(id);
     if (el) el.textContent = pair[ar ? 1 : 0];
   }
-  const panelKeys = [
+  const panelTranslations = [
     ["Monthly Performance", "الأداء الشهري", "Revenue, operating expenses and net profit", "الإيرادات والمصاريف التشغيلية وصافي الربح"],
-    null, null,
+    ["Annual Cost Coverage", "تغطية التكاليف السنوية", "Track progress toward your annual operating budget", "متابعة تغطية الميزانية التشغيلية السنوية"],
+    ["Monthly Booking Details", "تفاصيل الحجوزات الشهرية", "Bookings, nights and average apartment pricing", "الحجوزات والليالي ومتوسط الأسعار"],
     ["Earnings by Month", "الإيرادات حسب الشهر", "Compare your apartment's monthly performance", "مقارنة أداء الشقة شهريًا"],
-    null, null,
-    ["Bookings by Platform", "الحجوزات حسب المنصة", "See where your reservations come from", "معرفة مصادر حجوزاتك"]
+    ["Bookings by Month", "الحجوزات حسب الشهر", "Compare monthly reservation counts", "مقارنة عدد الحجوزات شهريًا"],
+    ["Revenue vs. Expenses", "الإيرادات مقابل المصاريف", "Compare income, costs and profit over time", "مقارنة الإيرادات والمصاريف والأرباح عبر الأشهر"],
+    ["Bookings by Platform", "الحجوزات حسب المنصة", "See where your reservations come from", "معرفة مصادر الحجوزات"]
   ];
-  document.querySelectorAll("#tab-reports > .panel").forEach((panel, i) => {
-    const pair = panelKeys[i];
+  document.querySelectorAll("#tab-reports > .panel").forEach((panel, index) => {
+    const pair = panelTranslations[index];
     if (!pair) return;
-    const h = panel.querySelector(":scope > .section-header h2");
-    const desc = panel.querySelector(":scope > .section-header p");
+    const h = panel.querySelector(".section-header h2");
+    const desc = panel.querySelector(".section-header p");
     if (h) h.textContent = pair[ar ? 1 : 0];
     if (desc) desc.textContent = pair[ar ? 3 : 2];
   });
+  const monthSelect = document.getElementById("report-month");
+  if (monthSelect) {
+    for (const option of monthSelect.options) {
+      if (!/^\d{4}-\d{2}$/.test(option.value)) continue;
+      const [year, month] = option.value.split("-").map(Number);
+      option.textContent = new Intl.DateTimeFormat(ar ? "ar-SA" : "en-US", {
+        month: "long", year: "numeric", timeZone: "UTC"
+      }).format(new Date(Date.UTC(year, month - 1, 1)));
+    }
+    monthSelect.setAttribute("aria-label", ar ? "اختيار شهر التقرير" : "Select report month");
+  }
 }
 
 /* =====================================================
@@ -4100,15 +4114,16 @@ checkSession();
     button.type = "button";
     button.className = "theme-toggle";
 
-    button.addEventListener("click", () => {
-      const currentTheme =
-        document.documentElement.getAttribute("data-theme");
-
-      applyTheme(currentTheme === "dark" ? "light" : "dark");
-    });
-
+    // Clicks are handled once at document level, including existing HTML buttons.
     if (!button.isConnected) parent.appendChild(button);
   }
+
+  document.addEventListener("click", (event) => {
+    const button = event.target.closest(".theme-toggle");
+    if (!button) return;
+    const current = document.documentElement.getAttribute("data-theme");
+    applyTheme(current === "dark" ? "light" : "dark");
+  });
 
   function initializeTheme() {
     createThemeButton(

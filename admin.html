@@ -1,20 +1,15 @@
+
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>OS Apartments | Admin Dashboard</title>
-
-  <!-- Arabic Font: Tajawal -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-
-  <!-- Dashboard Styles -->
-  <link rel="stylesheet" href="admin.css?v=6">
+  <link rel="stylesheet" href="admin.css?v=7">
 </head>
-
 <body>
 
   <!-- AUTHENTICATION -->
@@ -173,35 +168,27 @@
     </div>
   </section>
 
-  
-<!-- DASHBOARD -->
-<main id="dashboard-section" class="dashboard-section" hidden>
-  <header class="admin-header">
-    <div class="dashboard-brand">
+  <!-- DASHBOARD -->
+  <main id="dashboard-section" class="dashboard-section" hidden>
+    <header class="admin-header">
+      <div class="dashboard-brand">
         <img src="Images/logo-os.png"
-         class="admin-logo"
-    alt="OS Apartments"
-  >
-  <p class="dashboard-brand-subtitle">
-    Management Dashboard
-  </p>
-</div>
+          class="admin-logo"
+          alt="OS Apartments">
+        <p class="dashboard-brand-subtitle">
+          Management Dashboard
+        </p>
+      </div>
 
       <div class="header-actions">
         <button id="open-add-booking" type="button"
           class="primary-btn" data-i18n="addBooking">
           + Add Booking
         </button>
-       
-<button id="language-toggle" type="button">العربية</button>
-
-<button
-  class="theme-toggle"
-  type="button"
-  aria-pressed="false"
->
-  🌙 Dark Mode
-</button>
+        <button id="language-toggle" type="button">العربية</button>
+        <button class="theme-toggle" type="button" aria-pressed="false">
+          🌙 Dark Mode
+        </button>
         <button id="logout-btn" type="button" data-i18n="logout">
           Logout
         </button>
@@ -324,7 +311,9 @@
         <div class="section-header">
           <div>
             <h2 data-i18n="bookingCalendar">Booking Calendar</h2>
-            <p data-i18n="calendarDesc">See who is staying each day</p>
+            <p data-i18n="calendarDesc">
+              See who is staying each day
+            </p>
           </div>
           <div class="calendar-controls">
             <button id="prev-month" type="button"
@@ -445,16 +434,15 @@
               Cleaning, maintenance, utilities and supplies
             </p>
           </div>
-          
-<button type="button" id="open-add-expense"
-  class="primary-btn"
-  data-i18n="addExpense">
-  + Add Expense
-</button>
 
+          <button type="button" id="open-add-expense"
+            class="primary-btn" data-i18n="addExpense">
+            + Add Expense
+          </button>
         </div>
 
-       <p id="expenses-message" role="status" hidden></p>
+        <p id="expenses-message" role="status" hidden></p>
+
         <div class="table-wrapper">
           <table>
             <thead>
@@ -471,197 +459,205 @@
       </section>
     </section>
 
-    
-<!-- REPORTS -->
-<section id="tab-reports" class="tab-content" hidden>
-  <div class="section-header">
-    <div>
-      <h2 data-i18n="reports">Reports & Analytics</h2>
-      <p data-i18n="reportsDesc">
-        Understand how your apartment is performing
-      </p>
-    </div>
-  </div>
+    <!-- REPORTS -->
+    <section id="tab-reports" class="tab-content" hidden>
+      <div class="section-header">
+        <div>
+          <h2 data-i18n="reports">Reports & Analytics</h2>
+          <p data-i18n="reportsDesc">
+            Understand how your apartment is performing
+          </p>
+        </div>
+      </div>
 
-  <!-- MONTHLY FINANCIAL PERFORMANCE -->
-  <section class="panel">
-    <div class="section-header">
-      <div>
-        <h2 data-i18n="monthlyPerformance">Monthly Performance</h2>
-        <p data-i18n="monthlyPerformanceDesc">
-          Revenue, operating expenses and net profit
+      <!-- MONTHLY FINANCIAL PERFORMANCE -->
+      <section class="panel">
+        <div class="section-header">
+          <div>
+            <h2 data-i18n="monthlyPerformance">Monthly Performance</h2>
+            <p data-i18n="monthlyPerformanceDesc">
+              Revenue, operating expenses and net profit
+            </p>
+          </div>
+          <select id="report-month" aria-label="Select report month">
+            <option value="">Select month</option>
+          </select>
+        </div>
+
+        <div class="finance-grid">
+          <div class="stat-card">
+            <span id="report-revenue-label">
+              Operating Revenue | الأرباح التشغيلية
+            </span>
+            <h3 id="monthly-earnings">—</h3>
+          </div>
+
+          <div class="stat-card">
+            <span id="report-expenses-label">
+              Operating Expenses | المصاريف التشغيلية
+            </span>
+            <h3 id="monthly-expenses">—</h3>
+          </div>
+
+          <div class="stat-card">
+            <span id="report-profit-label">
+              Net Profit | صافي الربح
+            </span>
+            <h3 id="monthly-profit">—</h3>
+          </div>
+
+          <div class="stat-card">
+            <span id="monthly-occupancy-label">Occupancy Rate</span>
+            <h3 id="monthly-occupancy">—</h3>
+          </div>
+        </div>
+      </section>
+
+      <!-- ANNUAL COST COVERAGE -->
+      <section class="panel">
+        <div class="section-header">
+          <div>
+            <h2 id="cost-coverage-title">Annual Cost Coverage</h2>
+            <p id="cost-coverage-description">
+              Track progress toward your annual operating budget
+            </p>
+          </div>
+        </div>
+
+        <div class="finance-grid">
+          <div class="stat-card">
+            <span id="annual-budget-label">Annual Budget</span>
+            <h3>42,000 SAR</h3>
+          </div>
+          <div class="stat-card">
+            <span id="annual-rent-label">Annual Rent</span>
+            <h3>31,000 SAR</h3>
+          </div>
+          <div class="stat-card">
+            <span id="annual-cleaning-label">Cleaning Budget</span>
+            <h3>6,000 SAR</h3>
+          </div>
+          <div class="stat-card">
+            <span id="annual-reserve-label">Emergency Reserve</span>
+            <h3>5,000 SAR</h3>
+          </div>
+        </div>
+
+        <p id="annual-coverage-status" role="status">
+          Cost coverage will be calculated from your financial records.
         </p>
-      </div>
-      <select id="report-month" aria-label="Select report month">
-        <option value="">Select month</option>
-      </select>
-    </div>
 
-    <div class="finance-grid">
-      <div class="stat-card">
-        <span id="report-revenue-label">Operating Revenue | الأرباح التشغيلية</span>
-        <h3 id="monthly-earnings">—</h3>
-      </div>
+        <div class="report-progress-track"
+          role="progressbar"
+          aria-label="Annual cost coverage"
+          aria-valuemin="0"
+          aria-valuemax="100"
+          aria-valuenow="0"
+          id="annual-coverage-progress">
+          <div id="annual-coverage-bar"
+            class="report-progress-fill"></div>
+        </div>
 
-      <div class="stat-card">
-        <span id="report-expenses-label">Operating Expenses | المصاريف التشغيلية</span>
-        <h3 id="monthly-expenses">—</h3>
-      </div>
+        <p id="annual-coverage-details"></p>
+      </section>
 
-      <div class="stat-card">
-        <span id="report-profit-label">Net Profit | صافي الربح</span>
-        <h3 id="monthly-profit">—</h3>
-      </div>
+      <!-- MONTHLY BOOKING DETAILS -->
+      <section class="panel">
+        <div class="section-header">
+          <div>
+            <h2 id="monthly-booking-details-title">
+              Monthly Booking Details
+            </h2>
+            <p id="monthly-booking-details-description">
+              Bookings, nights and average apartment pricing
+            </p>
+          </div>
+        </div>
 
-      <div class="stat-card">
-        <span id="monthly-occupancy-label">Occupancy Rate</span>
-        <h3 id="monthly-occupancy">—</h3>
-      </div>
-    </div>
-  </section>
+        <div class="finance-grid">
+          <div class="stat-card">
+            <span id="monthly-bookings-label">Total Bookings</span>
+            <h3 id="report-booking-count">—</h3>
+          </div>
+          <div class="stat-card">
+            <span id="monthly-nights-label">Booked Nights</span>
+            <h3 id="report-booked-nights">—</h3>
+          </div>
+          <div class="stat-card">
+            <span id="monthly-nightly-rate-label">
+              Average Nightly Rate
+            </span>
+            <h3 id="report-average-nightly-rate">—</h3>
+          </div>
+          <div class="stat-card">
+            <span id="monthly-booking-value-label">
+              Average Booking Value
+            </span>
+            <h3 id="report-average-booking-value">—</h3>
+          </div>
+        </div>
+      </section>
 
-  <!-- ANNUAL COST COVERAGE -->
-  <section class="panel">
-    <div class="section-header">
-      <div>
-        <h2 id="cost-coverage-title">Annual Cost Coverage</h2>
-        <p id="cost-coverage-description">
-          Track progress toward your annual operating budget
-        </p>
-      </div>
-    </div>
+      <!-- EARNINGS CHART -->
+      <section class="panel">
+        <div class="section-header">
+          <div>
+            <h2 data-i18n="earningsByMonth">Earnings by Month</h2>
+            <p data-i18n="earningsByMonthDesc">
+              Compare your apartment's monthly performance
+            </p>
+          </div>
+        </div>
+        <div id="monthly-earnings-chart" class="chart-container">
+          <p>Charts will appear after analytics setup.</p>
+        </div>
+      </section>
 
-    <div class="finance-grid">
-      <div class="stat-card">
-        <span id="annual-budget-label">Annual Budget</span>
-        <h3>42,000 SAR</h3>
-      </div>
+      <!-- BOOKINGS CHART -->
+      <section class="panel">
+        <div class="section-header">
+          <div>
+            <h2 id="booking-trends-title">Bookings by Month</h2>
+            <p id="booking-trends-description">
+              Compare monthly reservation counts
+            </p>
+          </div>
+        </div>
+        <div id="monthly-bookings-chart" class="chart-container">
+          <p>Monthly booking analytics will appear here.</p>
+        </div>
+      </section>
 
-      <div class="stat-card">
-        <span id="annual-rent-label">Annual Rent</span>
-        <h3>31,000 SAR</h3>
-      </div>
+      <!-- FINANCIAL CHART -->
+      <section class="panel">
+        <div class="section-header">
+          <div>
+            <h2 id="financial-trends-title">Revenue vs. Expenses</h2>
+            <p id="financial-trends-description">
+              Compare income, costs and profit over time
+            </p>
+          </div>
+        </div>
+        <div id="monthly-financial-chart" class="chart-container">
+          <p>Monthly financial analytics will appear here.</p>
+        </div>
+      </section>
 
-      <div class="stat-card">
-        <span id="annual-cleaning-label">Cleaning Budget</span>
-        <h3>6,000 SAR</h3>
-      </div>
-
-      <div class="stat-card">
-        <span id="annual-reserve-label">Emergency Reserve</span>
-        <h3>5,000 SAR</h3>
-      </div>
-    </div>
-
-    <p id="annual-coverage-status" role="status">
-      Cost coverage will be calculated from your financial records.
-    </p>
-    <div class="report-progress-track"
-         role="progressbar"
-         aria-label="Annual cost coverage"
-         aria-valuemin="0"
-         aria-valuemax="100"
-         aria-valuenow="0"
-         id="annual-coverage-progress">
-      <div id="annual-coverage-bar" class="report-progress-fill"></div>
-    </div>
-    <p id="annual-coverage-details"></p>
-  </section>
-
-  <!-- MONTHLY BOOKING DETAILS -->
-  <section class="panel">
-    <div class="section-header">
-      <div>
-        <h2 id="monthly-booking-details-title">Monthly Booking Details</h2>
-        <p id="monthly-booking-details-description">
-          Bookings, nights and average apartment pricing
-        </p>
-      </div>
-    </div>
-
-    <div class="finance-grid">
-      <div class="stat-card">
-        <span id="monthly-bookings-label">Total Bookings</span>
-        <h3 id="report-booking-count">—</h3>
-      </div>
-
-      <div class="stat-card">
-        <span id="monthly-nights-label">Booked Nights</span>
-        <h3 id="report-booked-nights">—</h3>
-      </div>
-
-      <div class="stat-card">
-        <span id="monthly-nightly-rate-label">Average Nightly Rate</span>
-        <h3 id="report-average-nightly-rate">—</h3>
-      </div>
-
-      <div class="stat-card">
-        <span id="monthly-booking-value-label">Average Booking Value</span>
-        <h3 id="report-average-booking-value">—</h3>
-      </div>
-    </div>
-  </section>
-
-  <!-- EXISTING EARNINGS CHART -->
-  <section class="panel">
-    <div class="section-header">
-      <div>
-        <h2 data-i18n="earningsByMonth">Earnings by Month</h2>
-        <p data-i18n="earningsByMonthDesc">
-          Compare your apartment's monthly performance
-        </p>
-      </div>
-    </div>
-    <div id="monthly-earnings-chart" class="chart-container">
-      <p>Charts will appear after analytics setup.</p>
-    </div>
-  </section>
-
-  <!-- NEW BOOKING CHART -->
-  <section class="panel">
-    <div class="section-header">
-      <div>
-        <h2 id="booking-trends-title">Bookings by Month</h2>
-        <p id="booking-trends-description">
-          Compare monthly reservation counts
-        </p>
-      </div>
-    </div>
-    <div id="monthly-bookings-chart" class="chart-container">
-      <p>Monthly booking analytics will appear here.</p>
-    </div>
-  </section>
-
-  <!-- NEW FINANCIAL CHART -->
-  <section class="panel">
-    <div class="section-header">
-      <div>
-        <h2 id="financial-trends-title">Revenue vs. Expenses</h2>
-        <p id="financial-trends-description">
-          Compare income, costs and profit over time
-        </p>
-      </div>
-    </div>
-    <div id="monthly-financial-chart" class="chart-container">
-      <p>Monthly financial analytics will appear here.</p>
-    </div>
-  </section>
-
-  <!-- EXISTING PLATFORM CHART -->
-  <section class="panel">
-    <div class="section-header">
-      <div>
-        <h2 data-i18n="bookingsByPlatform">Bookings by Platform</h2>
-        <p data-i18n="bookingsByPlatformDesc">
-          See where your reservations come from
-        </p>
-      </div>
-    </div>
-    <div id="platform-chart" class="chart-container">
-      <p>Platform analytics will appear after setup.</p>
-    </div>
-  </section>
-</section>
+      <!-- PLATFORM CHART -->
+      <section class="panel">
+        <div class="section-header">
+          <div>
+            <h2 data-i18n="bookingsByPlatform">Bookings by Platform</h2>
+            <p data-i18n="bookingsByPlatformDesc">
+              See where your reservations come from
+            </p>
+          </div>
+        </div>
+        <div id="platform-chart" class="chart-container">
+          <p>Platform analytics will appear after setup.</p>
+        </div>
+      </section>
+    </section>
 
     <!-- ADD BOOKING -->
     <dialog id="add-booking-dialog" class="admin-dialog">
@@ -689,7 +685,9 @@
           </label>
 
           <label>
-            <span data-i18n="confirmationCode">Confirmation Code</span>
+            <span data-i18n="confirmationCode">
+              Confirmation Code
+            </span>
             <input id="manual-code" type="text">
           </label>
 
@@ -753,13 +751,17 @@
 
       <h3 id="payment-guest"></h3>
       <p>
-        <span data-i18n="remainingBalance">Remaining Balance:</span>
+        <span data-i18n="remainingBalance">
+          Remaining Balance:
+        </span>
         <strong id="payment-balance">—</strong>
       </p>
 
       <form id="record-payment-form">
         <label>
-          <span data-i18n="paymentAmount">Payment Amount (SAR)</span>
+          <span data-i18n="paymentAmount">
+            Payment Amount (SAR)
+          </span>
           <input id="new-payment-amount" type="number"
             min="0.01" step="0.01" required>
         </label>
@@ -790,10 +792,13 @@
     <!-- EARNINGS DETAILS -->
     <dialog id="earnings-dialog" class="admin-dialog">
       <div class="dialog-header">
-        <h2 data-i18n="hostEarnings">Estimated Host Earnings</h2>
+        <h2 data-i18n="hostEarnings">
+          Estimated Host Earnings
+        </h2>
         <button type="button" id="close-earnings-dialog"
           aria-label="Close">×</button>
       </div>
+
       <div id="earnings-breakdown-content">
         <p>Financial breakdown will appear here.</p>
       </div>
@@ -846,36 +851,38 @@
 
   </main>
 
-  
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="admin.js?v=6"></script>
+  <!-- SUPABASE -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
-  
-<!-- DELETE EXPENSE CONFIRMATION -->
-<dialog id="delete-expense-dialog" class="delete-expense-dialog">
-  <div class="delete-expense-content">
-    <div class="delete-expense-icon">!</div>
+  <!-- DASHBOARD JAVASCRIPT -->
+  <script src="admin.js?v=7"></script>
 
-    <h2 id="delete-expense-title">Delete Expense?</h2>
+  <!-- DELETE EXPENSE CONFIRMATION -->
+  <dialog id="delete-expense-dialog" class="delete-expense-dialog">
+    <div class="delete-expense-content">
+      <div class="delete-expense-icon">!</div>
 
-    <p id="delete-expense-description">
-      Are you sure you want to delete this expense?
-      This action cannot be undone.
-    </p>
+      <h2 id="delete-expense-title">Delete Expense?</h2>
 
-    <p id="delete-expense-details"></p>
-    <p id="delete-expense-error" role="alert"></p>
+      <p id="delete-expense-description">
+        Are you sure you want to delete this expense?
+        This action cannot be undone.
+      </p>
 
-    <div class="delete-expense-buttons">
-      <button type="button" id="cancel-delete-expense">
-        Cancel
-      </button>
+      <p id="delete-expense-details"></p>
+      <p id="delete-expense-error" role="alert"></p>
 
-      <button type="button" id="confirm-delete-expense">
-        Delete Expense
-      </button>
+      <div class="delete-expense-buttons">
+        <button type="button" id="cancel-delete-expense">
+          Cancel
+        </button>
+
+        <button type="button" id="confirm-delete-expense">
+          Delete Expense
+        </button>
+      </div>
     </div>
-  </div>
-</dialog>
+  </dialog>
+
 </body>
 </html>
