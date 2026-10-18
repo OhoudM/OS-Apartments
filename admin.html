@@ -455,78 +455,197 @@
       </section>
     </section>
 
-    <!-- REPORTS -->
-    <section id="tab-reports" class="tab-content" hidden>
-      <div class="section-header">
-        <div>
-          <h2 data-i18n="reports">Reports & Analytics</h2>
-          <p data-i18n="reportsDesc">
-            Understand how your apartment is performing
-          </p>
-        </div>
+    
+<!-- REPORTS -->
+<section id="tab-reports" class="tab-content" hidden>
+  <div class="section-header">
+    <div>
+      <h2 data-i18n="reports">Reports & Analytics</h2>
+      <p data-i18n="reportsDesc">
+        Understand how your apartment is performing
+      </p>
+    </div>
+  </div>
+
+  <!-- MONTHLY FINANCIAL PERFORMANCE -->
+  <section class="panel">
+    <div class="section-header">
+      <div>
+        <h2 data-i18n="monthlyPerformance">Monthly Performance</h2>
+        <p data-i18n="monthlyPerformanceDesc">
+          Revenue, operating expenses and net profit
+        </p>
+      </div>
+      <select id="report-month" aria-label="Select report month">
+        <option value="">Select month</option>
+      </select>
+    </div>
+
+    <div class="finance-grid">
+      <div class="stat-card">
+        <span id="report-revenue-label">Operating Revenue | الأرباح التشغيلية</span>
+        <h3 id="monthly-earnings">—</h3>
       </div>
 
-      <section class="panel">
-        <div class="section-header">
-          <div>
-            <h2 data-i18n="monthlyPerformance">Monthly Performance</h2>
-            <p data-i18n="monthlyPerformanceDesc">
-              Estimated earnings, expenses and profit
-            </p>
-          </div>
-          <select id="report-month" aria-label="Select report month">
-            <option value="">Select month</option>
-          </select>
-        </div>
+      <div class="stat-card">
+        <span id="report-expenses-label">Operating Expenses | المصاريف التشغيلية</span>
+        <h3 id="monthly-expenses">—</h3>
+      </div>
 
-        <div class="finance-grid">
-          <div class="stat-card">
-            <span data-i18n="monthlyEarnings">Monthly Earnings</span>
-            <h3 id="monthly-earnings">—</h3>
-          </div>
-          <div class="stat-card">
-            <span data-i18n="monthlyExpenses">Monthly Expenses</span>
-            <h3 id="monthly-expenses">—</h3>
-          </div>
-          <div class="stat-card">
-            <span data-i18n="estimatedProfit">Estimated Profit</span>
-            <h3 id="monthly-profit">—</h3>
-          </div>
-          <div class="stat-card">
-            <span data-i18n="occupancyRate">Occupancy Rate</span>
-            <h3 id="monthly-occupancy">—</h3>
-          </div>
-        </div>
-      </section>
+      <div class="stat-card">
+        <span id="report-profit-label">Net Profit | صافي الربح</span>
+        <h3 id="monthly-profit">—</h3>
+      </div>
 
-      <section class="panel">
-        <div class="section-header">
-          <div>
-            <h2 data-i18n="earningsByMonth">Earnings by Month</h2>
-            <p data-i18n="earningsByMonthDesc">
-              Compare your apartment's monthly performance
-            </p>
-          </div>
-        </div>
-        <div id="monthly-earnings-chart" class="chart-container">
-          <p>Charts will appear after analytics setup.</p>
-        </div>
-      </section>
+      <div class="stat-card">
+        <span id="monthly-occupancy-label">Occupancy Rate</span>
+        <h3 id="monthly-occupancy">—</h3>
+      </div>
+    </div>
+  </section>
 
-      <section class="panel">
-        <div class="section-header">
-          <div>
-            <h2 data-i18n="bookingsByPlatform">Bookings by Platform</h2>
-            <p data-i18n="bookingsByPlatformDesc">
-              See where your reservations come from
-            </p>
-          </div>
-        </div>
-        <div id="platform-chart" class="chart-container">
-          <p>Platform analytics will appear after setup.</p>
-        </div>
-      </section>
-    </section>
+  <!-- ANNUAL COST COVERAGE -->
+  <section class="panel">
+    <div class="section-header">
+      <div>
+        <h2 id="cost-coverage-title">Annual Cost Coverage</h2>
+        <p id="cost-coverage-description">
+          Track progress toward your annual operating budget
+        </p>
+      </div>
+    </div>
+
+    <div class="finance-grid">
+      <div class="stat-card">
+        <span id="annual-budget-label">Annual Budget</span>
+        <h3>42,000 SAR</h3>
+      </div>
+
+      <div class="stat-card">
+        <span id="annual-rent-label">Annual Rent</span>
+        <h3>31,000 SAR</h3>
+      </div>
+
+      <div class="stat-card">
+        <span id="annual-cleaning-label">Cleaning Budget</span>
+        <h3>6,000 SAR</h3>
+      </div>
+
+      <div class="stat-card">
+        <span id="annual-reserve-label">Emergency Reserve</span>
+        <h3>5,000 SAR</h3>
+      </div>
+    </div>
+
+    <p id="annual-coverage-status" role="status">
+      Cost coverage will be calculated from your financial records.
+    </p>
+    <div class="report-progress-track"
+         role="progressbar"
+         aria-label="Annual cost coverage"
+         aria-valuemin="0"
+         aria-valuemax="100"
+         aria-valuenow="0"
+         id="annual-coverage-progress">
+      <div id="annual-coverage-bar" class="report-progress-fill"></div>
+    </div>
+    <p id="annual-coverage-details"></p>
+  </section>
+
+  <!-- MONTHLY BOOKING DETAILS -->
+  <section class="panel">
+    <div class="section-header">
+      <div>
+        <h2 id="monthly-booking-details-title">Monthly Booking Details</h2>
+        <p id="monthly-booking-details-description">
+          Bookings, nights and average apartment pricing
+        </p>
+      </div>
+    </div>
+
+    <div class="finance-grid">
+      <div class="stat-card">
+        <span id="monthly-bookings-label">Total Bookings</span>
+        <h3 id="report-booking-count">—</h3>
+      </div>
+
+      <div class="stat-card">
+        <span id="monthly-nights-label">Booked Nights</span>
+        <h3 id="report-booked-nights">—</h3>
+      </div>
+
+      <div class="stat-card">
+        <span id="monthly-nightly-rate-label">Average Nightly Rate</span>
+        <h3 id="report-average-nightly-rate">—</h3>
+      </div>
+
+      <div class="stat-card">
+        <span id="monthly-booking-value-label">Average Booking Value</span>
+        <h3 id="report-average-booking-value">—</h3>
+      </div>
+    </div>
+  </section>
+
+  <!-- EXISTING EARNINGS CHART -->
+  <section class="panel">
+    <div class="section-header">
+      <div>
+        <h2 data-i18n="earningsByMonth">Earnings by Month</h2>
+        <p data-i18n="earningsByMonthDesc">
+          Compare your apartment's monthly performance
+        </p>
+      </div>
+    </div>
+    <div id="monthly-earnings-chart" class="chart-container">
+      <p>Charts will appear after analytics setup.</p>
+    </div>
+  </section>
+
+  <!-- NEW BOOKING CHART -->
+  <section class="panel">
+    <div class="section-header">
+      <div>
+        <h2 id="booking-trends-title">Bookings by Month</h2>
+        <p id="booking-trends-description">
+          Compare monthly reservation counts
+        </p>
+      </div>
+    </div>
+    <div id="monthly-bookings-chart" class="chart-container">
+      <p>Monthly booking analytics will appear here.</p>
+    </div>
+  </section>
+
+  <!-- NEW FINANCIAL CHART -->
+  <section class="panel">
+    <div class="section-header">
+      <div>
+        <h2 id="financial-trends-title">Revenue vs. Expenses</h2>
+        <p id="financial-trends-description">
+          Compare income, costs and profit over time
+        </p>
+      </div>
+    </div>
+    <div id="monthly-financial-chart" class="chart-container">
+      <p>Monthly financial analytics will appear here.</p>
+    </div>
+  </section>
+
+  <!-- EXISTING PLATFORM CHART -->
+  <section class="panel">
+    <div class="section-header">
+      <div>
+        <h2 data-i18n="bookingsByPlatform">Bookings by Platform</h2>
+        <p data-i18n="bookingsByPlatformDesc">
+          See where your reservations come from
+        </p>
+      </div>
+    </div>
+    <div id="platform-chart" class="chart-container">
+      <p>Platform analytics will appear after setup.</p>
+    </div>
+  </section>
+</section>
 
     <!-- ADD BOOKING -->
     <dialog id="add-booking-dialog" class="admin-dialog">

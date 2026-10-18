@@ -820,8 +820,9 @@ async function loadExpenses() {
     return;
   }
 
-  expenses = data || [];
-  renderExpenses();
+ expenses = data || [];
+renderExpenses();
+renderReports();
 }
 
 function renderExpenses() {
@@ -971,8 +972,7 @@ $("delete-expense-dialog")?.addEventListener("close", () => {
   expensePendingDeletion = null;
 });
 
-document.addEventListener("click", async (event) => {
-  if (!event.target.closest("#confirm-delete-expense")) return;
+$("confirm-delete-expense")?.addEventListener("click", async () => {
   if (!expensePendingDeletion || deletingExpense) return;
 
   deletingExpense = true;
@@ -1833,6 +1833,7 @@ function reportMonthOptions() {
   if (!select) return;
 
   const map = monthlyEarningsMap();
+const expenseMap = monthlyExpenseMap();
   const now = new Date();
 
   const currentKey = `${now.getFullYear()}-${String(
@@ -1840,9 +1841,10 @@ function reportMonthOptions() {
   ).padStart(2, "0")}`;
 
   const months = new Set([
-    ...map.keys(),
-    currentKey
-  ]);
+  ...map.keys(),
+  ...expenseMap.keys(),
+  currentKey
+]);
 
   const sorted = [...months].sort().reverse();
 
@@ -1871,41 +1873,179 @@ function reportMonthOptions() {
   select.value = selectedReportMonth;
 }
 
+
+function monthlyExpenseMap() {
+  const totals = new Map();
+
+  expenses.forEach(expense => {
+    const date = String(expense.expense_date || "");
+    const amount = safeNumber(expense.amount);
+
+    if (!parseDate(date) || amount === null) return;
+
+    const key = date.slice(0, 7);
+    totals.set(key, (totals.get(key) || 0) + amount);
+  });
+
+  return totals;
+}
+
+function monthlyBookingDetails(monthKey) {
+  const [year, month] = monthKey.split("-").map(Number);
+
+  if (!year || !month) {
+    return { count: 0, nights: 0, revenue: 0 };
+  }
+
+  const monthStart = Date.UTC(year, month - 1, 1);
+  const monthEnd = Date.UTC(year, month, 1);
+
+  let count = 0;
+  let nights = 0;
+  let revenue = 0;
+
+  activeBookings().forEach(booking => {
+    if (booking.check_in?.startsWith(monthKey)) {
+      count++;
+    }
+
+    const start = parseDate(booking.check_in);
+    const end = parseDate(booking.check_out);
+    const totalNights = bookingNights(booking);
+    const earnings = safeNumber(booking.amount);
+
+    if (!start || !end || totalNights <= 0) return;
+
+    const startUTC = Date.UTC(
+      start.getFullYear(), start.getMonth(), start.getDate()
+    );
+
+    const endUTC = Date.UTC(
+      end.getFullYear(), end.getMonth(), end.getDate()
+    );
+
+    const overlap = Math.max(
+      0,
+      Math.min(endUTC, monthEnd) -
+      Math.max(startUTC, monthStart)
+    );
+
+    const nightsInMonth = overlap / 86400000;
+
+    nights += nightsInMonth;
+
+    if (earnings !== null) {
+      revenue += earnings * nightsInMonth / totalNights;
+    }
+  });
+
+  return { count, nights, revenue };
+}
+
+function renderAnnualCoverage(earningsMap) {
+  const ANNUAL_BUDGET = 42000;
+
+  const year = Number(selectedReportMonth.slice(0, 4));
+
+  const annualRevenue = [...earningsMap.entries()]
+    .filter(([key]) => key.startsWith(`${year}-`))
+    .reduce((sum, [, amount]) => sum + amount, 0);
+
+  const covered = Math.min(
+    100,
+    Math.max(0, annualRevenue / ANNUAL_BUDGET * 100)
+  );
+
+  const remaining = Math.max(0, ANNUAL_BUDGET - annualRevenue);
+  const surplus = Math.max(0, annualRevenue - ANNUAL_BUDGET);
+
+  const isArabic = currentLanguage === "ar";
+
+  setText(
+    "annual-coverage-status",
+    isArabic
+      ? `تغطية الميزانية السنوية ${year}: ${covered.toFixed(1)}%`
+      : `Annual budget coverage ${year}: ${covered.toFixed(1)}%`
+  );
+
+  setText(
+    "annual-coverage-details",
+    remaining > 0
+      ? (isArabic
+          ? `المتبقي للوصول للميزانية: ${money(remaining)}`
+          : `Remaining to budget target: ${money(remaining)}`)
+      : (isArabic
+          ? `تجاوز الإيرادات للميزانية: ${money(surplus)}`
+          : `Revenue above budget target: ${money(surplus)}`)
+  );
+
+  const bar = $("annual-coverage-bar");
+  if (bar) bar.style.width = `${covered}%`;
+
+  $("annual-coverage-progress")?.setAttribute(
+    "aria-valuenow",
+    covered.toFixed(1)
+  );
+}
+
 function renderReports() {
   reportMonthOptions();
 
-  const earnings = monthlyEarningsMap();
+  const earningsMap = monthlyEarningsMap();
+  const expenseMap = monthlyExpenseMap();
 
-  const monthly =
-    earnings.get(selectedReportMonth) || 0;
+  const month = selectedReportMonth;
 
-  setText(
-    "monthly-earnings",
-    money(monthly)
-  );
+  const revenue = earningsMap.get(month) || 0;
+  const expenseTotal = expenseMap.get(month) || 0;
+  const profit = revenue - expenseTotal;
 
-  // No expense data exists yet, so profit is unknown.
-  setText(
-    "monthly-expenses",
-    t("notConfigured")
-  );
+  setText("monthly-earnings", money(revenue));
+  setText("monthly-expenses", money(expenseTotal));
+  setText("monthly-profit", money(profit));
 
-  setText(
-    "monthly-profit",
-    "—"
-  );
-
-  const occupancy = monthlyOccupancy(
-    selectedReportMonth
-  );
+  const occupancy = monthlyOccupancy(month);
 
   setText(
     "monthly-occupancy",
     occupancy === null ? "—" : `${occupancy}%`
   );
 
-  renderEarningsChart(earnings);
+  const details = monthlyBookingDetails(month);
+
+  setText("report-booking-count", details.count);
+  setText("report-booked-nights", details.nights);
+
+  setText(
+    "report-average-nightly-rate",
+    details.nights > 0
+      ? money(details.revenue / details.nights)
+      : "—"
+  );
+
+  const startingBookings = activeBookings().filter(
+    booking => booking.check_in?.startsWith(month)
+  );
+
+  const bookingValues = startingBookings
+    .map(booking => safeNumber(booking.amount))
+    .filter(value => value !== null);
+
+  setText(
+    "report-average-booking-value",
+    bookingValues.length
+      ? money(
+          bookingValues.reduce((sum, value) => sum + value, 0) /
+          bookingValues.length
+        )
+      : "—"
+  );
+
+  renderAnnualCoverage(earningsMap);
+  renderEarningsChart(earningsMap);
   renderPlatformChart();
+  renderMonthlyBookingsChart(earningsMap, expenseMap);
+  renderMonthlyFinancialChart(earningsMap, expenseMap);
 }
 
 $("report-month")?.addEventListener(
@@ -2001,82 +2141,144 @@ function renderEarningsChart(earningsMap) {
   container.append(chart);
 }
 
-function renderPlatformChart() {
-  const container = $("platform-chart");
+
+function reportChartMonths(earningsMap, expenseMap) {
+  const months = new Set([
+    ...earningsMap.keys(),
+    ...expenseMap.keys()
+  ]);
+
+  activeBookings().forEach(booking => {
+    if (booking.check_in) {
+      months.add(booking.check_in.slice(0, 7));
+    }
+  });
+
+  return [...months].sort().slice(-12);
+}
+
+function reportMonthLabel(key) {
+  const [year, month] = key.split("-").map(Number);
+
+  return new Date(year, month - 1, 1).toLocaleString(
+    "en-US",
+    { month: "short", year: "2-digit" }
+  );
+}
+
+function renderMonthlyBookingsChart(earningsMap, expenseMap) {
+  const container = $("monthly-bookings-chart");
   if (!container) return;
 
   container.replaceChildren();
+  container.dir = "ltr";
 
-  const counts = new Map();
+  const months = reportChartMonths(earningsMap, expenseMap);
 
-  activeBookings().forEach((booking) => {
-    const platform = booking.platform || "Other";
-
-    counts.set(
-      platform,
-      (counts.get(platform) || 0) + 1
-    );
-  });
-
-  if (!counts.size) {
-    container.append(
-      createElement("p", "", t("noChartData"))
-    );
+  if (!months.length) {
+    container.textContent = t("noChartData");
     return;
   }
 
-  const total = [...counts.values()].reduce(
-    (sum, count) => sum + count,
-    0
+  const counts = months.map(month =>
+    activeBookings().filter(booking =>
+      booking.check_in?.startsWith(month)
+    ).length
   );
 
-  const colors = [
-    "#4b5130",
-    "#b69a65",
-    "#7c8a64",
-    "#9c8063",
-    "#697d75"
-  ];
+  const max = Math.max(1, ...counts);
 
-  [...counts.entries()].forEach(
-    ([platform, count], index) => {
-      const wrapper = createElement("div");
-      wrapper.style.marginBottom = "22px";
+  const chart = createElement("div");
+  chart.className = "report-bar-chart";
 
-      const heading = createElement("div");
-      heading.style.display = "flex";
-      heading.style.justifyContent = "space-between";
-      heading.style.gap = "10px";
-      heading.style.marginBottom = "7px";
+  months.forEach((month, index) => {
+    const group = createElement("div", "report-bar-group");
 
-      heading.append(
-        createElement("strong", "", platform),
-        createElement(
-          "span",
-          "",
-          `${count} (${Math.round(
-            (count / total) * 100
-          )}%)`
-        )
-      );
+    const value = createElement(
+      "strong", "report-bar-value", counts[index]
+    );
 
-      const track = createElement("div");
-      track.style.height = "13px";
-      track.style.background = "#e7e5dc";
-      track.style.borderRadius = "999px";
-      track.style.overflow = "hidden";
+    const bar = createElement("div", "report-bar");
+    bar.style.height =
+      `${Math.max(3, counts[index] / max * 155)}px`;
+    bar.style.background = "#7c8a64";
 
-      const fill = createElement("div");
-      fill.style.width = `${(count / total) * 100}%`;
-      fill.style.height = "100%";
-      fill.style.background =
-        colors[index % colors.length];
+    const label = createElement(
+      "span", "report-bar-month", reportMonthLabel(month)
+    );
 
-      track.append(fill);
-      wrapper.append(heading, track);
-      container.append(wrapper);
-    }
-  );
+    group.append(value, bar, label);
+    chart.append(group);
+  });
+
+  container.append(chart);
+}
+
+function renderMonthlyFinancialChart(earningsMap, expenseMap) {
+  const container = $("monthly-financial-chart");
+  if (!container) return;
+
+  container.replaceChildren();
+  container.dir = "ltr";
+
+  const months = reportChartMonths(earningsMap, expenseMap);
+
+  if (!months.length) {
+    container.textContent = t("noChartData");
+    return;
+  }
+
+  const values = months.flatMap(month => [
+    earningsMap.get(month) || 0,
+    expenseMap.get(month) || 0
+  ]);
+
+  const max = Math.max(1, ...values);
+
+  const legend = createElement("div", "report-chart-legend");
+
+  [
+    [currentLanguage === "ar" ? "الإيرادات" : "Revenue", "#7c8a64"],
+    [currentLanguage === "ar" ? "المصاريف" : "Expenses", "#b69a65"]
+  ].forEach(([name, color]) => {
+    const item = createElement("span", "", `● ${name}`);
+    item.style.color = color;
+    legend.append(item);
+  });
+
+  const chart = createElement("div");
+  chart.className = "report-bar-chart";
+
+  months.forEach(month => {
+    const revenue = earningsMap.get(month) || 0;
+    const expense = expenseMap.get(month) || 0;
+
+    const group = createElement("div", "report-bar-group");
+    const pair = createElement("div", "report-bar-pair");
+
+    [
+      [revenue, "#7c8a64"],
+      [expense, "#b69a65"]
+    ].forEach(([amount, color]) => {
+      const bar = createElement("div", "report-bar");
+
+      bar.style.height =
+        `${Math.max(3, amount / max * 155)}px`;
+      bar.style.background = color;
+      bar.title = money(amount);
+
+      pair.append(bar);
+    });
+
+    group.append(
+      pair,
+      createElement("span", "report-bar-month", reportMonthLabel(month))
+    );
+
+    chart.append(group);
+  });
+
+  container.append(legend, chart);
 }
 
 
@@ -2895,10 +3097,6 @@ if (quickActionsPanel) {
     ]
   );
 
-  const reportPanels = document.querySelectorAll(
-    "#tab-reports > .panel"
-  );
-
   [
     ["monthlyPerformance", "monthlyDesc"],
     ["earningsChart", "earningsChartDesc"],
@@ -2916,10 +3114,6 @@ if (quickActionsPanel) {
     if (h2) h2.textContent = t(title);
     if (p) p.textContent = t(desc);
   });
-
-  const monthlyCards = document.querySelectorAll(
-    "#tab-reports .finance-grid .stat-card"
-  );
 
   [
     "monthlyEarnings",
@@ -2976,6 +3170,82 @@ if (quickActionsPanel) {
   if (earningsHeading) {
     earningsHeading.textContent = t("hostEarnings");
   }
+
+  
+  const isAr = currentLanguage === "ar";
+
+  const reportLabels = {
+    "report-revenue-label": ["Operating Revenue", "الإيرادات التشغيلية"],
+    "report-expenses-label": ["Operating Expenses", "المصاريف التشغيلية"],
+    "report-profit-label": ["Net Profit", "صافي الربح"],
+    "cost-coverage-title": ["Annual Cost Coverage", "تغطية التكاليف السنوية"],
+    "cost-coverage-description": [
+      "Track progress toward your annual operating budget",
+      "متابعة تغطية الميزانية التشغيلية السنوية"
+    ],
+    "annual-budget-label": ["Annual Budget", "الميزانية السنوية"],
+    "annual-rent-label": ["Annual Rent", "الإيجار السنوي"],
+    "annual-cleaning-label": ["Cleaning Budget", "ميزانية النظافة"],
+    "annual-reserve-label": ["Emergency Reserve", "احتياطي الطوارئ"],
+    "monthly-booking-details-title": ["Monthly Booking Details", "تفاصيل الحجوزات الشهرية"],
+    "monthly-booking-details-description": [
+      "Bookings, nights and average apartment pricing",
+      "الحجوزات والليالي ومتوسط الأسعار"
+    ],
+    "monthly-bookings-label": ["Total Bookings", "عدد الحجوزات"],
+    "monthly-nights-label": ["Booked Nights", "الليالي المحجوزة"],
+    "monthly-nightly-rate-label": ["Average Nightly Rate", "متوسط العائد لليلة"],
+    "monthly-booking-value-label": ["Average Booking Value", "متوسط قيمة الحجز"],
+    "booking-trends-title": ["Bookings by Month", "الحجوزات حسب الشهر"],
+    "booking-trends-description": [
+      "Compare monthly reservation counts",
+      "مقارنة عدد الحجوزات شهريًا"
+    ],
+    "financial-trends-title": ["Revenue vs. Expenses", "الإيرادات مقابل المصاريف"],
+    "financial-trends-description": [
+      "Compare income, costs and profit over time",
+      "مقارنة الإيرادات والتكاليف عبر الأشهر"
+    ]
+  };
+
+  Object.entries(reportLabels).forEach(([id, labels]) => {
+    setText(id, labels[isAr ? 1 : 0]);
+  });
+
+  const reportPanels = document.querySelectorAll(
+    "#tab-reports > .panel"
+  );
+
+  const panelTranslations = [
+    ["monthlyPerformance", "monthlyDesc"],
+    null,
+    null,
+    ["earningsChart", "earningsChartDesc"],
+    null,
+    null,
+    ["platformChart", "platformChartDesc"]
+  ];
+
+  panelTranslations.forEach((keys, index) => {
+    if (!keys) return;
+
+    const header = reportPanels[index]?.querySelector(
+      ":scope > .section-header"
+    );
+
+    if (!header) return;
+
+    const heading = header.querySelector("h2");
+    const description = header.querySelector("p");
+
+    if (heading) heading.textContent = t(keys[0]);
+    if (description) description.textContent = t(keys[1]);
+  });
+
+  setText(
+    "monthly-occupancy-label",
+    t("occupancy")
+  );
 
   renderEverything();
 }

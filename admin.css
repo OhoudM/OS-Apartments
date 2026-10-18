@@ -3054,37 +3054,118 @@ html[data-theme="dark"] .dashboard-brand .admin-logo {
   cursor: not-allowed;
 }
 
-/* MOBILE HEADER - CENTER LOGO */
-@media (max-width: 768px) {
-
-  .admin-header {
+/* MOBILE DASHBOARD BRAND */
+@media screen and (max-width: 768px) {
+  #dashboard-section .admin-header {
     display: flex;
     flex-direction: column;
     align-items: center;
-    width: 100%;
   }
 
-  .admin-header .dashboard-brand {
+  #dashboard-section .admin-header .dashboard-brand {
     display: flex;
     flex-direction: column;
     align-items: center;
-    justify-content: center;
     text-align: center;
+    align-self: stretch;
     width: 100%;
-    margin: 0 auto;
+    margin-inline: auto;
   }
 
-  .admin-header .dashboard-brand .admin-logo {
+  #dashboard-section .dashboard-brand .admin-logo {
     display: block;
-    margin: 0 auto;
+    margin-inline: auto !important;
   }
 
-  .admin-header .dashboard-brand-subtitle {
+  #dashboard-section .dashboard-brand-subtitle {
+    width: 100%;
     text-align: center;
-    width: 100%;
   }
 
-  .admin-header .header-actions {
+  #dashboard-section .header-actions {
     width: 100%;
   }
+}
+
+/* Reports: annual cost coverage */
+
+.report-progress-track {
+  width: 100%;
+  height: 14px;
+  overflow: hidden;
+  border-radius: 999px;
+  background: var(--surface-soft);
+  border: 1px solid var(--border);
+}
+
+.report-progress-fill {
+  width: 0%;
+  height: 100%;
+  border-radius: inherit;
+  background: var(--olive);
+  transition: width 0.3s ease;
+}
+
+#annual-coverage-status {
+  margin-bottom: 12px;
+  color: var(--text);
+  font-weight: 600;
+}
+
+#annual-coverage-details {
+  margin-top: 10px;
+  color: var(--text-muted);
+  font-size: 13px;
+}
+
+
+.report-bar-chart {
+  display: flex;
+  align-items: flex-end;
+  gap: 14px;
+  min-height: 215px;
+  overflow-x: auto;
+  padding: 12px 4px;
+}
+
+.report-bar-group {
+  flex: 1 0 58px;
+  min-width: 58px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+.report-bar {
+  width: 26px;
+  min-height: 3px;
+  border-radius: 5px 5px 0 0;
+}
+
+.report-bar-pair {
+  height: 155px;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  gap: 5px;
+}
+
+.report-bar-pair .report-bar {
+  width: 20px;
+}
+
+.report-bar-value,
+.report-bar-month {
+  font-size: 12px;
+  color: var(--text);
+}
+
+.report-chart-legend {
+  display: flex;
+  gap: 20px;
+  margin-bottom: 12px;
+  font-size: 13px;
+  font-weight: 600;
 }
