@@ -3605,9 +3605,22 @@ async function showDashboard() {
     $("login-section").hidden = true;
     $("dashboard-section").hidden = false;
 
-   switchTab(currentTab);
-await loadBookings();
-await loadExpenses();
+   
+    switchTab(currentTab);
+
+try {
+  await loadBookings();
+  await loadExpenses();
+} catch (dashboardError) {
+  console.error("Dashboard loading error:", dashboardError);
+
+  showMessage(
+    "Dashboard data could not finish loading: " +
+    dashboardError.message,
+    true
+  );
+}
+
   } catch (err) {
     if (request !== authVersion) return;
 
