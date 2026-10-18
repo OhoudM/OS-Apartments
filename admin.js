@@ -972,7 +972,8 @@ $("delete-expense-dialog")?.addEventListener("close", () => {
   expensePendingDeletion = null;
 });
 
-$("confirm-delete-expense")?.addEventListener("click", async () => {
+document.addEventListener("click", async (event) => {
+  if (!event.target.closest("#confirm-delete-expense")) return;
   if (!expensePendingDeletion || deletingExpense) return;
 
   deletingExpense = true;
@@ -2141,6 +2142,54 @@ function renderEarningsChart(earningsMap) {
   container.append(chart);
 }
 
+
+function renderPlatformChart() {
+  const container = $("platform-chart");
+  if (!container) return;
+
+  container.replaceChildren();
+  const counts = new Map();
+  activeBookings().forEach((booking) => {
+    const platform = booking.platform || "Other";
+    counts.set(platform, (counts.get(platform) || 0) + 1);
+  });
+
+  if (!counts.size) {
+    container.append(createElement("p", "", t("noChartData")));
+    return;
+  }
+
+  const total = [...counts.values()].reduce((sum, count) => sum + count, 0);
+  const colors = ["#4b5130", "#b69a65", "#7c8a64", "#9c8063", "#697d75"];
+
+  [...counts.entries()]
+    .sort((a, b) => b[1] - a[1])
+    .forEach(([platform, count], index) => {
+      const row = createElement("div", "platform-chart-row");
+      row.style.marginBottom = "18px";
+      const heading = createElement("div", "platform-chart-heading");
+      heading.style.display = "flex";
+      heading.style.justifyContent = "space-between";
+      heading.style.gap = "12px";
+      heading.style.marginBottom = "7px";
+      heading.append(
+        createElement("strong", "", platform),
+        createElement("span", "", `${count} (${Math.round(count / total * 100)}%)`)
+      );
+      const track = createElement("div", "platform-chart-track");
+      track.style.height = "12px";
+      track.style.borderRadius = "999px";
+      track.style.background = "var(--border, #e7e5dc)";
+      track.style.overflow = "hidden";
+      const bar = createElement("div", "platform-chart-fill");
+      bar.style.height = "100%";
+      bar.style.width = `${count / total * 100}%`;
+      bar.style.background = colors[index % colors.length];
+      track.append(bar);
+      row.append(heading, track);
+      container.append(row);
+    });
+}
 
 function reportChartMonths(earningsMap, expenseMap) {
   const months = new Set([
@@ -4048,4 +4097,3 @@ document.addEventListener("click", (event) => {
     }
   }
 });
-
