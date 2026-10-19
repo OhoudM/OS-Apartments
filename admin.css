@@ -3142,3 +3142,32 @@ html[data-theme="dark"] .expense-edit-btn {
     grid-template-columns: minmax(0, 1fr);
   }
 }
+
+/* Calendar-only colors: booked = red, available = green. */
+.calendar-legend .legend-booked::before { background: #c45e63 !important; }
+.calendar-legend .legend-available::before { background: #6da785 !important; }
+.calendar-day:not(.booked):not(.empty) {
+  background: #e8f3eb;
+  border-color: #cde2d2;
+}
+.calendar-day.booked,
+html[data-theme="dark"] .calendar-day.booked {
+  background: #f9e5e6;
+  border-color: #e7b7ba;
+}
+.calendar-day.booked .calendar-day-number,
+.calendar-day .booked-label { color: #a73d46; }
+.calendar-day .calendar-guest,
+.calendar-day .calendar-guest-name { background: #bd5960; }
+.calendar-day button.calendar-guest:hover,
+.calendar-day button.calendar-guest-name:hover { background: #9c3d45; }
+html[data-theme="dark"] .calendar-day:not(.booked):not(.empty) {
+  background: #243b30;
+  border-color: #345443;
+}
+html[data-theme="dark"] .calendar-day.booked {
+  background: #462d32;
+  border-color: #734249;
+}
+html[data-theme="dark"] .calendar-day.booked .calendar-day-number,
+html[data-theme="dark"] .calendar-day .booked-label { color: #f0a1a3; }
