@@ -3108,3 +3108,37 @@ html[data-theme="dark"] .expense-edit-btn {
     transition-duration: .01ms !important;
   }
 }
+
+/* Login theme control */
+#login-section .auth-theme-toggle { display: flex !important; margin: 14px auto 0; width: fit-content; max-width: 100%; }
+
+/* Reports-only layout: four existing charts in two columns. */
+#tab-reports .reports-charts-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 20px;
+  align-items: stretch;
+}
+#tab-reports .reports-charts-grid > .panel {
+  min-width: 0;
+  margin: 0;
+}
+#tab-reports .reports-charts-grid .chart-container {
+  max-width: 100%;
+  overflow-x: auto;
+}
+#tab-reports .budget-balance-card.budget-below h3 {
+  color: #c76a6a;
+}
+#tab-reports .budget-balance-card.budget-covered h3 {
+  color: #62865d;
+}
+#tab-reports .budget-balance-card small {
+  display: block;
+  margin-top: 8px;
+}
+@media (max-width: 800px) {
+  #tab-reports .reports-charts-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}

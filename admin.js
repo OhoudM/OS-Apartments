@@ -2149,6 +2149,28 @@ function renderAnnualCoverage(earningsMap) {
 
   const isArabic = currentLanguage === "ar";
 
+  // Signed annual budget balance: negative until annual revenue covers the target.
+  const budgetBalance = annualRevenue - ANNUAL_BUDGET;
+  const budgetBalanceCard = $("annual-budget-balance-card");
+  setText(
+    "annual-budget-balance-label",
+    isArabic ? "رصيد الميزانية السنوية" : "Annual Budget Balance"
+  );
+  setText(
+    "annual-budget-balance",
+    `${budgetBalance < 0 ? "−" : budgetBalance > 0 ? "+" : ""}${money(Math.abs(budgetBalance))}`
+  );
+  setText(
+    "annual-budget-balance-note",
+    budgetBalance < 0
+      ? (isArabic ? "لم تتم تغطية الميزانية بعد" : "Budget not yet covered")
+      : (isArabic ? "تمت تغطية الميزانية" : "Annual budget covered")
+  );
+  if (budgetBalanceCard) {
+    budgetBalanceCard.classList.toggle("budget-below", budgetBalance < 0);
+    budgetBalanceCard.classList.toggle("budget-covered", budgetBalance >= 0);
+  }
+
   setText(
     "annual-coverage-status",
     isArabic
