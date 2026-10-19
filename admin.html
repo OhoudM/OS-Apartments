@@ -1,452 +1,256 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
   <title>OS Apartments | Admin Dashboard</title>
-
-  <!-- Arabic font -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-
-  <!-- Styles -->
   <link rel="stylesheet" href="admin.css?v=7">
 </head>
-
 <body>
 
   <!-- AUTHENTICATION -->
   <section id="login-section" class="login-section">
     <div class="login-card">
-
-      <img src="Images/logo-os.png"
-           alt="OS Apartments"
-           class="login-logo">
-
+      <img src="Images/logo-os.png" alt="OS Apartments" class="login-logo">
       <h1>OS Apartments</h1>
-      <p id="portal-subtitle">Family Management Portal</p>
+      <p id="portal-subtitle" data-i18n="portalSubtitle">Sign in to manage your apartment.</p>
 
       <!-- SIGN IN -->
       <form id="login-form" class="auth-form">
-
         <label for="email" data-i18n="email">Email</label>
-        <input id="email"
-               type="email"
-               autocomplete="email"
-               required>
+        <input id="email" type="email" autocomplete="email" required>
 
-        <label for="password" data-i18n="password">
-          Password
-        </label>
-
+        <label for="password" data-i18n="password">Password</label>
         <div class="password-field">
-          <input id="password"
-                 type="password"
-                 autocomplete="current-password"
-                 required>
-
-          <button type="button"
-                  class="password-toggle"
-                  data-target="password"
-                  aria-label="Show password"
-                  aria-pressed="false">👁</button>
+          <input id="password" type="password" autocomplete="current-password" required>
+          <button type="button" class="password-toggle"
+            data-target="password" aria-label="Show password"
+            aria-pressed="false">👁</button>
         </div>
 
-        <button type="submit"
-                class="primary-btn"
-                data-i18n="login">
-          Sign In
-        </button>
-
+        <button type="submit" class="primary-btn" data-i18n="login">Sign In</button>
         <p id="login-error" role="alert"></p>
 
-        <button type="button"
-                class="auth-link"
-                id="show-forgot-password"
-                data-i18n="forgotPassword">
+        <button type="button" class="auth-link"
+          id="show-forgot-password" data-i18n="forgotPassword">
           Forgot Password?
         </button>
 
-        <button type="button"
-                class="auth-link"
-                id="show-create-account"
-                data-i18n="createAccount">
+        <button type="button" class="auth-link"
+          id="show-create-account" data-i18n="createAccount">
           Create Account
         </button>
-
       </form>
 
       <!-- CREATE ACCOUNT -->
       <form id="signup-form" class="auth-form" hidden>
-
         <h2 data-i18n="createAccount">Create Account</h2>
 
-        <label for="signup-email" data-i18n="email">
-          Email
-        </label>
+        <label for="signup-email" data-i18n="email">Email</label>
+        <input id="signup-email" type="email" autocomplete="email" required>
 
-        <input id="signup-email"
-               type="email"
-               autocomplete="email"
-               required>
-
-        <label for="signup-password" data-i18n="password">
-          Password
-        </label>
-
+        <label for="signup-password" data-i18n="password">Password</label>
         <div class="password-field">
-          <input id="signup-password"
-                 type="password"
-                 autocomplete="new-password"
-                 minlength="8"
-                 required>
-
-          <button type="button"
-                  class="password-toggle"
-                  data-target="signup-password"
-                  aria-label="Show password"
-                  aria-pressed="false">👁</button>
+          <input id="signup-password" type="password"
+            autocomplete="new-password" minlength="8" required>
+          <button type="button" class="password-toggle"
+            data-target="signup-password" aria-label="Show password"
+            aria-pressed="false">👁</button>
         </div>
 
-        <label for="signup-confirm"
-               data-i18n="confirmPassword">
+        <label for="signup-confirm" data-i18n="confirmPassword">
           Confirm Password
         </label>
-
         <div class="password-field">
-          <input id="signup-confirm"
-                 type="password"
-                 autocomplete="new-password"
-                 minlength="8"
-                 required>
-
-          <button type="button"
-                  class="password-toggle"
-                  data-target="signup-confirm"
-                  aria-label="Show password"
-                  aria-pressed="false">👁</button>
+          <input id="signup-confirm" type="password"
+            autocomplete="new-password" minlength="8" required>
+          <button type="button" class="password-toggle"
+            data-target="signup-confirm" aria-label="Show password"
+            aria-pressed="false">👁</button>
         </div>
 
-        <button type="submit"
-                class="primary-btn"
-                data-i18n="createAccount">
-          Create Account
-        </button>
+        <button type="submit" class="primary-btn"
+          data-i18n="createAccount">Create Account</button>
 
         <p id="signup-message" role="status"></p>
 
-        <button type="button"
-                class="auth-link"
-                id="back-to-login-from-signup"
-                data-i18n="backToLogin">
+        <button type="button" class="auth-link"
+          id="back-to-login-from-signup" data-i18n="backToLogin">
           Back to Sign In
         </button>
-
       </form>
 
       <!-- PENDING APPROVAL -->
       <section id="pending-approval" class="auth-form" hidden>
-
-        <h2 data-i18n="pendingTitle">
-          Waiting for Approval
-        </h2>
-
+        <h2 data-i18n="pendingTitle">Waiting for Approval</h2>
         <p data-i18n="pendingDescription">
           Your account is registered. A family administrator
           must approve your access before you can view bookings.
         </p>
-
         <p id="approval-message" role="status"></p>
 
-        <button type="button"
-                class="primary-btn"
-                id="check-approval"
-                data-i18n="checkApproval">
+        <button type="button" class="primary-btn"
+          id="check-approval" data-i18n="checkApproval">
           Check Approval
         </button>
 
-        <button type="button"
-                class="auth-link"
-                id="pending-logout"
-                data-i18n="logout">
+        <button type="button" class="auth-link"
+          id="pending-logout" data-i18n="logout">
           Logout
         </button>
-
-        <button
-    type="button"
-    class="theme-toggle"
-    aria-label="Switch between light and dark mode"
-    aria-pressed="false">
-    🌙 Dark Mode
-  </button>
-
       </section>
 
       <!-- FORGOT PASSWORD -->
       <form id="forgot-form" class="auth-form" hidden>
-
-        <h2 data-i18n="resetPassword">
-          Reset Password
-        </h2>
-
+        <h2 data-i18n="resetPassword">Reset Password</h2>
         <p data-i18n="forgotDescription">
           Enter your email address to receive a password reset link.
         </p>
 
-        <label for="forgot-email" data-i18n="email">
-          Email
-        </label>
+        <label for="forgot-email" data-i18n="email">Email</label>
+        <input id="forgot-email" type="email" autocomplete="email" required>
 
-        <input id="forgot-email"
-               type="email"
-               autocomplete="email"
-               required>
-
-        <button type="submit"
-                class="primary-btn"
-                data-i18n="sendResetLink">
+        <button type="submit" class="primary-btn"
+          data-i18n="sendResetLink">
           Send Reset Link
         </button>
 
         <p id="forgot-message" role="status"></p>
 
-        <button type="button"
-                class="auth-link"
-                id="back-to-login-from-forgot"
-                data-i18n="backToLogin">
+        <button type="button" class="auth-link"
+          id="back-to-login-from-forgot" data-i18n="backToLogin">
           Back to Sign In
         </button>
-
       </form>
 
       <!-- SET NEW PASSWORD -->
       <form id="reset-form" class="auth-form" hidden>
-
-        <h2 data-i18n="chooseNewPassword">
-          Choose New Password
-        </h2>
+        <h2 data-i18n="chooseNewPassword">Choose New Password</h2>
 
         <label for="reset-password" data-i18n="newPassword">
           New Password
         </label>
-
         <div class="password-field">
-          <input id="reset-password"
-                 type="password"
-                 autocomplete="new-password"
-                 minlength="8"
-                 required>
-
-          <button type="button"
-                  class="password-toggle"
-                  data-target="reset-password"
-                  aria-label="Show password"
-                  aria-pressed="false">👁</button>
+          <input id="reset-password" type="password"
+            autocomplete="new-password" minlength="8" required>
+          <button type="button" class="password-toggle"
+            data-target="reset-password" aria-label="Show password"
+            aria-pressed="false">👁</button>
         </div>
 
-        <label for="reset-confirm"
-               data-i18n="confirmNewPassword">
+        <label for="reset-confirm" data-i18n="confirmNewPassword">
           Confirm New Password
         </label>
-
         <div class="password-field">
-          <input id="reset-confirm"
-                 type="password"
-                 autocomplete="new-password"
-                 minlength="8"
-                 required>
-
-          <button type="button"
-                  class="password-toggle"
-                  data-target="reset-confirm"
-                  aria-label="Show password"
-                  aria-pressed="false">👁</button>
+          <input id="reset-confirm" type="password"
+            autocomplete="new-password" minlength="8" required>
+          <button type="button" class="password-toggle"
+            data-target="reset-confirm" aria-label="Show password"
+            aria-pressed="false">👁</button>
         </div>
 
-        <button type="submit"
-                class="primary-btn"
-                data-i18n="saveNewPassword">
+        <button type="submit" class="primary-btn"
+          data-i18n="saveNewPassword">
           Save New Password
         </button>
 
         <p id="reset-message" role="status"></p>
-
       </form>
 
-      <!-- LOGIN LANGUAGE BUTTON -->
-      <button type="button"
-              class="auth-link"
-              id="auth-language-toggle"
-              style="margin:16px auto 0">
+      <button type="button" class="auth-link" id="auth-language-toggle"
+        style="margin:16px auto 0">
         العربية
       </button>
-
+      <button type="button" class="theme-toggle auth-theme-toggle" aria-pressed="false">🌙 Dark Mode</button>
     </div>
   </section>
 
-
-  <!-- DASHBOARD -->
-  <main id="dashboard-section"
-        class="dashboard-section"
-        hidden>
-
-    <!-- HEADER -->
-    <header class="admin-header">
-
-      <div class="dashboard-brand">
+  
+<!-- DASHBOARD -->
+<main id="dashboard-section" class="dashboard-section" hidden>
+  <header class="admin-header">
+    <div class="dashboard-brand">
         <img src="Images/logo-os.png"
-             class="admin-logo"
-             alt="OS Apartments">
-
-        <p class="dashboard-brand-subtitle">
-          Management Dashboard
-        </p>
-      </div>
+         class="admin-logo"
+    alt="OS Apartments"
+  >
+  <p class="dashboard-brand-subtitle">
+    Management Dashboard
+  </p>
+</div>
 
       <div class="header-actions">
-
-        <button id="open-add-booking"
-                type="button"
-                class="primary-btn"
-                data-i18n="addBooking">
+        <button id="open-add-booking" type="button"
+          class="primary-btn" data-i18n="addBooking">
           + Add Booking
         </button>
-
-        <!-- LANGUAGE -->
-        <button id="language-toggle"
-                type="button">
-          العربية
-        </button>
-
-        <!-- DARK / LIGHT MODE -->
-        <button id="theme-toggle"
-                class="theme-toggle"
-                type="button"
-                aria-label="Toggle dark mode"
-                aria-pressed="false">
-          🌙
-        </button>
-
-        <!-- LOGOUT -->
-        <button id="logout-btn"
-                type="button"
-                data-i18n="logout">
+        <button id="language-toggle" type="button">العربية</button>
+        <button class="theme-toggle" type="button" aria-pressed="false">🌙 Dark Mode</button>
+        <button id="logout-btn" type="button" data-i18n="logout">
           Logout
         </button>
-
       </div>
     </header>
 
-
     <!-- NAVIGATION -->
-    <nav class="dashboard-tabs"
-         aria-label="Dashboard sections">
+    <nav class="dashboard-tabs" aria-label="Dashboard sections">
+      <button type="button" class="tab-btn active"
+        data-tab="overview" aria-selected="true"
+        data-i18n="overview">Overview</button>
 
-      <button type="button"
-              class="tab-btn active"
-              data-tab="overview"
-              aria-selected="true"
-              data-i18n="overview">
-        Overview
-      </button>
+      <button type="button" class="tab-btn"
+        data-tab="bookings" aria-selected="false"
+        data-i18n="bookingsTab">Bookings & Calendar</button>
 
-      <button type="button"
-              class="tab-btn"
-              data-tab="bookings"
-              aria-selected="false"
-              data-i18n="bookingsTab">
-        Bookings & Calendar
-      </button>
+      <button type="button" class="tab-btn"
+        data-tab="finances" aria-selected="false"
+        data-i18n="finances">Finances</button>
 
-      <button type="button"
-              class="tab-btn"
-              data-tab="finances"
-              aria-selected="false"
-              data-i18n="finances">
-        Finances
-      </button>
-
-      <button type="button"
-              class="tab-btn"
-              data-tab="reports"
-              aria-selected="false"
-              data-i18n="reports">
-        Reports
-      </button>
-
+      <button type="button" class="tab-btn"
+        data-tab="reports" aria-selected="false"
+        data-i18n="reports">Reports</button>
     </nav>
 
     <p id="dashboard-message" role="status"></p>
 
-
     <!-- OVERVIEW -->
-    <section id="tab-overview"
-             class="tab-content active">
-
+    <section id="tab-overview" class="tab-content active">
       <div class="section-header">
         <div>
           <h2 data-i18n="overview">Overview</h2>
-          <p data-i18n="overviewDesc">
-            Your apartment at a glance
-          </p>
+          <p data-i18n="overviewDesc">Your apartment at a glance</p>
         </div>
       </div>
 
-      <!-- STATISTICS -->
       <div class="stats-grid">
-
         <div class="stat-card">
-          <span data-i18n="totalBookings">
-            Total Bookings
-          </span>
+          <span data-i18n="totalBookings">Total Bookings</span>
           <h3 id="total-bookings">—</h3>
         </div>
-
         <div class="stat-card">
-          <span data-i18n="upcomingBookings">
-            Upcoming Bookings
-          </span>
+          <span data-i18n="upcomingBookings">Upcoming Bookings</span>
           <h3 id="upcoming-bookings">—</h3>
         </div>
-
         <div class="stat-card">
-          <span data-i18n="guestTotals">
-            Guest Booking Totals
-          </span>
+          <span data-i18n="guestTotals">Guest Booking Totals</span>
           <h3 id="guest-payments">—</h3>
         </div>
-
-        <div class="stat-card clickable-card"
-             id="earnings-card"
-             role="button"
-             tabindex="0"
-             aria-label="View estimated host earnings details">
-
-          <span data-i18n="hostEarnings">
-            Estimated Host Earnings
-          </span>
-
+        <div class="stat-card clickable-card" id="earnings-card"
+          role="button" tabindex="0"
+          aria-label="View estimated host earnings details">
+          <span data-i18n="hostEarnings">Estimated Host Earnings</span>
           <h3 id="host-payouts">—</h3>
-
-          <small data-i18n="viewDetails">
-            View details →
-          </small>
+          <small data-i18n="viewDetails">View details →</small>
         </div>
-
       </div>
 
-
-      <!-- TODAY'S OVERVIEW -->
       <section class="panel" id="today-panel">
-
         <div class="section-header">
           <div>
-            <h2 data-i18n="todayOverview">
-              Today's Overview
-            </h2>
+            <h2 data-i18n="todayOverview">Today's Overview</h2>
             <p data-i18n="todayDesc">
               Arrivals, departures and current guests
             </p>
@@ -454,79 +258,46 @@
         </div>
 
         <div class="today-grid">
-
           <div class="today-card">
-            <span data-i18n="arrivingToday">
-              Arriving Today
-            </span>
+            <span data-i18n="arrivingToday">Arriving Today</span>
             <h3 id="today-arrivals">0</h3>
           </div>
-
           <div class="today-card">
-            <span data-i18n="departingToday">
-              Departing Today
-            </span>
+            <span data-i18n="departingToday">Departing Today</span>
             <h3 id="today-departures">0</h3>
           </div>
-
           <div class="today-card">
-            <span data-i18n="currentlyStaying">
-              Currently Staying
-            </span>
+            <span data-i18n="currentlyStaying">Currently Staying</span>
             <h3 id="today-staying">0</h3>
           </div>
-
         </div>
-
         <div id="today-guest-list"></div>
-
       </section>
 
-
-      <!-- QUICK ACTIONS -->
       <section class="panel" id="quick-actions-panel">
-
         <div class="section-header">
           <div>
-            <h2 data-i18n="quickActions">
-              Quick Actions
-            </h2>
+            <h2 data-i18n="quickActions">Quick Actions</h2>
             <p data-i18n="quickActionsDesc">
               Common tasks for your family
             </p>
           </div>
         </div>
-
         <div class="quick-actions">
-
-          <button type="button"
-                  id="quick-add-booking"
-                  class="primary-btn"
-                  data-i18n="addBooking">
+          <button type="button" id="quick-add-booking"
+            class="primary-btn" data-i18n="addBooking">
             + Add Booking
           </button>
-
-          <button type="button"
-                  id="quick-view-bookings"
-                  data-i18n="viewBookings">
-            View Bookings
-          </button>
-
-          <button type="button"
-                  id="quick-view-finances"
-                  data-i18n="viewFinances">
-            View Finances
-          </button>
-
+          <button type="button" id="quick-view-bookings"
+            data-i18n="viewBookings">View Bookings</button>
+          <button type="button" id="quick-view-finances"
+            data-i18n="viewFinances">View Finances</button>
         </div>
-
       </section>
-
     </section>
 
     <!-- BOOKINGS -->
     <section id="tab-bookings" class="tab-content" hidden>
-
       <div class="section-header">
         <div>
           <h2 data-i18n="bookingsTab">Bookings & Calendar</h2>
@@ -536,58 +307,37 @@
         </div>
       </div>
 
-      <!-- BOOKING CALENDAR -->
       <section class="panel">
-
         <div class="section-header">
           <div>
             <h2 data-i18n="bookingCalendar">Booking Calendar</h2>
-            <p data-i18n="calendarDesc">
-              See who is staying each day
-            </p>
+            <p data-i18n="calendarDesc">See who is staying each day</p>
           </div>
-
           <div class="calendar-controls">
-            <button id="prev-month"
-                    type="button"
-                    aria-label="Previous month">‹</button>
-
+            <button id="prev-month" type="button"
+              aria-label="Previous month">‹</button>
             <h3 id="calendar-month"></h3>
-
-            <button id="next-month"
-                    type="button"
-                    aria-label="Next month">›</button>
+            <button id="next-month" type="button"
+              aria-label="Next month">›</button>
           </div>
         </div>
 
         <div class="calendar-legend">
-          <span class="legend-booked" data-i18n="confirmed">
-            Confirmed
-          </span>
-
-          <span class="legend-available" data-i18n="available">
-            Available
-          </span>
+          <span class="legend-booked"
+            data-i18n="confirmed">Confirmed</span>
+          <span class="legend-available"
+            data-i18n="available">Available</span>
         </div>
 
         <div class="calendar-weekdays">
-          <span>Sun</span>
-          <span>Mon</span>
-          <span>Tue</span>
-          <span>Wed</span>
-          <span>Thu</span>
-          <span>Fri</span>
+          <span>Sun</span><span>Mon</span><span>Tue</span>
+          <span>Wed</span><span>Thu</span><span>Fri</span>
           <span>Sat</span>
         </div>
-
         <div id="calendar-grid" class="calendar-grid"></div>
-
       </section>
 
-
-      <!-- ALL BOOKINGS -->
       <section class="panel">
-
         <div class="section-header">
           <div>
             <h2 data-i18n="allBookings">All Bookings</h2>
@@ -595,12 +345,8 @@
               View reservations and payment details
             </p>
           </div>
-
-          <button type="button"
-                  id="refresh-bookings-btn"
-                  data-i18n="refresh">
-            Refresh
-          </button>
+          <button type="button" id="refresh-bookings-btn"
+            data-i18n="refresh">Refresh</button>
         </div>
 
         <div class="table-wrapper">
@@ -616,19 +362,14 @@
                 <th data-i18n="details">Details</th>
               </tr>
             </thead>
-
             <tbody id="bookings-table-body"></tbody>
           </table>
         </div>
-
       </section>
-
     </section>
-
 
     <!-- FINANCES -->
     <section id="tab-finances" class="tab-content" hidden>
-
       <div class="section-header">
         <div>
           <h2 data-i18n="finances">Finances</h2>
@@ -638,43 +379,26 @@
         </div>
       </div>
 
-      <!-- FINANCIAL SUMMARY -->
       <div class="finance-grid">
-
         <div class="stat-card">
-          <span data-i18n="estimatedEarnings">
-            Estimated Earnings
-          </span>
+          <span data-i18n="estimatedEarnings">Estimated Earnings</span>
           <h3 id="finance-earnings">—</h3>
         </div>
-
         <div class="stat-card">
-          <span data-i18n="paymentsReceived">
-            Payments Received
-          </span>
+          <span data-i18n="paymentsReceived">Payments Received</span>
           <h3 id="finance-received">—</h3>
         </div>
-
         <div class="stat-card">
-          <span data-i18n="paymentsRemaining">
-            Payments Remaining
-          </span>
+          <span data-i18n="paymentsRemaining">Payments Remaining</span>
           <h3 id="finance-remaining">—</h3>
         </div>
-
         <div class="stat-card">
-          <span data-i18n="recordedExpenses">
-            Recorded Expenses
-          </span>
+          <span data-i18n="recordedExpenses">Recorded Expenses</span>
           <h3 id="finance-expenses">—</h3>
         </div>
-
       </div>
 
-
-      <!-- REMAINING PAYMENTS -->
       <section class="panel" id="remaining-payments-panel">
-
         <div class="section-header">
           <div>
             <h2 id="remaining-title">Remaining Payments</h2>
@@ -682,10 +406,8 @@
               Guest balances that still need to be collected
             </p>
           </div>
-
           <strong id="remaining-total">—</strong>
         </div>
-
         <div class="table-wrapper">
           <table>
             <thead>
@@ -697,38 +419,29 @@
                 <th id="remaining-action-heading">Action</th>
               </tr>
             </thead>
-
             <tbody id="remaining-payments-body"></tbody>
           </table>
         </div>
-
       </section>
 
-
-      <!-- APARTMENT EXPENSES -->
       <section class="panel" id="expenses-panel">
-
         <div class="section-header">
           <div>
-            <h2 data-i18n="apartmentExpenses">
-              Apartment Expenses
-            </h2>
-
+            <h2 data-i18n="apartmentExpenses">Apartment Expenses</h2>
             <p data-i18n="expensesDesc">
               Cleaning, maintenance, utilities and supplies
             </p>
           </div>
+          
+<button type="button" id="open-add-expense"
+  class="primary-btn"
+  data-i18n="addExpense">
+  + Add Expense
+</button>
 
-          <button type="button"
-                  id="open-add-expense"
-                  class="primary-btn"
-                  data-i18n="addExpense">
-            + Add Expense
-          </button>
         </div>
 
         <p id="expenses-message" role="status" hidden></p>
-
         <div class="table-wrapper">
           <table>
             <thead>
@@ -739,337 +452,217 @@
                 <th data-i18n="amount">Amount</th>
               </tr>
             </thead>
-
             <tbody id="expenses-table-body"></tbody>
           </table>
         </div>
-
       </section>
-
     </section>
 
+    
+<!-- REPORTS -->
+<section id="tab-reports" class="tab-content" hidden>
+  <div class="section-header">
+    <div>
+      <h2 data-i18n="reports">Reports & Analytics</h2>
+      <p data-i18n="reportsDesc">
+        Understand how your apartment is performing
+      </p>
+    </div>
+  </div>
 
-    <!-- REPORTS & ANALYTICS -->
-    <section id="tab-reports" class="tab-content" hidden>
+  <!-- MONTHLY FINANCIAL PERFORMANCE -->
+  <section class="panel">
+    <div class="section-header">
+      <div>
+        <h2 data-i18n="monthlyPerformance">Monthly Performance</h2>
+        <p data-i18n="monthlyPerformanceDesc">
+          Revenue, operating expenses and net profit
+        </p>
+      </div>
+      <select id="report-month" aria-label="Select report month">
+        <option value="">Select month</option>
+      </select>
+    </div>
 
-      <div class="section-header">
-        <div>
-          <h2 data-i18n="reports">Reports & Analytics</h2>
-          <p data-i18n="reportsDesc">
-            Understand how your apartment is performing
-          </p>
-        </div>
+    <div class="finance-grid">
+      <div class="stat-card">
+        <span id="report-revenue-label">Operating Revenue | الأرباح التشغيلية</span>
+        <h3 id="monthly-earnings">—</h3>
       </div>
 
+      <div class="stat-card">
+        <span id="report-expenses-label">Operating Expenses | المصاريف التشغيلية</span>
+        <h3 id="monthly-expenses">—</h3>
+      </div>
 
-      <!-- MONTHLY PERFORMANCE -->
-      <section class="panel">
+      <div class="stat-card">
+        <span id="report-profit-label">Net Profit | صافي الربح</span>
+        <h3 id="monthly-profit">—</h3>
+      </div>
 
-        <div class="section-header">
-          <div>
-            <h2 data-i18n="monthlyPerformance">
-              Monthly Performance
-            </h2>
+      <div class="stat-card">
+        <span id="monthly-occupancy-label">Occupancy Rate</span>
+        <h3 id="monthly-occupancy">—</h3>
+      </div>
+    </div>
+  </section>
 
-            <p data-i18n="monthlyPerformanceDesc">
-              Revenue, operating expenses and net profit
-            </p>
-          </div>
-
-          <select id="report-month"
-                  aria-label="Select report month">
-            <option value="">Select month</option>
-          </select>
-        </div>
-
-        <div class="finance-grid">
-
-          <div class="stat-card">
-            <span id="report-revenue-label"
-                  data-i18n="operatingRevenue">
-              Operating Revenue
-            </span>
-            <h3 id="monthly-earnings">—</h3>
-          </div>
-
-          <div class="stat-card">
-            <span id="report-expenses-label"
-                  data-i18n="operatingExpenses">
-              Operating Expenses
-            </span>
-            <h3 id="monthly-expenses">—</h3>
-          </div>
-
-          <div class="stat-card">
-            <span id="report-profit-label"
-                  data-i18n="netProfit">
-              Net Profit
-            </span>
-            <h3 id="monthly-profit">—</h3>
-          </div>
-
-          <div class="stat-card">
-            <span id="monthly-occupancy-label"
-                  data-i18n="occupancyRate">
-              Occupancy Rate
-            </span>
-            <h3 id="monthly-occupancy">—</h3>
-          </div>
-
-        </div>
-
-      </section>
-
-
-      <!-- ANNUAL COST COVERAGE -->
-      <section class="panel">
-
-        <div class="section-header">
-          <div>
-            <h2 id="cost-coverage-title"
-                data-i18n="annualCostCoverage">
-              Annual Cost Coverage
-            </h2>
-
-            <p id="cost-coverage-description"
-               data-i18n="annualCostCoverageDesc">
-              Track progress toward your annual operating budget
-            </p>
-          </div>
-        </div>
-
-        <div class="finance-grid">
-
-          <div class="stat-card">
-            <span id="annual-budget-label"
-                  data-i18n="annualBudget">
-              Annual Budget
-            </span>
-            <h3>42,000 SAR</h3>
-          </div>
-
-          <div class="stat-card">
-            <span id="annual-rent-label"
-                  data-i18n="annualRent">
-              Annual Rent
-            </span>
-            <h3>31,000 SAR</h3>
-          </div>
-
-          <div class="stat-card">
-            <span id="annual-cleaning-label"
-                  data-i18n="cleaningBudget">
-              Cleaning Budget
-            </span>
-            <h3>6,000 SAR</h3>
-          </div>
-
-          <div class="stat-card">
-            <span id="annual-reserve-label"
-                  data-i18n="emergencyReserve">
-              Emergency Reserve
-            </span>
-            <h3>5,000 SAR</h3>
-          </div>
-
-        </div>
-
-        <p id="annual-coverage-status" role="status">
-          Cost coverage will be calculated from your financial records.
+  <!-- ANNUAL COST COVERAGE -->
+  <section class="panel">
+    <div class="section-header">
+      <div>
+        <h2 id="cost-coverage-title">Annual Cost Coverage</h2>
+        <p id="cost-coverage-description">
+          Track progress toward your annual operating budget
         </p>
+      </div>
+    </div>
 
-        <div id="annual-coverage-progress"
-             class="report-progress-track"
-             role="progressbar"
-             aria-label="Annual cost coverage"
-             aria-valuemin="0"
-             aria-valuemax="100"
-             aria-valuenow="0">
+    <div class="finance-grid">
+      <div class="stat-card">
+        <span id="annual-budget-label">Annual Budget</span>
+        <h3>42,000 SAR</h3>
+      </div>
 
-          <div id="annual-coverage-bar"
-               class="report-progress-fill"></div>
-        </div>
+      <div class="stat-card">
+        <span id="annual-rent-label">Annual Rent</span>
+        <h3>31,000 SAR</h3>
+      </div>
 
-        <p id="annual-coverage-details"></p>
+      <div class="stat-card">
+        <span id="annual-cleaning-label">Cleaning Budget</span>
+        <h3>6,000 SAR</h3>
+      </div>
 
-      </section>
+      <div class="stat-card">
+        <span id="annual-reserve-label">Emergency Reserve</span>
+        <h3>5,000 SAR</h3>
+      </div>
+    </div>
 
+    <p id="annual-coverage-status" role="status">
+      Cost coverage will be calculated from your financial records.
+    </p>
+    <div class="report-progress-track"
+         role="progressbar"
+         aria-label="Annual cost coverage"
+         aria-valuemin="0"
+         aria-valuemax="100"
+         aria-valuenow="0"
+         id="annual-coverage-progress">
+      <div id="annual-coverage-bar" class="report-progress-fill"></div>
+    </div>
+    <p id="annual-coverage-details"></p>
+  </section>
 
-      <!-- MONTHLY BOOKING DETAILS -->
-      <section class="panel">
+  <!-- MONTHLY BOOKING DETAILS -->
+  <section class="panel">
+    <div class="section-header">
+      <div>
+        <h2 id="monthly-booking-details-title">Monthly Booking Details</h2>
+        <p id="monthly-booking-details-description">
+          Bookings, nights and average apartment pricing
+        </p>
+      </div>
+    </div>
 
-        <div class="section-header">
-          <div>
-            <h2 id="monthly-booking-details-title"
-                data-i18n="monthlyBookingDetails">
-              Monthly Booking Details
-            </h2>
+    <div class="finance-grid">
+      <div class="stat-card">
+        <span id="monthly-bookings-label">Total Bookings</span>
+        <h3 id="report-booking-count">—</h3>
+      </div>
 
-            <p id="monthly-booking-details-description"
-               data-i18n="monthlyBookingDetailsDesc">
-              Bookings, nights and average apartment pricing
-            </p>
-          </div>
-        </div>
+      <div class="stat-card">
+        <span id="monthly-nights-label">Booked Nights</span>
+        <h3 id="report-booked-nights">—</h3>
+      </div>
 
-        <div class="finance-grid">
+      <div class="stat-card">
+        <span id="monthly-nightly-rate-label">Average Nightly Rate</span>
+        <h3 id="report-average-nightly-rate">—</h3>
+      </div>
 
-          <div class="stat-card">
-            <span id="monthly-bookings-label"
-                  data-i18n="totalBookings">
-              Total Bookings
-            </span>
-            <h3 id="report-booking-count">—</h3>
-          </div>
+      <div class="stat-card">
+        <span id="monthly-booking-value-label">Average Booking Value</span>
+        <h3 id="report-average-booking-value">—</h3>
+      </div>
+    </div>
+  </section>
 
-          <div class="stat-card">
-            <span id="monthly-nights-label"
-                  data-i18n="bookedNights">
-              Booked Nights
-            </span>
-            <h3 id="report-booked-nights">—</h3>
-          </div>
+  <!-- EXISTING EARNINGS CHART -->
+  <section class="panel">
+    <div class="section-header">
+      <div>
+        <h2 data-i18n="earningsByMonth">Earnings by Month</h2>
+        <p data-i18n="earningsByMonthDesc">
+          Compare your apartment's monthly performance
+        </p>
+      </div>
+    </div>
+    <div id="monthly-earnings-chart" class="chart-container">
+      <p>Charts will appear after analytics setup.</p>
+    </div>
+  </section>
 
-          <div class="stat-card">
-            <span id="monthly-nightly-rate-label"
-                  data-i18n="averageNightlyRate">
-              Average Nightly Rate
-            </span>
-            <h3 id="report-average-nightly-rate">—</h3>
-          </div>
+  <!-- NEW BOOKING CHART -->
+  <section class="panel">
+    <div class="section-header">
+      <div>
+        <h2 id="booking-trends-title">Bookings by Month</h2>
+        <p id="booking-trends-description">
+          Compare monthly reservation counts
+        </p>
+      </div>
+    </div>
+    <div id="monthly-bookings-chart" class="chart-container">
+      <p>Monthly booking analytics will appear here.</p>
+    </div>
+  </section>
 
-          <div class="stat-card">
-            <span id="monthly-booking-value-label"
-                  data-i18n="averageBookingValue">
-              Average Booking Value
-            </span>
-            <h3 id="report-average-booking-value">—</h3>
-          </div>
+  <!-- NEW FINANCIAL CHART -->
+  <section class="panel">
+    <div class="section-header">
+      <div>
+        <h2 id="financial-trends-title">Revenue vs. Expenses</h2>
+        <p id="financial-trends-description">
+          Compare income, costs and profit over time
+        </p>
+      </div>
+    </div>
+    <div id="monthly-financial-chart" class="chart-container">
+      <p>Monthly financial analytics will appear here.</p>
+    </div>
+  </section>
 
-        </div>
+  <!-- EXISTING PLATFORM CHART -->
+  <section class="panel">
+    <div class="section-header">
+      <div>
+        <h2 data-i18n="bookingsByPlatform">Bookings by Platform</h2>
+        <p data-i18n="bookingsByPlatformDesc">
+          See where your reservations come from
+        </p>
+      </div>
+    </div>
+    <div id="platform-chart" class="chart-container">
+      <p>Platform analytics will appear after setup.</p>
+    </div>
+  </section>
+</section>
 
-      </section>
-
-
-      <!-- EARNINGS BY MONTH -->
-      <section class="panel">
-
-        <div class="section-header">
-          <div>
-            <h2 data-i18n="earningsByMonth">
-              Earnings by Month
-            </h2>
-
-            <p data-i18n="earningsByMonthDesc">
-              Compare your apartment's monthly performance
-            </p>
-          </div>
-        </div>
-
-        <div id="monthly-earnings-chart"
-             class="chart-container">
-          <p>Charts will appear after analytics setup.</p>
-        </div>
-
-      </section>
-
-
-      <!-- BOOKINGS BY MONTH -->
-      <section class="panel">
-
-        <div class="section-header">
-          <div>
-            <h2 id="booking-trends-title"
-                data-i18n="bookingsByMonth">
-              Bookings by Month
-            </h2>
-
-            <p id="booking-trends-description"
-               data-i18n="bookingsByMonthDesc">
-              Compare monthly reservation counts
-            </p>
-          </div>
-        </div>
-
-        <div id="monthly-bookings-chart"
-             class="chart-container">
-          <p>Monthly booking analytics will appear here.</p>
-        </div>
-
-      </section>
-
-
-      <!-- REVENUE VS EXPENSES -->
-      <section class="panel">
-
-        <div class="section-header">
-          <div>
-            <h2 id="financial-trends-title"
-                data-i18n="revenueVsExpenses">
-              Revenue vs. Expenses
-            </h2>
-
-            <p id="financial-trends-description"
-               data-i18n="revenueVsExpensesDesc">
-              Compare income, costs and profit over time
-            </p>
-          </div>
-        </div>
-
-        <div id="monthly-financial-chart"
-             class="chart-container">
-          <p>Monthly financial analytics will appear here.</p>
-        </div>
-
-      </section>
-
-
-      <!-- BOOKINGS BY PLATFORM -->
-      <section class="panel">
-
-        <div class="section-header">
-          <div>
-            <h2 data-i18n="bookingsByPlatform">
-              Bookings by Platform
-            </h2>
-
-            <p data-i18n="bookingsByPlatformDesc">
-              See where your reservations come from
-            </p>
-          </div>
-        </div>
-
-        <div id="platform-chart"
-             class="chart-container">
-          <p>Platform analytics will appear after setup.</p>
-        </div>
-
-      </section>
-
-    </section>
-
-    <!-- ADD BOOKING DIALOG -->
+    <!-- ADD BOOKING -->
     <dialog id="add-booking-dialog" class="admin-dialog">
-
       <div class="dialog-header">
-        <h2 data-i18n="addBookingTitle">
-          Add Booking
-        </h2>
-
-        <button type="button"
-                id="close-add-booking"
-                aria-label="Close">×</button>
+        <h2 data-i18n="addBookingTitle">Add Booking</h2>
+        <button type="button" id="close-add-booking"
+          aria-label="Close">×</button>
       </div>
 
       <form id="add-booking-form">
-
         <div class="form-grid">
-
           <label>
             <span data-i18n="guestName">Guest Name</span>
-            <input id="manual-guest"
-                   type="text"
-                   required>
+            <input id="manual-guest" type="text" required>
           </label>
 
           <label>
@@ -1083,61 +676,43 @@
           </label>
 
           <label>
-            <span data-i18n="confirmationCode">
-              Confirmation Code
-            </span>
+            <span data-i18n="confirmationCode">Confirmation Code</span>
             <input id="manual-code" type="text">
           </label>
 
           <label>
             <span data-i18n="checkIn">Check-in</span>
-            <input id="manual-check-in"
-                   type="date"
-                   required>
+            <input id="manual-check-in" type="date" required>
           </label>
 
           <label>
             <span data-i18n="checkOut">Check-out</span>
-            <input id="manual-check-out"
-                   type="date"
-                   required>
+            <input id="manual-check-out" type="date" required>
           </label>
 
           <label>
             <span data-i18n="totalBookingAmount">
               Total Booking Amount (SAR)
             </span>
-            <input id="manual-total"
-                   type="number"
-                   min="0"
-                   step="0.01"
-                   required>
+            <input id="manual-total" type="number"
+              min="0" step="0.01" required>
           </label>
 
           <label>
             <span data-i18n="platformCommission">
               Platform Commission (SAR)
             </span>
-            <input id="manual-commission"
-                   type="number"
-                   min="0"
-                   step="0.01"
-                   value="0"
-                   required>
+            <input id="manual-commission" type="number"
+              min="0" step="0.01" value="0" required>
           </label>
 
           <label>
             <span data-i18n="amountReceived">
               Amount Received (SAR)
             </span>
-            <input id="manual-received"
-                   type="number"
-                   min="0"
-                   step="0.01"
-                   value="0"
-                   required>
+            <input id="manual-received" type="number"
+              min="0" step="0.01" value="0" required>
           </label>
-
         </div>
 
         <label>
@@ -1148,136 +723,85 @@
         <p id="manual-balance-preview"></p>
         <p id="manual-booking-message" role="status"></p>
 
-        <button type="submit"
-                id="save-manual-booking"
-                class="primary-btn"
-                data-i18n="saveBooking">
+        <button type="submit" id="save-manual-booking"
+          class="primary-btn" data-i18n="saveBooking">
           Save Booking
         </button>
-
       </form>
     </dialog>
 
-
-    <!-- RECORD PAYMENT DIALOG -->
+    <!-- RECORD PAYMENT -->
     <dialog id="record-payment-dialog" class="admin-dialog">
-
       <div class="dialog-header">
-        <h2 data-i18n="recordPayment">
-          Record Payment
-        </h2>
-
-        <button type="button"
-                id="close-payment-dialog"
-                aria-label="Close">×</button>
+        <h2 data-i18n="recordPayment">Record Payment</h2>
+        <button type="button" id="close-payment-dialog"
+          aria-label="Close">×</button>
       </div>
 
       <h3 id="payment-guest"></h3>
-
       <p>
-        <span data-i18n="remainingBalance">
-          Remaining Balance:
-        </span>
+        <span data-i18n="remainingBalance">Remaining Balance:</span>
         <strong id="payment-balance">—</strong>
       </p>
 
       <form id="record-payment-form">
-
         <label>
-          <span data-i18n="paymentAmount">
-            Payment Amount (SAR)
-          </span>
-
-          <input id="new-payment-amount"
-                 type="number"
-                 min="0.01"
-                 step="0.01"
-                 required>
+          <span data-i18n="paymentAmount">Payment Amount (SAR)</span>
+          <input id="new-payment-amount" type="number"
+            min="0.01" step="0.01" required>
         </label>
 
         <p id="payment-message" role="status"></p>
 
-        <button type="submit"
-                id="save-payment"
-                class="primary-btn"
-                data-i18n="savePayment">
+        <button type="submit" id="save-payment"
+          class="primary-btn" data-i18n="savePayment">
           Save Payment
         </button>
-
       </form>
     </dialog>
 
-
-    <!-- BOOKING DETAILS DIALOG -->
+    <!-- BOOKING DETAILS -->
     <dialog id="breakdown-dialog" class="admin-dialog">
-
       <div class="dialog-header">
-        <h2 id="breakdown-guest"
-            data-i18n="bookingDetails">
-          Booking Details
-        </h2>
-
-        <button type="button"
-                id="close-breakdown"
-                aria-label="Close">×</button>
+        <h2 id="breakdown-guest">Booking Details</h2>
+        <button type="button" id="close-breakdown"
+          aria-label="Close">×</button>
       </div>
 
       <div id="breakdown-content"></div>
 
-      <button type="button"
-              id="close-breakdown-bottom"
-              data-i18n="close">
-        Close
-      </button>
-
+      <button type="button" id="close-breakdown-bottom"
+        data-i18n="close">Close</button>
     </dialog>
 
-
-    <!-- EARNINGS DETAILS DIALOG -->
+    <!-- EARNINGS DETAILS -->
     <dialog id="earnings-dialog" class="admin-dialog">
-
       <div class="dialog-header">
-        <h2 data-i18n="hostEarnings">
-          Estimated Host Earnings
-        </h2>
-
-        <button type="button"
-                id="close-earnings-dialog"
-                aria-label="Close">×</button>
+        <h2 data-i18n="hostEarnings">Estimated Host Earnings</h2>
+        <button type="button" id="close-earnings-dialog"
+          aria-label="Close">×</button>
       </div>
-
       <div id="earnings-breakdown-content">
         <p>Financial breakdown will appear here.</p>
       </div>
-
     </dialog>
 
-
-    <!-- ADD EXPENSE DIALOG -->
+    <!-- ADD EXPENSE -->
     <dialog id="add-expense-dialog" class="admin-dialog">
-
       <div class="dialog-header">
-        <h2 data-i18n="addExpenseTitle">
-          Add Expense
-        </h2>
-
-        <button type="button"
-                id="close-expense-dialog"
-                aria-label="Close">×</button>
+        <h2 data-i18n="addExpenseTitle">Add Expense</h2>
+        <button type="button" id="close-expense-dialog"
+          aria-label="Close">×</button>
       </div>
 
       <form id="add-expense-form">
-
         <label>
           <span data-i18n="date">Date</span>
-          <input id="expense-date"
-                 type="date"
-                 required>
+          <input id="expense-date" type="date" required>
         </label>
 
         <label>
           <span data-i18n="category">Category</span>
-
           <select id="expense-category" required>
             <option value="Cleaning">Cleaning</option>
             <option value="Maintenance">Maintenance</option>
@@ -1289,79 +813,55 @@
 
         <label>
           <span data-i18n="description">Description</span>
-          <input id="expense-description"
-                 type="text">
+          <input id="expense-description" type="text">
         </label>
 
         <label>
           <span data-i18n="amountSAR">Amount (SAR)</span>
-          <input id="expense-amount"
-                 type="number"
-                 min="0.01"
-                 step="0.01"
-                 required>
+          <input id="expense-amount" type="number"
+            min="0.01" step="0.01" required>
         </label>
 
         <p id="expense-message" role="status"></p>
 
-        <button type="submit"
-                id="save-expense"
-                class="primary-btn"
-                data-i18n="saveExpense">
+        <button type="submit" id="save-expense"
+          class="primary-btn" data-i18n="saveExpense">
           Save Expense
         </button>
-
       </form>
-    </dialog>
-
-
-    <!-- DELETE EXPENSE CONFIRMATION -->
-    <dialog id="delete-expense-dialog"
-            class="delete-expense-dialog">
-
-      <div class="delete-expense-content">
-
-        <div class="delete-expense-icon">!</div>
-
-        <h2 id="delete-expense-title">
-          Delete Expense?
-        </h2>
-
-        <p id="delete-expense-description">
-          Are you sure you want to delete this expense?
-          This action cannot be undone.
-        </p>
-
-        <p id="delete-expense-details"></p>
-        <p id="delete-expense-error" role="alert"></p>
-
-        <div class="delete-expense-buttons">
-
-          <button type="button"
-                  id="cancel-delete-expense"
-                  data-i18n="cancel">
-            Cancel
-          </button>
-
-          <button type="button"
-                  id="confirm-delete-expense"
-                  data-i18n="deleteExpense">
-            Delete Expense
-          </button>
-
-        </div>
-
-      </div>
     </dialog>
 
   </main>
 
-
-  <!-- SUPABASE -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-
-  <!-- DASHBOARD JAVASCRIPT -->
   <script src="admin.js?v=7"></script>
 
+  
+<!-- DELETE EXPENSE CONFIRMATION -->
+<dialog id="delete-expense-dialog" class="delete-expense-dialog">
+  <div class="delete-expense-content">
+    <div class="delete-expense-icon">!</div>
+
+    <h2 id="delete-expense-title">Delete Expense?</h2>
+
+    <p id="delete-expense-description">
+      Are you sure you want to delete this expense?
+      This action cannot be undone.
+    </p>
+
+    <p id="delete-expense-details"></p>
+    <p id="delete-expense-error" role="alert"></p>
+
+    <div class="delete-expense-buttons">
+      <button type="button" id="cancel-delete-expense">
+        Cancel
+      </button>
+
+      <button type="button" id="confirm-delete-expense">
+        Delete Expense
+      </button>
+    </div>
+  </div>
+</dialog>
 </body>
 </html>

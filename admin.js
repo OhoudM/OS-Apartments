@@ -1,9 +1,6 @@
 const SUPABASE_URL = "https://ptpdexboeaummnywwgyv.supabase.co";
 const SUPABASE_KEY = "sb_publishable_JrsJrxQ86TCBZWRc9g7HTg_bsLXaYJ8";
-const supabaseClient = window.supabase.createClient(
-    SUPABASE_URL,
-    SUPABASE_KEY
-);
+const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
 const $ = (id) => document.getElementById(id);
 
@@ -26,6 +23,21 @@ let selectedReportMonth = "";
 const translations = {
   en: {
     management: "Management Dashboard",
+    portalSubtitle: "Sign in to manage your apartment.",
+    forgotPassword: "Forgot Password?",
+    createAccount: "Create Account",
+    confirmPassword: "Confirm Password",
+    backToLogin: "Back to Sign In",
+    pendingTitle: "Waiting for Approval",
+    pendingDescription: "A family administrator must approve your account before you can view bookings.",
+    checkApproval: "Check Approval",
+    resetPassword: "Reset Password",
+    forgotDescription: "Enter your email to receive a password reset link.",
+    sendResetLink: "Send Reset Link",
+    chooseNewPassword: "Choose New Password",
+    newPassword: "New Password",
+    confirmNewPassword: "Confirm New Password",
+    saveNewPassword: "Save New Password",
     login: "Sign In",
     email: "Email",
     password: "Password",
@@ -255,6 +267,21 @@ const translations = {
   
   ar: {
     management: "لوحة إدارة الشقق",
+    portalSubtitle: "سجّل الدخول لإدارة شقتك.",
+    forgotPassword: "نسيت كلمة المرور؟",
+    createAccount: "إنشاء حساب",
+    confirmPassword: "تأكيد كلمة المرور",
+    backToLogin: "العودة لتسجيل الدخول",
+    pendingTitle: "بانتظار الموافقة",
+    pendingDescription: "يجب أن يوافق مسؤول العائلة على الحساب قبل عرض الحجوزات.",
+    checkApproval: "التحقق من الموافقة",
+    resetPassword: "إعادة تعيين كلمة المرور",
+    forgotDescription: "أدخل بريدك الإلكتروني لاستلام رابط الاستعادة.",
+    sendResetLink: "إرسال رابط الاستعادة",
+    chooseNewPassword: "اختيار كلمة مرور جديدة",
+    newPassword: "كلمة المرور الجديدة",
+    confirmNewPassword: "تأكيد كلمة المرور الجديدة",
+    saveNewPassword: "حفظ كلمة المرور الجديدة",
     login: "تسجيل الدخول",
     email: "البريد الإلكتروني",
     password: "كلمة المرور",
@@ -3130,6 +3157,7 @@ function setLanguage(language) {
   currentLanguage = language === "ar" ? "ar" : "en";
 
   localStorage.setItem("osAdminLanguage", currentLanguage);
+  setText("portal-subtitle", t("portalSubtitle"));
 
   document.documentElement.lang = currentLanguage;
   document.documentElement.dir =
@@ -3387,6 +3415,38 @@ function initializeTheme() {
 }
 
 initializeTheme();
+
+/* =====================================================
+   AUTHENTICATION CONFIGURATION AND TRANSLATIONS
+   ===================================================== */
+const AUTH_REDIRECT = new URL("admin.html", window.location.href).href.split("#")[0].split("?")[0];
+let recoveryMode =
+  new URLSearchParams(window.location.hash.slice(1)).get("type") === "recovery" ||
+  new URLSearchParams(window.location.search).get("type") === "recovery";
+let authVersion = 0;
+const authWords = {
+  en: {
+    pending: "Your account is waiting for family approval.",
+    short: "Password must contain at least 8 characters.",
+    mismatch: "Passwords do not match.",
+    sent: "Check your email for the confirmation link. Family approval is required.",
+    resetSent: "If this email is registered, a reset link will be sent.",
+    saved: "Password updated. Please sign in.",
+    show: "Show password", hide: "Hide password"
+  },
+  ar: {
+    pending: "حسابك بانتظار موافقة مسؤول العائلة.",
+    short: "يجب أن تتكون كلمة المرور من ٨ أحرف على الأقل.",
+    mismatch: "كلمتا المرور غير متطابقتين.",
+    sent: "تحقق من بريدك الإلكتروني لتأكيد الحساب. يجب انتظار الموافقة.",
+    resetSent: "إذا كان البريد مسجلاً، سيصلك رابط الاستعادة.",
+    saved: "تم تحديث كلمة المرور. يرجى تسجيل الدخول.",
+    show: "إظهار كلمة المرور", hide: "إخفاء كلمة المرور"
+  }
+};
+function authText(key) {
+  return authWords[currentLanguage]?.[key] || key;
+}
 
 /* =====================================================
    PART 12 — AUTHENTICATION VIEWS
