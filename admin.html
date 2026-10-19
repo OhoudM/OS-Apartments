@@ -778,8 +778,30 @@
 
       <div id="breakdown-content"></div>
 
+      <button type="button" id="open-payment-correction" hidden>Edit payment</button>
+      <p id="payment-correction-message" role="status"></p>
       <button type="button" id="close-breakdown-bottom"
         data-i18n="close">Close</button>
+    </dialog>
+
+    <!-- DIRECT BOOKING PAYMENT CORRECTION -->
+    <dialog id="payment-correction-dialog" class="admin-dialog">
+      <div class="dialog-header">
+        <h2 id="payment-correction-heading">Edit payment</h2>
+        <button type="button" id="close-payment-correction" aria-label="Close">×</button>
+      </div>
+      <form id="payment-correction-form">
+        <label for="payment-correction-received" id="payment-correction-received-label">Amount received (SAR)</label>
+        <input id="payment-correction-received" type="number" min="0" step="0.01" required />
+        <p id="payment-correction-balance"></p>
+        <label for="payment-correction-notes" id="payment-correction-notes-label">Notes</label>
+        <textarea id="payment-correction-notes" rows="4"></textarea>
+        <p id="payment-correction-error" role="alert"></p>
+        <div class="payment-correction-actions">
+          <button type="button" id="cancel-payment-correction">Cancel</button>
+          <button type="submit" id="save-payment-correction">Save payment</button>
+        </div>
+      </form>
     </dialog>
 
     <!-- EARNINGS DETAILS -->

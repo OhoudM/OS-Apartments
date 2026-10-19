@@ -1667,6 +1667,12 @@ function showBreakdown(index) {
     );
   }
 
+  // Payment corrections are available only for manually entered Direct bookings.
+  const correctionButton = $("open-payment-correction");
+  correctionButton.hidden = String(booking.platform || "").toLowerCase() !== "direct" || cancelledBooking(booking);
+  correctionButton.onclick = () => openPaymentCorrection(booking.id);
+  setText("payment-correction-message", "");
+
   dialog.showModal();
 }
 
@@ -2686,6 +2692,90 @@ function renderMonthlyFinancialChart(
   container.append(legend, chart);
 }
 
+
+/* =====================================================
+   DIRECT BOOKING PAYMENT CORRECTION ONLY
+   Does not change platform sync, dates, booking total or other records.
+   ===================================================== */
+let paymentCorrectionBookingId = null;
+let paymentCorrectionSaving = false;
+
+function paymentCorrectionLabel(en, ar) {
+  return document.documentElement.lang === "ar" ? ar : en;
+}
+
+function updatePaymentCorrectionPreview() {
+  const booking = bookings.find(b => String(b.id) === String(paymentCorrectionBookingId));
+  if (!booking) return;
+  const received = Number($("payment-correction-received").value);
+  const total = safeNumber(booking.guest_total);
+  setText("payment-correction-balance", Number.isFinite(received) && received >= 0
+    ? `${paymentCorrectionLabel("Remaining balance", "المبلغ المتبقي")}: ${money(Math.max(0, (cents(total) - cents(received)) / 100))}`
+    : "");
+}
+
+function openPaymentCorrection(id) {
+  const booking = bookings.find(b => String(b.id) === String(id));
+  if (!booking || String(booking.platform || "").toLowerCase() !== "direct" || cancelledBooking(booking)) return;
+  paymentCorrectionBookingId = booking.id;
+  setText("payment-correction-heading", paymentCorrectionLabel("Edit direct booking payment", "تعديل دفعة الحجز المباشر"));
+  setText("payment-correction-received-label", paymentCorrectionLabel("Amount received (SAR)", "المبلغ المستلم (ريال)"));
+  setText("payment-correction-notes-label", paymentCorrectionLabel("Notes", "ملاحظات"));
+  setText("cancel-payment-correction", paymentCorrectionLabel("Cancel", "إلغاء"));
+  setText("save-payment-correction", paymentCorrectionLabel("Save payment", "حفظ الدفعة"));
+  $("payment-correction-received").value = String(safeNumber(booking.original_guest_payment) ?? 0);
+  $("payment-correction-notes").value = booking.notes || "";
+  setText("payment-correction-error", "");
+  updatePaymentCorrectionPreview();
+  $("breakdown-dialog").close();
+  $("payment-correction-dialog").showModal();
+}
+
+$("payment-correction-received")?.addEventListener("input", updatePaymentCorrectionPreview);
+["close-payment-correction", "cancel-payment-correction"].forEach(id => {
+  $(id)?.addEventListener("click", () => $("payment-correction-dialog").close());
+});
+
+$("payment-correction-form")?.addEventListener("submit", async event => {
+  event.preventDefault();
+  if (paymentCorrectionSaving || !bookingsLoaded) return;
+  const booking = bookings.find(b => String(b.id) === String(paymentCorrectionBookingId));
+  if (!booking || String(booking.platform || "").toLowerCase() !== "direct" || cancelledBooking(booking)) return;
+  const received = Number($("payment-correction-received").value);
+  const total = safeNumber(booking.guest_total);
+  const errorBox = $("payment-correction-error");
+  if (!Number.isFinite(received) || received < 0 || cents(received) > cents(total)) {
+    errorBox.textContent = paymentCorrectionLabel("Enter a valid amount between zero and the booking total.", "أدخلي مبلغاً صحيحاً بين الصفر وإجمالي الحجز.");
+    return;
+  }
+  paymentCorrectionSaving = true;
+  $("save-payment-correction").disabled = true;
+  errorBox.textContent = "";
+  try {
+    const { data: authData, error: authError } = await supabaseClient.auth.getUser();
+    if (authError || !authData?.user) throw new Error(t("sessionExpired"));
+    const updated = {
+      original_guest_payment: cents(received) / 100,
+      financial_status: cents(received) >= cents(total) ? "paid" : cents(received) === 0 ? "unpaid" : "partially_paid",
+      notes: $("payment-correction-notes").value.trim() || null
+    };
+    const { data, error } = await supabaseClient.from("Bookings")
+      .update(updated)
+      .eq("id", booking.id)
+      .eq("platform", booking.platform)
+      .select("id");
+    if (error) throw error;
+    if (!data || data.length !== 1) throw new Error(paymentCorrectionLabel("Update not permitted or booking not found. Check Supabase permissions.", "لم يُسمح بالتعديل أو لم يتم العثور على الحجز. تحققي من صلاحيات Supabase."));
+    $("payment-correction-dialog").close();
+    await loadBookings();
+    if (bookingsLoaded) showMessage(paymentCorrectionLabel("Payment updated successfully.", "تم تحديث الدفعة بنجاح."));
+  } catch (error) {
+    errorBox.textContent = t("saveError") + error.message;
+  } finally {
+    paymentCorrectionSaving = false;
+    $("save-payment-correction").disabled = false;
+  }
+});
 
 /* =====================================================
    ADD MANUAL BOOKING

@@ -3171,3 +3171,11 @@ html[data-theme="dark"] .calendar-day.booked {
 }
 html[data-theme="dark"] .calendar-day.booked .calendar-day-number,
 html[data-theme="dark"] .calendar-day .booked-label { color: #f0a1a3; }
+
+/* Direct booking payment correction controls only */
+#open-payment-correction { margin: 12px 12px 12px 0; }
+#open-payment-correction[hidden] { display: none !important; }
+#payment-correction-form { display: grid; gap: 12px; }
+#payment-correction-form input, #payment-correction-form textarea { width: 100%; box-sizing: border-box; }
+.payment-correction-actions { display: flex; flex-wrap: wrap; gap: 10px; }
+#payment-correction-error { color: #db7777; }
