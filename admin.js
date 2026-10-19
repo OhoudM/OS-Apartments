@@ -205,7 +205,51 @@ const translations = {
     wed: "Wed",
     thu: "Thu",
     fri: "Fri",
-    sat: "Sat"
+    sat: "Sat",
+
+    todayOverview: "Today's Overview",
+    arrivingToday: "Arriving Today",
+    departingToday: "Departing Today",
+    currentlyStaying: "Currently Staying",
+    quickActionsDesc: "Common tasks for your family",
+    bookingCalendar: "Booking Calendar",
+    bookingsTableDesc: "View reservations and payment details",
+    apartmentExpenses: "Apartment Expenses",
+    monthlyPerformanceDesc: "Revenue, operating expenses and net profit",
+    operatingRevenue: "Operating Revenue",
+    operatingExpenses: "Operating Expenses",
+    netProfit: "Net Profit",
+    occupancyRate: "Occupancy Rate",
+    annualCostCoverage: "Annual Cost Coverage",
+    annualCostCoverageDesc: "Track progress toward your annual operating budget",
+    annualBudget: "Annual Budget",
+    annualRent: "Annual Rent",
+    cleaningBudget: "Cleaning Budget",
+    emergencyReserve: "Emergency Reserve",
+    monthlyBookingDetails: "Monthly Booking Details",
+    monthlyBookingDetailsDesc: "Bookings, nights and average apartment pricing",
+    bookedNights: "Booked Nights",
+    averageNightlyRate: "Average Nightly Rate",
+    averageBookingValue: "Average Booking Value",
+    earningsByMonth: "Earnings by Month",
+    earningsByMonthDesc: "Compare your apartment's monthly performance",
+    bookingsByMonth: "Bookings by Month",
+    bookingsByMonthDesc: "Compare monthly reservation counts",
+    revenueVsExpenses: "Revenue vs. Expenses",
+    revenueVsExpensesDesc: "Compare income, costs and profit over time",
+    bookingsByPlatform: "Bookings by Platform",
+    bookingsByPlatformDesc: "See where your reservations come from",
+    addBookingTitle: "Add Booking",
+    totalBookingAmount: "Total Booking Amount (SAR)",
+    addExpenseTitle: "Add Expense",
+    date: "Date",
+    category: "Category",
+    description: "Description",
+    amount: "Amount",
+    amountSAR: "Amount (SAR)",
+    saveExpense: "Save Expense",
+    cancel: "Cancel",
+    deleteExpense: "Delete Expense"
   },
 
   
@@ -387,17 +431,62 @@ const translations = {
     wed: "الأربعاء",
     thu: "الخميس",
     fri: "الجمعة",
-    sat: "السبت"
+    sat: "السبت",
+
+    // Updated HTML translations
+    todayOverview: "ملخص اليوم",
+    arrivingToday: "الوصول اليوم",
+    departingToday: "المغادرة اليوم",
+    currentlyStaying: "المقيمون حاليًا",
+    quickActionsDesc: "المهام اليومية للعائلة",
+    bookingCalendar: "تقويم الحجوزات",
+    bookingsTableDesc: "تفاصيل الحجوزات والمدفوعات",
+    apartmentExpenses: "مصاريف الشقة",
+    monthlyPerformanceDesc: "الإيرادات والمصاريف التشغيلية وصافي الربح",
+    operatingRevenue: "الإيرادات التشغيلية",
+    operatingExpenses: "المصاريف التشغيلية",
+    netProfit: "صافي الربح",
+    occupancyRate: "نسبة الإشغال",
+    annualCostCoverage: "تغطية التكاليف السنوية",
+    annualCostCoverageDesc: "متابعة التقدم نحو تغطية الميزانية التشغيلية السنوية",
+    annualBudget: "الميزانية السنوية",
+    annualRent: "الإيجار السنوي",
+    cleaningBudget: "ميزانية النظافة",
+    emergencyReserve: "احتياطي الطوارئ",
+    monthlyBookingDetails: "تفاصيل الحجوزات الشهرية",
+    monthlyBookingDetailsDesc: "الحجوزات والليالي ومتوسط أسعار الإقامة",
+    bookedNights: "الليالي المحجوزة",
+    averageNightlyRate: "متوسط سعر الليلة",
+    averageBookingValue: "متوسط قيمة الحجز",
+    earningsByMonth: "الأرباح حسب الشهر",
+    earningsByMonthDesc: "مقارنة أداء الشقة شهريًا",
+    bookingsByMonth: "الحجوزات حسب الشهر",
+    bookingsByMonthDesc: "مقارنة عدد الحجوزات الشهرية",
+    revenueVsExpenses: "الإيرادات مقابل المصاريف",
+    revenueVsExpensesDesc: "مقارنة الإيرادات والتكاليف والأرباح بمرور الوقت",
+    bookingsByPlatform: "الحجوزات حسب المنصة",
+    bookingsByPlatformDesc: "معرفة مصادر الحجوزات",
+    addBookingTitle: "إضافة حجز",
+    totalBookingAmount: "إجمالي مبلغ الحجز (ريال)",
+    addExpenseTitle: "إضافة مصروف",
+    date: "التاريخ",
+    category: "الفئة",
+    description: "الوصف",
+    amount: "المبلغ",
+    amountSAR: "المبلغ (ريال)",
+    saveExpense: "حفظ المصروف",
+    cancel: "إلغاء",
+    deleteExpense: "حذف المصروف"
   }
 };
 
 
 /* =====================================================
-   PART 3 — ORIGINAL DASHBOARD HELPERS
+   PART 3 — DASHBOARD HELPERS
    ===================================================== */
 
 function t(key) {
-  return translations[currentLanguage][key] || key;
+  return translations[currentLanguage]?.[key] || key;
 }
 
 function setText(id, value) {
@@ -424,14 +513,12 @@ function money(value) {
     return t("notRecorded");
   }
 
-  
-return (
-  number.toLocaleString("en-US", {
-    minimumFractionDigits: 2,
-    maximumFractionDigits: 2
-  }) + " SAR"
-);
-
+  return (
+    number.toLocaleString("en-US", {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2
+    }) + " SAR"
+  );
 }
 
 function cents(value) {
@@ -568,6 +655,7 @@ function activeBookings() {
   return bookings.filter(activeBooking);
 }
 
+
 /* =====================================================
    FINANCIAL CALCULATIONS
    ===================================================== */
@@ -606,8 +694,7 @@ function displayTotal(field) {
 }
 
 /*
- * IMPORTANT:
- * Your original database uses original_guest_payment
+ * Your database uses original_guest_payment
  * for the recorded guest payment.
  */
 function amountReceived(booking) {
@@ -651,6 +738,7 @@ function outstandingBalance(booking) {
   ) / 100;
 }
 
+
 /* =====================================================
    ELEMENT AND MESSAGE HELPERS
    ===================================================== */
@@ -677,11 +765,7 @@ function showMessage(message, isError = false) {
     : "var(--success)";
 }
 
-/* =====================================================
-   NAVIGATION
-   ===================================================== */
 
-   
 /* =====================================================
    NAVIGATION
    ===================================================== */
@@ -731,6 +815,7 @@ $("quick-view-finances")?.addEventListener(
   "click",
   () => switchTab("finances")
 );
+
 
 /* =====================================================
    SUPABASE — LOAD BOOKINGS
@@ -803,7 +888,6 @@ async function loadBookings() {
    LOAD EXPENSES FROM SUPABASE
    ========================================= */
 
-
 let expenses = [];
 let editingExpenseId = null;
 let savingExpenseChange = false;
@@ -820,10 +904,15 @@ async function loadExpenses() {
     return;
   }
 
- expenses = data || [];
-renderExpenses();
-renderReports();
+  expenses = data || [];
+  renderExpenses();
+  renderReports();
 }
+
+
+/* =========================================
+   DISPLAY EXPENSES
+   ========================================= */
 
 function renderExpenses() {
   const tbody = $("expenses-table-body");
@@ -840,6 +929,7 @@ function renderExpenses() {
   }
 
   const heading = headerRow?.querySelector("[data-expense-actions]");
+
   if (heading) {
     heading.textContent = currentLanguage === "ar"
       ? "الإجراءات"
@@ -848,7 +938,7 @@ function renderExpenses() {
 
   let total = 0;
 
-  expenses.forEach(expense => {
+  expenses.forEach((expense) => {
     const amount = Number(expense.amount) || 0;
     total += amount;
 
@@ -859,7 +949,7 @@ function renderExpenses() {
       expense.category,
       expense.description || "—",
       money(amount)
-    ].forEach(value => {
+    ].forEach((value) => {
       const cell = document.createElement("td");
       cell.textContent = value;
       row.append(cell);
@@ -868,24 +958,28 @@ function renderExpenses() {
     const actions = document.createElement("td");
     actions.className = "expense-actions";
 
+    // EDIT BUTTON
     const editButton = document.createElement("button");
     editButton.type = "button";
     editButton.className = "expense-edit-btn";
     editButton.textContent = currentLanguage === "ar"
       ? "تعديل"
       : "Edit";
+
     editButton.addEventListener("click", () => {
       openEditExpense(expense);
     });
 
+    // DELETE BUTTON
     const deleteButton = document.createElement("button");
     deleteButton.type = "button";
     deleteButton.className = "expense-delete-btn";
     deleteButton.textContent = currentLanguage === "ar"
       ? "حذف"
       : "Delete";
+
     deleteButton.addEventListener("click", () => {
-      deleteExpense(expense, deleteButton);
+      deleteExpense(expense);
     });
 
     actions.append(editButton, deleteButton);
@@ -896,16 +990,23 @@ function renderExpenses() {
   if (!expenses.length) {
     const row = document.createElement("tr");
     const cell = document.createElement("td");
+
     cell.colSpan = 5;
     cell.textContent = currentLanguage === "ar"
       ? "لا توجد مصاريف مسجلة"
       : "No expenses recorded";
+
     row.append(cell);
     tbody.append(row);
   }
 
   setText("finance-expenses", money(total));
 }
+
+
+/* =========================================
+   EDIT EXPENSE
+   ========================================= */
 
 function openEditExpense(expense) {
   if (expense.id == null) {
@@ -922,6 +1023,7 @@ function openEditExpense(expense) {
   $("expense-amount").value = expense.amount ?? "";
 
   setText("expense-message", "");
+
   setText(
     "save-expense",
     currentLanguage === "ar" ? "حفظ التعديلات" : "Save Changes"
@@ -930,6 +1032,10 @@ function openEditExpense(expense) {
   $("add-expense-dialog").showModal();
 }
 
+
+/* =========================================
+   DELETE EXPENSE CONFIRMATION
+   ========================================= */
 
 let expensePendingDeletion = null;
 let deletingExpense = false;
@@ -962,15 +1068,33 @@ function deleteExpense(expense) {
   );
 
   setText("delete-expense-error", "");
-  setText("cancel-delete-expense", isArabic ? "إلغاء" : "Cancel");
-  setText("confirm-delete-expense", isArabic ? "حذف المصروف" : "Delete Expense");
+
+  setText(
+    "cancel-delete-expense",
+    isArabic ? "إلغاء" : "Cancel"
+  );
+
+  setText(
+    "confirm-delete-expense",
+    isArabic ? "حذف المصروف" : "Delete Expense"
+  );
 
   $("delete-expense-dialog").showModal();
 }
 
+
+/* =========================================
+   RESET DELETE DIALOG STATE
+   ========================================= */
+
 $("delete-expense-dialog")?.addEventListener("close", () => {
   expensePendingDeletion = null;
 });
+
+
+/* =========================================
+   CONFIRM DELETE EXPENSE
+   ========================================= */
 
 document.addEventListener("click", async (event) => {
   if (!event.target.closest("#confirm-delete-expense")) return;
@@ -994,7 +1118,9 @@ document.addEventListener("click", async (event) => {
     if (error) throw error;
 
     if (!data?.length) {
-      throw new Error("Expense was not deleted. Check Supabase permissions.");
+      throw new Error(
+        "Expense was not deleted. Check Supabase permissions."
+      );
     }
 
     $("delete-expense-dialog").close();
@@ -1014,6 +1140,11 @@ document.addEventListener("click", async (event) => {
   }
 });
 
+
+/* =========================================
+   RENDER COMPLETE DASHBOARD
+   ========================================= */
+
 function renderEverything() {
   renderStatistics();
   renderToday();
@@ -1023,6 +1154,7 @@ function renderEverything() {
   renderFinanceSummary();
   renderReports();
 }
+
 
 /* =====================================================
    DASHBOARD STATISTICS
@@ -1318,6 +1450,7 @@ function renderTable() {
   });
 }
 
+
 /* =====================================================
    BOOKING DETAILS DIALOG
    ===================================================== */
@@ -1520,6 +1653,7 @@ $("close-breakdown-bottom")?.addEventListener(
   () => $("breakdown-dialog").close()
 );
 
+
 /* =====================================================
    FINANCE SUMMARY
    ===================================================== */
@@ -1565,11 +1699,11 @@ function renderFinanceSummary() {
   );
 
   const expenseTotal = expenses.reduce(
-  (sum, expense) => sum + (Number(expense.amount) || 0),
-  0
-);
+    (sum, expense) => sum + (Number(expense.amount) || 0),
+    0
+  );
 
-setText("finance-expenses", money(expenseTotal));
+  setText("finance-expenses", money(expenseTotal));
 }
 
 
@@ -1643,6 +1777,7 @@ function renderRemainingPayments() {
     tbody.append(row);
   });
 }
+
 
 /* =====================================================
    EARNINGS DETAILS
@@ -1742,8 +1877,7 @@ $("close-earnings-dialog")?.addEventListener(
    ===================================================== */
 
 // Earnings are allocated across the nights of a stay.
-// Example: a stay crossing October and November
-// contributes to both months.
+// A stay crossing two months contributes to both.
 //
 // This is estimated earned revenue, NOT cash received.
 // Actual monthly cash flow needs payment timestamps.
@@ -1829,12 +1963,16 @@ function monthlyOccupancy(monthKey) {
   return Math.round((occupied / days) * 100);
 }
 
+/* =====================================================
+   REPORT MONTH SELECTION
+   ===================================================== */
+
 function reportMonthOptions() {
   const select = $("report-month");
   if (!select) return;
 
   const map = monthlyEarningsMap();
-const expenseMap = monthlyExpenseMap();
+  const expenseMap = monthlyExpenseMap();
   const now = new Date();
 
   const currentKey = `${now.getFullYear()}-${String(
@@ -1842,10 +1980,10 @@ const expenseMap = monthlyExpenseMap();
   ).padStart(2, "0")}`;
 
   const months = new Set([
-  ...map.keys(),
-  ...expenseMap.keys(),
-  currentKey
-]);
+    ...map.keys(),
+    ...expenseMap.keys(),
+    currentKey
+  ]);
 
   const sorted = [...months].sort().reverse();
 
@@ -1874,11 +2012,14 @@ const expenseMap = monthlyExpenseMap();
   select.value = selectedReportMonth;
 }
 
+/* =====================================================
+   MONTHLY EXPENSE CALCULATIONS
+   ===================================================== */
 
 function monthlyExpenseMap() {
   const totals = new Map();
 
-  expenses.forEach(expense => {
+  expenses.forEach((expense) => {
     const date = String(expense.expense_date || "");
     const amount = safeNumber(expense.amount);
 
@@ -1890,6 +2031,10 @@ function monthlyExpenseMap() {
 
   return totals;
 }
+
+/* =====================================================
+   MONTHLY BOOKING DETAILS
+   ===================================================== */
 
 function monthlyBookingDetails(monthKey) {
   const [year, month] = monthKey.split("-").map(Number);
@@ -1905,7 +2050,7 @@ function monthlyBookingDetails(monthKey) {
   let nights = 0;
   let revenue = 0;
 
-  activeBookings().forEach(booking => {
+  activeBookings().forEach((booking) => {
     if (booking.check_in?.startsWith(monthKey)) {
       count++;
     }
@@ -1918,11 +2063,15 @@ function monthlyBookingDetails(monthKey) {
     if (!start || !end || totalNights <= 0) return;
 
     const startUTC = Date.UTC(
-      start.getFullYear(), start.getMonth(), start.getDate()
+      start.getFullYear(),
+      start.getMonth(),
+      start.getDate()
     );
 
     const endUTC = Date.UTC(
-      end.getFullYear(), end.getMonth(), end.getDate()
+      end.getFullYear(),
+      end.getMonth(),
+      end.getDate()
     );
 
     const overlap = Math.max(
@@ -1943,6 +2092,10 @@ function monthlyBookingDetails(monthKey) {
   return { count, nights, revenue };
 }
 
+/* =====================================================
+   ANNUAL BUDGET COVERAGE
+   ===================================================== */
+
 function renderAnnualCoverage(earningsMap) {
   const ANNUAL_BUDGET = 42000;
 
@@ -1957,8 +2110,15 @@ function renderAnnualCoverage(earningsMap) {
     Math.max(0, annualRevenue / ANNUAL_BUDGET * 100)
   );
 
-  const remaining = Math.max(0, ANNUAL_BUDGET - annualRevenue);
-  const surplus = Math.max(0, annualRevenue - ANNUAL_BUDGET);
+  const remaining = Math.max(
+    0,
+    ANNUAL_BUDGET - annualRevenue
+  );
+
+  const surplus = Math.max(
+    0,
+    annualRevenue - ANNUAL_BUDGET
+  );
 
   const isArabic = currentLanguage === "ar";
 
@@ -1981,13 +2141,20 @@ function renderAnnualCoverage(earningsMap) {
   );
 
   const bar = $("annual-coverage-bar");
-  if (bar) bar.style.width = `${covered}%`;
+
+  if (bar) {
+    bar.style.width = `${covered}%`;
+  }
 
   $("annual-coverage-progress")?.setAttribute(
     "aria-valuenow",
     covered.toFixed(1)
   );
 }
+
+/* =====================================================
+   RENDER MONTHLY REPORTS
+   ===================================================== */
 
 function renderReports() {
   reportMonthOptions();
@@ -2025,19 +2192,21 @@ function renderReports() {
   );
 
   const startingBookings = activeBookings().filter(
-    booking => booking.check_in?.startsWith(month)
+    (booking) => booking.check_in?.startsWith(month)
   );
 
   const bookingValues = startingBookings
-    .map(booking => safeNumber(booking.amount))
-    .filter(value => value !== null);
+    .map((booking) => safeNumber(booking.amount))
+    .filter((value) => value !== null);
 
   setText(
     "report-average-booking-value",
     bookingValues.length
       ? money(
-          bookingValues.reduce((sum, value) => sum + value, 0) /
-          bookingValues.length
+          bookingValues.reduce(
+            (sum, value) => sum + value,
+            0
+          ) / bookingValues.length
         )
       : "—"
   );
@@ -2050,6 +2219,10 @@ function renderReports() {
   translateReportLabels();
 }
 
+/* =====================================================
+   REPORT MONTH CHANGE
+   ===================================================== */
+
 $("report-month")?.addEventListener(
   "change",
   (event) => {
@@ -2057,6 +2230,7 @@ $("report-month")?.addEventListener(
     renderReports();
   }
 );
+
 
 /* =====================================================
    SIMPLE CHARTS — NO EXTRA LIBRARY NEEDED
@@ -2067,7 +2241,6 @@ function renderEarningsChart(earningsMap) {
   if (!container) return;
 
   container.dir = "ltr";
-
   container.replaceChildren();
 
   const entries = [...earningsMap.entries()]
@@ -2129,9 +2302,10 @@ function renderEarningsChart(earningsMap) {
     const label = createElement(
       "div",
       "chart-label",
-   `${new Date(year, month - 1, 1).toLocaleString("en-US", {
-  month: "short"
-})} ${String(year).slice(-2)}`
+      `${new Date(year, month - 1, 1).toLocaleString(
+        "en-US",
+        { month: "short" }
+      )} ${String(year).slice(-2)}`
     );
 
     label.style.marginTop = "8px";
@@ -2144,53 +2318,108 @@ function renderEarningsChart(earningsMap) {
 }
 
 
+/* =====================================================
+   BOOKINGS BY PLATFORM
+   ===================================================== */
+
 function renderPlatformChart() {
   const container = $("platform-chart");
   if (!container) return;
 
   container.replaceChildren();
+
   const counts = new Map();
+
   activeBookings().forEach((booking) => {
     const platform = booking.platform || "Other";
-    counts.set(platform, (counts.get(platform) || 0) + 1);
+
+    counts.set(
+      platform,
+      (counts.get(platform) || 0) + 1
+    );
   });
 
   if (!counts.size) {
-    container.append(createElement("p", "", t("noChartData")));
+    container.append(
+      createElement("p", "", t("noChartData"))
+    );
     return;
   }
 
-  const total = [...counts.values()].reduce((sum, count) => sum + count, 0);
-  const colors = ["#4b5130", "#b69a65", "#7c8a64", "#9c8063", "#697d75"];
+  const total = [...counts.values()].reduce(
+    (sum, count) => sum + count,
+    0
+  );
+
+  const colors = [
+    "#4b5130",
+    "#b69a65",
+    "#7c8a64",
+    "#9c8063",
+    "#697d75"
+  ];
 
   [...counts.entries()]
     .sort((a, b) => b[1] - a[1])
     .forEach(([platform, count], index) => {
-      const row = createElement("div", "platform-chart-row");
+      const row = createElement(
+        "div",
+        "platform-chart-row"
+      );
+
       row.style.marginBottom = "18px";
-      const heading = createElement("div", "platform-chart-heading");
+
+      const heading = createElement(
+        "div",
+        "platform-chart-heading"
+      );
+
       heading.style.display = "flex";
       heading.style.justifyContent = "space-between";
       heading.style.gap = "12px";
       heading.style.marginBottom = "7px";
+
       heading.append(
         createElement("strong", "", platform),
-        createElement("span", "", `${count} (${Math.round(count / total * 100)}%)`)
+        createElement(
+          "span",
+          "",
+          `${count} (${Math.round(
+            count / total * 100
+          )}%)`
+        )
       );
-      const track = createElement("div", "platform-chart-track");
+
+      const track = createElement(
+        "div",
+        "platform-chart-track"
+      );
+
       track.style.height = "12px";
       track.style.borderRadius = "999px";
       track.style.background = "var(--border, #e7e5dc)";
       track.style.overflow = "hidden";
-      const bar = createElement("div", "platform-chart-fill");
+
+      const bar = createElement(
+        "div",
+        "platform-chart-fill"
+      );
+
       bar.style.height = "100%";
       bar.style.width = `${count / total * 100}%`;
-      bar.style.background = colors[index % colors.length];
+      bar.style.background =
+        colors[index % colors.length];
+
       track.append(bar);
       row.append(heading, track);
       container.append(row);
     });
 }
+
+
+/* =====================================================
+   SHARED REPORT CHART HELPERS
+   ===================================================== */
 
 function reportChartMonths(earningsMap, expenseMap) {
   const months = new Set([
@@ -2198,7 +2427,7 @@ function reportChartMonths(earningsMap, expenseMap) {
     ...expenseMap.keys()
   ]);
 
-  activeBookings().forEach(booking => {
+  activeBookings().forEach((booking) => {
     if (booking.check_in) {
       months.add(booking.check_in.slice(0, 7));
     }
@@ -2210,30 +2439,47 @@ function reportChartMonths(earningsMap, expenseMap) {
 function reportMonthLabel(key) {
   const [year, month] = key.split("-").map(Number);
 
-  return new Date(year, month - 1, 1).toLocaleString(
-    "en-US",
-    { month: "short", year: "2-digit" }
-  );
+  return new Date(
+    year,
+    month - 1,
+    1
+  ).toLocaleString("en-US", {
+    month: "short",
+    year: "2-digit"
+  });
 }
 
-function renderMonthlyBookingsChart(earningsMap, expenseMap) {
+
+/* =====================================================
+   BOOKINGS BY MONTH
+   ===================================================== */
+
+function renderMonthlyBookingsChart(
+  earningsMap,
+  expenseMap
+) {
   const container = $("monthly-bookings-chart");
   if (!container) return;
 
   container.replaceChildren();
   container.dir = "ltr";
 
-  const months = reportChartMonths(earningsMap, expenseMap);
+  const months = reportChartMonths(
+    earningsMap,
+    expenseMap
+  );
 
   if (!months.length) {
     container.textContent = t("noChartData");
     return;
   }
 
-  const counts = months.map(month =>
-    activeBookings().filter(booking =>
-      booking.check_in?.startsWith(month)
-    ).length
+  const counts = months.map(
+    (month) =>
+      activeBookings().filter(
+        (booking) =>
+          booking.check_in?.startsWith(month)
+      ).length
   );
 
   const max = Math.max(1, ...counts);
@@ -2242,19 +2488,33 @@ function renderMonthlyBookingsChart(earningsMap, expenseMap) {
   chart.className = "report-bar-chart";
 
   months.forEach((month, index) => {
-    const group = createElement("div", "report-bar-group");
-
-    const value = createElement(
-      "strong", "report-bar-value", counts[index]
+    const group = createElement(
+      "div",
+      "report-bar-group"
     );
 
-    const bar = createElement("div", "report-bar");
-    bar.style.height =
-      `${Math.max(3, counts[index] / max * 155)}px`;
+    const value = createElement(
+      "strong",
+      "report-bar-value",
+      counts[index]
+    );
+
+    const bar = createElement(
+      "div",
+      "report-bar"
+    );
+
+    bar.style.height = `${Math.max(
+      3,
+      counts[index] / max * 155
+    )}px`;
+
     bar.style.background = "#7c8a64";
 
     const label = createElement(
-      "span", "report-bar-month", reportMonthLabel(month)
+      "span",
+      "report-bar-month",
+      reportMonthLabel(month)
     );
 
     group.append(value, bar, label);
@@ -2264,34 +2524,63 @@ function renderMonthlyBookingsChart(earningsMap, expenseMap) {
   container.append(chart);
 }
 
-function renderMonthlyFinancialChart(earningsMap, expenseMap) {
+
+/* =====================================================
+   REVENUE VS EXPENSES
+   ===================================================== */
+
+function renderMonthlyFinancialChart(
+  earningsMap,
+  expenseMap
+) {
   const container = $("monthly-financial-chart");
   if (!container) return;
 
   container.replaceChildren();
   container.dir = "ltr";
 
-  const months = reportChartMonths(earningsMap, expenseMap);
+  const months = reportChartMonths(
+    earningsMap,
+    expenseMap
+  );
 
   if (!months.length) {
     container.textContent = t("noChartData");
     return;
   }
 
-  const values = months.flatMap(month => [
+  const values = months.flatMap((month) => [
     earningsMap.get(month) || 0,
     expenseMap.get(month) || 0
   ]);
 
   const max = Math.max(1, ...values);
 
-  const legend = createElement("div", "report-chart-legend");
+  const legend = createElement(
+    "div",
+    "report-chart-legend"
+  );
 
   [
-    [currentLanguage === "ar" ? "الإيرادات" : "Revenue", "#7c8a64"],
-    [currentLanguage === "ar" ? "المصاريف" : "Expenses", "#b69a65"]
+    [
+      currentLanguage === "ar"
+        ? "الإيرادات"
+        : "Revenue",
+      "#7c8a64"
+    ],
+    [
+      currentLanguage === "ar"
+        ? "المصاريف"
+        : "Expenses",
+      "#b69a65"
+    ]
   ].forEach(([name, color]) => {
-    const item = createElement("span", "", `● ${name}`);
+    const item = createElement(
+      "span",
+      "",
+      `● ${name}`
+    );
+
     item.style.color = color;
     legend.append(item);
   });
@@ -2299,21 +2588,34 @@ function renderMonthlyFinancialChart(earningsMap, expenseMap) {
   const chart = createElement("div");
   chart.className = "report-bar-chart";
 
-  months.forEach(month => {
+  months.forEach((month) => {
     const revenue = earningsMap.get(month) || 0;
     const expense = expenseMap.get(month) || 0;
 
-    const group = createElement("div", "report-bar-group");
-    const pair = createElement("div", "report-bar-pair");
+    const group = createElement(
+      "div",
+      "report-bar-group"
+    );
+
+    const pair = createElement(
+      "div",
+      "report-bar-pair"
+    );
 
     [
       [revenue, "#7c8a64"],
       [expense, "#b69a65"]
     ].forEach(([amount, color]) => {
-      const bar = createElement("div", "report-bar");
+      const bar = createElement(
+        "div",
+        "report-bar"
+      );
 
-      bar.style.height =
-        `${Math.max(3, amount / max * 155)}px`;
+      bar.style.height = `${Math.max(
+        3,
+        amount / max * 155
+      )}px`;
+
       bar.style.background = color;
       bar.title = money(amount);
 
@@ -2322,7 +2624,11 @@ function renderMonthlyFinancialChart(earningsMap, expenseMap) {
 
     group.append(
       pair,
-      createElement("span", "report-bar-month", reportMonthLabel(month))
+      createElement(
+        "span",
+        "report-bar-month",
+        reportMonthLabel(month)
+      )
     );
 
     chart.append(group);
@@ -2689,18 +2995,10 @@ $("record-payment-form")?.addEventListener(
   }
 );
 
+
 /* =====================================================
-   EXPENSES — RESERVED FOR NEXT DEVELOPMENT STEP
+   ADD OR EDIT EXPENSES
    ===================================================== */
-
-// Expense saving is intentionally disabled until
-// the Supabase Expenses table and security policies
-// are created.
-//
-// Do not store expense records only in localStorage:
-// family members need shared, reliable data.
-
-
 
 $("open-add-expense")?.addEventListener("click", () => {
   editingExpenseId = null;
@@ -2717,223 +3015,172 @@ $("open-add-expense")?.addEventListener("click", () => {
   $("add-expense-dialog").showModal();
 });
 
-$("add-expense-form")?.addEventListener("submit", async event => {
-  event.preventDefault();
+$("add-expense-form")?.addEventListener(
+  "submit",
+  async (event) => {
+    event.preventDefault();
 
-  if (savingExpenseChange) return;
+    if (savingExpenseChange) return;
 
-  const button = $("save-expense");
-  const message = $("expense-message");
+    const button = $("save-expense");
+    const message = $("expense-message");
 
-  const expense = {
-    expense_date: $("expense-date").value,
-    category: $("expense-category").value,
-    description: $("expense-description").value.trim() || null,
-    amount: Number($("expense-amount").value)
-  };
+    const expense = {
+      expense_date: $("expense-date").value,
+      category: $("expense-category").value,
+      description:
+        $("expense-description").value.trim() || null,
+      amount: Number($("expense-amount").value)
+    };
 
-  if (
-    !expense.expense_date ||
-    !expense.category ||
-    !Number.isFinite(expense.amount) ||
-    expense.amount <= 0
-  ) {
-    message.textContent = "Please enter valid expense details.";
-    return;
-  }
+    if (
+      !parseDate(expense.expense_date) ||
+      !expense.category ||
+      !Number.isFinite(expense.amount) ||
+      expense.amount <= 0
+    ) {
+      message.textContent =
+        currentLanguage === "ar"
+          ? "يرجى إدخال بيانات مصروف صحيحة."
+          : "Please enter valid expense details.";
+      return;
+    }
 
-  savingExpenseChange = true;
-  button.disabled = true;
-  message.textContent = "";
+    savingExpenseChange = true;
+    button.disabled = true;
+    message.textContent = "";
 
-  try {
-    if (editingExpenseId !== null) {
-      const { data, error } = await supabaseClient
-        .from("Expenses")
-        .update(expense)
-        .eq("id", editingExpenseId)
-        .select("id");
+    try {
+      const { data: authData, error: authError } =
+        await supabaseClient.auth.getUser();
 
-      if (error) throw error;
-
-      if (!data?.length) {
-        throw new Error("No record updated. Check Supabase permissions.");
+      if (authError || !authData.user) {
+        throw new Error(t("sessionExpired"));
       }
-    } else {
-      const { error } = await supabaseClient
-        .from("Expenses")
-        .insert(expense);
 
-      if (error) throw error;
+      if (editingExpenseId !== null) {
+        const { data, error } = await supabaseClient
+          .from("Expenses")
+          .update(expense)
+          .eq("id", editingExpenseId)
+          .select("id");
+
+        if (error) throw error;
+
+        if (!data?.length) {
+          throw new Error(
+            "No record updated. Check Supabase permissions."
+          );
+        }
+      } else {
+        const { data, error } = await supabaseClient
+          .from("Expenses")
+          .insert(expense)
+          .select("id");
+
+        if (error) throw error;
+
+        if (!data?.length) {
+          throw new Error(
+            "Expense was not saved. Check Supabase permissions."
+          );
+        }
+      }
+
+      editingExpenseId = null;
+      $("add-expense-dialog").close();
+
+      await loadExpenses();
+
+      showMessage(
+        currentLanguage === "ar"
+          ? "تم حفظ المصروف بنجاح"
+          : "Expense saved successfully!"
+      );
+    } catch (error) {
+      message.textContent = error.message;
+    } finally {
+      savingExpenseChange = false;
+      button.disabled = false;
+      button.textContent =
+        currentLanguage === "ar"
+          ? "حفظ المصروف"
+          : "Save Expense";
     }
+  }
+);
 
+$("close-expense-dialog")?.addEventListener(
+  "click",
+  () => $("add-expense-dialog").close()
+);
+
+$("add-expense-dialog")?.addEventListener(
+  "close",
+  () => {
     editingExpenseId = null;
-    $("add-expense-dialog").close();
-
-    await loadExpenses();
-
-    showMessage(
-      currentLanguage === "ar"
-        ? "تم حفظ المصروف بنجاح"
-        : "Expense saved successfully!"
-    );
-  } catch (error) {
-    message.textContent = error.message;
-  } finally {
-    savingExpenseChange = false;
-    button.disabled = false;
   }
-});
-
-$("close-expense-dialog")?.addEventListener("click", () => {
-  $("add-expense-dialog").close();
-});
-
-$("add-expense-dialog")?.addEventListener("close", () => {
-  editingExpenseId = null;
-});
-
+);
 
 /* =====================================================
-   LANGUAGE SWITCHING
-   ===================================================== */
-
-   
-/* =====================================================
-   LANGUAGE HELPERS
-   ===================================================== */
-
-
-function setLabelForInput(inputId, labelText) {
-  const input = $(inputId);
-  if (!input) return;
-
-  const label = input.closest("label");
-  if (!label) return;
-
-  const labelSpan = label.querySelector("span");
-
-  if (labelSpan) {
-    labelSpan.textContent = labelText;
-    return;
-  }
-
-  Array.from(label.childNodes).forEach((node) => {
-    if (node.nodeType === Node.TEXT_NODE) {
-      node.textContent = "";
-    }
-  });
-
-  label.insertBefore(
-    document.createTextNode(labelText + " "),
-    label.firstChild
-  );
-}
-
-function translateSectionHeader(section, title, desc) {
-  if (!section) return;
-
-  const header = section.querySelector(
-    ":scope > .section-header"
-  );
-
-  if (!header) return;
-
-  const heading = header.querySelector("h2");
-  const paragraph = header.querySelector("p");
-
-  if (heading) heading.textContent = t(title);
-  if (paragraph) paragraph.textContent = t(desc);
-}
-
-function translatePanel(panelId, title, desc) {
-  const panel = $(panelId);
-  if (!panel) return;
-
-  const header = panel.querySelector(
-    ":scope > .section-header"
-  );
-
-  if (!header) return;
-
-  const heading = header.querySelector("h2");
-  const paragraph = header.querySelector("p");
-
-  if (heading) heading.textContent = t(title);
-  if (paragraph) paragraph.textContent = t(desc);
-}
-
-function translateTableHeadings(tbodyId, keys) {
-  const tbody = $(tbodyId);
-  if (!tbody) return;
-
-  const table = tbody.closest("table");
-  if (!table) return;
-
-  const headings = table.querySelectorAll("thead th");
-
-  keys.forEach((key, index) => {
-    if (headings[index]) {
-      headings[index].textContent = t(key);
-    }
-  });
-}
-
-/* =====================================================
-   SWITCH LANGUAGE
+   PART 11 — LANGUAGE AND THEME
    ===================================================== */
 
 function setLanguage(language) {
   currentLanguage = language === "ar" ? "ar" : "en";
 
-  localStorage.setItem(
-    "osAdminLanguage",
-    currentLanguage
-  );
+  localStorage.setItem("osAdminLanguage", currentLanguage);
 
- document.documentElement.style.fontVariantNumeric = "lining-nums";
+  document.documentElement.lang = currentLanguage;
   document.documentElement.dir =
     currentLanguage === "ar" ? "rtl" : "ltr";
 
-  setText("language-toggle", t("language"));
+  document.documentElement.style.fontVariantNumeric =
+    "lining-nums";
 
-  const loginTitle = document.querySelector(
-    ".login-card h1"
-  );
+  // Translate HTML elements using data-i18n attributes.
+  document.querySelectorAll("[data-i18n]").forEach((element) => {
+    const key = element.dataset.i18n;
+    const translation = translations[currentLanguage]?.[key];
 
-  const loginSubtitle = document.querySelector(
-    ".login-card > p"
-  );
+    if (!translation) return;
 
-  if (loginTitle) loginTitle.textContent = "OS Apartments";
+    // Keep the guest name visible in an open booking dialog.
+    if (
+      element.id === "breakdown-guest" &&
+      $("breakdown-dialog")?.open
+    ) {
+      return;
+    }
 
-  if (loginSubtitle) {
-    loginSubtitle.textContent = t("management");
+    element.textContent = translation;
+  });
+
+  const buttonLabels = {
+    "logout-btn": "logout",
+    "open-add-booking": "addBooking",
+    "quick-add-booking": "addBooking",
+    "quick-view-bookings": "viewBookings",
+    "quick-view-finances": "viewFinances",
+    "refresh-bookings-btn": "refresh",
+    "save-manual-booking": "saveBooking",
+    "save-payment": "savePayment",
+    "save-expense": "saveExpense"
+  };
+
+  for (const [id, key] of Object.entries(buttonLabels)) {
+    if ($(id)) setText(id, t(key));
   }
 
-  const brandSubtitle = document.querySelector(
-    ".brand p"
+  setText(
+    "language-toggle",
+    currentLanguage === "ar" ? "English" : "العربية"
   );
 
-  if (brandSubtitle) {
-    brandSubtitle.textContent = t("management");
-  }
-
-  setLabelForInput("email", t("email"));
-  setLabelForInput("password", t("password"));
-
-  const loginButton = document.querySelector(
-    '#login-form button[type="submit"]'
+  setText(
+    "auth-language-toggle",
+    currentLanguage === "ar" ? "English" : "العربية"
   );
-
-  if (loginButton) loginButton.textContent = t("login");
-
-  setButtonText("logout-btn", t("logout"));
-  setButtonText("open-add-booking", t("addBooking"));
-  setButtonText("quick-add-booking", t("addBooking"));
-  setButtonText("quick-view-bookings", t("viewBookings"));
-  setButtonText("quick-view-finances", t("viewFinances"));
-  setButtonText("refresh-bookings-btn", t("refresh"));
 
   const tabKeys = {
     overview: "overview",
@@ -2942,588 +3189,15 @@ function setLanguage(language) {
     reports: "reports"
   };
 
-  document.querySelectorAll(".tab-btn").forEach(
-    (button) => {
-      button.textContent = t(
-        tabKeys[button.dataset.tab]
-      );
-    }
-  );
+  document.querySelectorAll(".tab-btn").forEach((button) => {
+    const key = tabKeys[button.dataset.tab];
 
-  translateSectionHeader(
-    $("tab-overview"),
-    "overview",
-    "overviewDesc"
-  );
-
-  translateSectionHeader(
-    $("tab-bookings"),
-    "bookingsTab",
-    "bookingsDesc"
-  );
-
-  translateSectionHeader(
-    $("tab-finances"),
-    "finances",
-    "financesDesc"
-  );
-
-  translateSectionHeader(
-    $("tab-reports"),
-    "reports",
-    "reportsDesc"
-  );
-
-  const overviewCards = document.querySelectorAll(
-    "#tab-overview .stats-grid .stat-card"
-  );
-
-  [
-    "totalBookings",
-    "upcomingBookings",
-    "guestTotals",
-    "hostEarnings"
-  ].forEach((key, index) => {
-    const span = overviewCards[index]?.querySelector(
-      "span"
-    );
-
-    if (span) span.textContent = t(key);
-  });
-
-  const earningsHint = $("earnings-card")?.querySelector(
-    "small"
-  );
-
-  if (earningsHint) {
-    earningsHint.textContent = t("viewDetails");
-  }
-
-  translatePanel(
-    "today-panel",
-    "today",
-    "todayDesc"
-  );
-
-  
-const quickActionsPanel = $("quick-actions-panel");
-
-if (quickActionsPanel) {
-  const description = quickActionsPanel.querySelector(
-    ".section-header p"
-  );
-
-  if (description) {
-    description.remove();
-  }
-
-  const heading = quickActionsPanel.querySelector(
-    ".section-header h2"
-  );
-
-  if (heading) {
-    heading.textContent = t("quickActions");
-  }
-}
-
-
-  const todayLabels = document.querySelectorAll(
-    ".today-card span"
-  );
-
-  ["arriving", "departing", "staying"].forEach(
-    (key, index) => {
-      if (todayLabels[index]) {
-        todayLabels[index].textContent = t(key);
-      }
-    }
-  );
-
-  const bookingPanels = document.querySelectorAll(
-    "#tab-bookings > .panel"
-  );
-
-  [
-    ["calendar", "calendarDesc"],
-    ["allBookings", "allBookingsDesc"]
-  ].forEach(([title, desc], index) => {
-    const header = bookingPanels[index]?.querySelector(
-      ".section-header"
-    );
-
-    if (!header) return;
-
-    const h2 = header.querySelector("h2");
-    const p = header.querySelector("p");
-
-    if (h2) h2.textContent = t(title);
-    if (p) p.textContent = t(desc);
-  });
-
-  const legend = document.querySelectorAll(
-    ".calendar-legend span"
-  );
-
-  if (legend[0]) {
-    legend[0].textContent = t("confirmed");
-  }
-
-  if (legend[1]) {
-    legend[1].textContent = t("available");
-  }
-
-  const weekdays = document.querySelectorAll(
-    ".calendar-weekdays span"
-  );
-
-  [
-    "sun", "mon", "tue", "wed",
-    "thu", "fri", "sat"
-  ].forEach((key, index) => {
-    if (weekdays[index]) {
-      weekdays[index].textContent = t(key);
+    if (key && translations[currentLanguage]?.[key]) {
+      button.textContent = t(key);
     }
   });
 
-  translateTableHeadings(
-    "bookings-table-body",
-    [
-      "guest",
-      "platform",
-      "checkIn",
-      "checkOut",
-      "status",
-      "earnings",
-      "details"
-    ]
-  );
-
-  const financeCards = document.querySelectorAll(
-    "#tab-finances > .finance-grid .stat-card"
-  );
-
-  [
-    "estimatedEarnings",
-    "paymentsReceived",
-    "paymentsRemaining",
-    "recordedExpenses"
-  ].forEach((key, index) => {
-    const span = financeCards[index]?.querySelector(
-      "span"
-    );
-
-    if (span) span.textContent = t(key);
-  });
-
-  setText("remaining-title", t("remainingTitle"));
-  setText("remaining-description", t("remainingDesc"));
-
-  [
-    ["remaining-guest-heading", "guest"],
-    ["remaining-total-heading", "total"],
-    ["remaining-paid-heading", "received"],
-    ["remaining-due-heading", "remaining"],
-    ["remaining-action-heading", "action"]
-  ].forEach(([id, key]) => {
-    setText(id, t(key));
-  });
-
-  translatePanel(
-    "expenses-panel",
-    "expenses",
-    "expensesDesc"
-  );
-
-  setText("open-add-expense", t("addExpense"));
-  setText("expenses-message", t("expensesSetup"));
-
-  translateTableHeadings(
-    "expenses-table-body",
-    [
-      "dates",
-      "expenses",
-      "notes",
-      "total"
-    ]
-  );
-
-  [
-    ["monthlyPerformance", "monthlyDesc"],
-    ["earningsChart", "earningsChartDesc"],
-    ["platformChart", "platformChartDesc"]
-  ].forEach(([title, desc], index) => {
-    const header = reportPanels[index]?.querySelector(
-      ".section-header"
-    );
-
-    if (!header) return;
-
-    const h2 = header.querySelector("h2");
-    const p = header.querySelector("p");
-
-    if (h2) h2.textContent = t(title);
-    if (p) p.textContent = t(desc);
-  });
-
-  [
-    "monthlyEarnings",
-    "monthlyExpenses",
-    "estimatedProfit",
-    "occupancy"
-  ].forEach((key, index) => {
-    const span = monthlyCards[index]?.querySelector(
-      "span"
-    );
-
-    if (span) span.textContent = t(key);
-  });
-
-  const addBookingHeading = document.querySelector(
-    "#add-booking-dialog .dialog-header h2"
-  );
-
-  if (addBookingHeading) {
-    addBookingHeading.textContent = t("addBooking");
-  }
-
-  [
-    ["manual-guest", "guestName"],
-    ["manual-platform", "platform"],
-    ["manual-code", "confirmationCode"],
-    ["manual-check-in", "checkIn"],
-    ["manual-check-out", "checkOut"],
-    ["manual-total", "bookingAmount"],
-    ["manual-commission", "commission"],
-    ["manual-received", "amountReceived"],
-    ["manual-notes", "notes"],
-    ["new-payment-amount", "paymentAmount"]
-  ].forEach(([id, key]) => {
-    setLabelForInput(id, t(key));
-  });
-
-  setText("save-manual-booking", t("saveBooking"));
-  setText("save-payment", t("savePayment"));
-  setText("close-breakdown-bottom", t("close"));
-
-  const paymentHeading = document.querySelector(
-    "#record-payment-dialog .dialog-header h2"
-  );
-
-  if (paymentHeading) {
-    paymentHeading.textContent = t("recordPayment");
-  }
-
-  const earningsHeading = document.querySelector(
-    "#earnings-dialog .dialog-header h2"
-  );
-
-  if (earningsHeading) {
-    earningsHeading.textContent = t("hostEarnings");
-  }
-
-  
-  const isAr = currentLanguage === "ar";
-
-  const reportLabels = {
-    "report-revenue-label": ["Operating Revenue", "الإيرادات التشغيلية"],
-    "report-expenses-label": ["Operating Expenses", "المصاريف التشغيلية"],
-    "report-profit-label": ["Net Profit", "صافي الربح"],
-    "cost-coverage-title": ["Annual Cost Coverage", "تغطية التكاليف السنوية"],
-    "cost-coverage-description": [
-      "Track progress toward your annual operating budget",
-      "متابعة تغطية الميزانية التشغيلية السنوية"
-    ],
-    "annual-budget-label": ["Annual Budget", "الميزانية السنوية"],
-    "annual-rent-label": ["Annual Rent", "الإيجار السنوي"],
-    "annual-cleaning-label": ["Cleaning Budget", "ميزانية النظافة"],
-    "annual-reserve-label": ["Emergency Reserve", "احتياطي الطوارئ"],
-    "monthly-booking-details-title": ["Monthly Booking Details", "تفاصيل الحجوزات الشهرية"],
-    "monthly-booking-details-description": [
-      "Bookings, nights and average apartment pricing",
-      "الحجوزات والليالي ومتوسط الأسعار"
-    ],
-    "monthly-bookings-label": ["Total Bookings", "عدد الحجوزات"],
-    "monthly-nights-label": ["Booked Nights", "الليالي المحجوزة"],
-    "monthly-nightly-rate-label": ["Average Nightly Rate", "متوسط العائد لليلة"],
-    "monthly-booking-value-label": ["Average Booking Value", "متوسط قيمة الحجز"],
-    "booking-trends-title": ["Bookings by Month", "الحجوزات حسب الشهر"],
-    "booking-trends-description": [
-      "Compare monthly reservation counts",
-      "مقارنة عدد الحجوزات شهريًا"
-    ],
-    "financial-trends-title": ["Revenue vs. Expenses", "الإيرادات مقابل المصاريف"],
-    "financial-trends-description": [
-      "Compare income, costs and profit over time",
-      "مقارنة الإيرادات والتكاليف عبر الأشهر"
-    ]
-  };
-
-  Object.entries(reportLabels).forEach(([id, labels]) => {
-    setText(id, labels[isAr ? 1 : 0]);
-  });
-
-  const reportPanels = document.querySelectorAll(
-    "#tab-reports > .panel"
-  );
-
-  const panelTranslations = [
-    ["monthlyPerformance", "monthlyDesc"],
-    null,
-    null,
-    ["earningsChart", "earningsChartDesc"],
-    null,
-    null,
-    ["platformChart", "platformChartDesc"]
-  ];
-
-  panelTranslations.forEach((keys, index) => {
-    if (!keys) return;
-
-    const header = reportPanels[index]?.querySelector(
-      ":scope > .section-header"
-    );
-
-    if (!header) return;
-
-    const heading = header.querySelector("h2");
-    const description = header.querySelector("p");
-
-    if (heading) heading.textContent = t(keys[0]);
-    if (description) description.textContent = t(keys[1]);
-  });
-
-  setText(
-    "monthly-occupancy-label",
-    t("occupancy")
-  );
-
-  renderEverything();
-}
-
-/* =====================================================
-   FAMILY AUTHENTICATION / ACCOUNT RECOVERY
-   ===================================================== */
-
-   
-const AUTH_REDIRECT = "https://ohoudm.github.io/OS-Apartments/admin.html";
-
-let recoveryMode =
-  new URLSearchParams(location.hash.slice(1)).get("type") === "recovery" ||
-  new URLSearchParams(location.search).get("type") === "recovery";
-
-let authVersion = 0;
-
-const authWords = {
-  en: {
-    portal: "Property Management Dashboard",
-    email: "Email",
-    password: "Password",
-    signIn: "Sign In",
-    create: "Create Account",
-    forgot: "Forgot Password?",
-    confirm: "Confirm Password",
-    back: "Back to Sign In",
-    reset: "Reset Password",
-    resetHelp: "Enter your email address to receive a password reset link.",
-    sendLink: "Send Reset Link",
-    choose: "Choose New Password",
-    newPassword: "New Password",
-    confirmNew: "Confirm New Password",
-    saveNew: "Save New Password",
-    waiting: "Waiting for Approval",
-    waitingHelp: "Your account is registered. A family administrator must approve your access before you can view bookings.",
-    check: "Check Approval",
-    mismatch: "Passwords do not match.",
-    short: "Password must contain at least 8 characters.",
-    sent: "Check your email for the confirmation link. Family approval is required before accessing bookings.",
-    resetSent: "If the address is registered, a reset link will be sent. Check your inbox and spam folder.",
-    saved: "Password updated. Please sign in.",
-    pending: "Your account is waiting for family approval.",
-    checkFailed: "Could not check your account status. Try again.",
-    show: "Show password",
-    hide: "Hide password",
-    expenseNotice: "Expense tracking will be available after setup.",
-    cleaning: "Cleaning",
-    maintenance: "Maintenance",
-    utilities: "Utilities",
-    supplies: "Supplies",
-    other: "Other"
-  },
-  ar: {
-    portal: "لوحة إدارة الشقق",
-    email: "البريد الإلكتروني",
-    password: "كلمة المرور",
-    signIn: "تسجيل الدخول",
-    create: "إنشاء حساب",
-    forgot: "نسيت كلمة المرور؟",
-    confirm: "تأكيد كلمة المرور",
-    back: "العودة لتسجيل الدخول",
-    reset: "إعادة تعيين كلمة المرور",
-    resetHelp: "أدخل بريدك الإلكتروني لإرسال رابط إعادة تعيين كلمة المرور.",
-    sendLink: "إرسال رابط الاستعادة",
-    choose: "اختيار كلمة مرور جديدة",
-    newPassword: "كلمة المرور الجديدة",
-    confirmNew: "تأكيد كلمة المرور الجديدة",
-    saveNew: "حفظ كلمة المرور الجديدة",
-    waiting: "بانتظار الموافقة",
-    waitingHelp: "تم تسجيل حسابك. يجب أن يوافق مسؤول العائلة على وصولك قبل الاطلاع على الحجوزات.",
-    check: "التحقق من الموافقة",
-    mismatch: "كلمتا المرور غير متطابقتين.",
-    short: "يجب أن تتكون كلمة المرور من ٨ أحرف على الأقل.",
-    sent: "تحقق من بريدك الإلكتروني لتأكيد الحساب. يجب انتظار موافقة العائلة قبل الوصول للحجوزات.",
-    resetSent: "إذا كان البريد مسجلاً، سيصلك رابط الاستعادة. تحقق من البريد الوارد وغير المرغوب فيه.",
-    saved: "تم تحديث كلمة المرور. يرجى تسجيل الدخول.",
-    pending: "حسابك بانتظار موافقة مسؤول العائلة.",
-    checkFailed: "تعذر التحقق من حالة الحساب. حاول مرة أخرى.",
-    show: "إظهار كلمة المرور",
-    hide: "إخفاء كلمة المرور",
-    expenseNotice: "سيتم تفعيل تسجيل المصاريف بعد الإعداد.",
-    cleaning: "تنظيف",
-    maintenance: "صيانة",
-    utilities: "فواتير",
-    supplies: "مستلزمات",
-    other: "أخرى"
-  }
-};
-
-const authText = key =>
-  authWords[currentLanguage][key] || key;
-
-const extraLabels = {
-  en: {
-    todayOverview: "Today's Overview",
-    arrivingToday: "Arriving Today",
-    departingToday: "Departing Today",
-    currentlyStaying: "Currently Staying",
-    quickActionsDesc: "Common tasks for your family",
-    bookingCalendar: "Booking Calendar",
-    bookingsTableDesc: "View reservations and payment details",
-    apartmentExpenses: "Apartment Expenses",
-    monthlyPerformanceDesc: "Estimated earnings, expenses and profit",
-    occupancyRate: "Occupancy Rate",
-    earningsByMonth: "Earnings by Month",
-    earningsByMonthDesc: "Compare your apartment's monthly performance",
-    bookingsByPlatform: "Bookings by Platform",
-    bookingsByPlatformDesc: "See where your reservations come from",
-    addBookingTitle: "Add Booking",
-    totalBookingAmount: "Total Booking Amount (SAR)",
-    amountSAR: "Amount (SAR)",
-    addExpenseTitle: "Add Expense",
-    saveExpense: "Save Expense",
-    date: "Date",
-    category: "Category",
-    description: "Description",
-    amount: "Amount",
-    confirmPassword: "Confirm Password",
-    confirmNewPassword: "Confirm New Password",
-    resetPassword: "Reset Password",
-    forgotDescription: "Enter your email address to receive a password reset link.",
-    sendResetLink: "Send Reset Link",
-    chooseNewPassword: "Choose New Password",
-    saveNewPassword: "Save New Password",
-    pendingTitle: "Waiting for Approval",
-    pendingDescription: "Your account is registered. A family administrator must approve your access before you can view bookings.",
-    checkApproval: "Check Approval",
-    backToLogin: "Back to Sign In",
-    createAccount: "Create Account",
-    forgotPassword: "Forgot Password?",
-    newPassword: "New Password",
-    monthlyPerformance: "Monthly Performance",
-    bookingsByPlatform: "Bookings by Platform",
-    addExpense: "+ Add Expense",
-    recordPayment: "Record Payment",
-    remainingBalance: "Remaining Balance:",
-    paymentAmount: "Payment Amount (SAR)",
-    guestName: "Guest Name",
-    amountReceived: "Amount Received (SAR)",
-    platformCommission: "Platform Commission (SAR)"
-  },
-  ar: {
-    todayOverview: "ملخص اليوم",
-    arrivingToday: "الوصول اليوم",
-    departingToday: "المغادرة اليوم",
-    currentlyStaying: "المقيمون حالياً",
-    quickActionsDesc: "المهام الشائعة للعائلة",
-    bookingCalendar: "تقويم الحجوزات",
-    bookingsTableDesc: "عرض الحجوزات وتفاصيل المدفوعات",
-    apartmentExpenses: "مصاريف الشقة",
-    monthlyPerformanceDesc: "الأرباح والمصاريف والربح التقديري",
-    occupancyRate: "نسبة الإشغال",
-    earningsByMonth: "الأرباح حسب الشهر",
-    earningsByMonthDesc: "مقارنة الأداء الشهري للشقة",
-    bookingsByPlatform: "الحجوزات حسب المنصة",
-    bookingsByPlatformDesc: "تعرف على مصادر الحجوزات",
-    addBookingTitle: "إضافة حجز",
-    totalBookingAmount: "إجمالي مبلغ الحجز (ريال)",
-    amountSAR: "المبلغ (ريال)",
-    addExpenseTitle: "إضافة مصروف",
-    saveExpense: "حفظ المصروف",
-    date: "التاريخ",
-    category: "الفئة",
-    description: "الوصف",
-    amount: "المبلغ",
-    confirmPassword: "تأكيد كلمة المرور",
-    confirmNewPassword: "تأكيد كلمة المرور الجديدة",
-    resetPassword: "إعادة تعيين كلمة المرور",
-    forgotDescription: "أدخل بريدك الإلكتروني لإرسال رابط إعادة تعيين كلمة المرور.",
-    sendResetLink: "إرسال رابط الاستعادة",
-    chooseNewPassword: "اختيار كلمة مرور جديدة",
-    saveNewPassword: "حفظ كلمة المرور الجديدة",
-    pendingTitle: "بانتظار الموافقة",
-    pendingDescription: "تم تسجيل حسابك. يجب أن يوافق مسؤول العائلة على وصولك قبل الاطلاع على الحجوزات.",
-    checkApproval: "التحقق من الموافقة",
-    backToLogin: "العودة لتسجيل الدخول",
-    createAccount: "إنشاء حساب",
-    forgotPassword: "نسيت كلمة المرور؟",
-    newPassword: "كلمة المرور الجديدة",
-    monthlyPerformance: "الأداء الشهري",
-    addExpense: "+ إضافة مصروف",
-    recordPayment: "تسجيل دفعة",
-    remainingBalance: "المبلغ المتبقي:",
-    paymentAmount: "مبلغ الدفعة (ريال)",
-    guestName: "اسم الضيف",
-    amountReceived: "المبلغ المستلم (ريال)",
-    platformCommission: "عمولة المنصة (ريال)"
-  }
-};
-
-function translateNewUI() {
-  document.querySelectorAll("[data-i18n]").forEach(element => {
-    const key = element.dataset.i18n;
-    const value =
-      extraLabels[currentLanguage][key] ||
-      authWords[currentLanguage][key] ||
-      translations[currentLanguage][key];
-
-    if (value) element.textContent = value;
-  });
-
-  setText("portal-subtitle", authText("portal"));
-  setText(
-    "auth-language-toggle",
-    currentLanguage === "ar" ? "English" : "العربية"
-  );
-
-  const selectors = {
-    '#login-form label[for="email"]': "email",
-    '#login-form label[for="password"]': "password",
-    '#signup-form label[for="signup-email"]': "email",
-    '#signup-form label[for="signup-password"]': "password",
-    '#signup-form label[for="signup-confirm"]': "confirm",
-    '#forgot-form label[for="forgot-email"]': "email",
-    '#reset-form label[for="reset-password"]': "newPassword",
-    '#reset-form label[for="reset-confirm"]': "confirmNew",
-    "#forgot-form > p": "resetHelp",
-    "#pending-approval > p[data-i18n]": "waitingHelp"
-  };
-
-  for (const [selector, key] of Object.entries(selectors)) {
-    const el = document.querySelector(selector);
-    if (el) el.textContent = authText(key);
-  }
-
-  const expenseSelect = $("expense-category");
-  const expenseKeys = {
+  const expenseCategories = {
     Cleaning: "cleaning",
     Maintenance: "maintenance",
     Utilities: "utilities",
@@ -3531,101 +3205,192 @@ function translateNewUI() {
     Other: "other"
   };
 
-  if (expenseSelect) {
-    for (const opt of expenseSelect.options) {
-      if (expenseKeys[opt.value]) {
-        opt.textContent = authText(expenseKeys[opt.value]);
+  const categorySelect = $("expense-category");
+
+  if (categorySelect) {
+    for (const option of categorySelect.options) {
+      const key = expenseCategories[option.value];
+
+      if (key && translations[currentLanguage]?.[key]) {
+        option.textContent = t(key);
       }
     }
   }
 
-  setText("expenses-message", authText("expenseNotice"));
+  translateReportLabels();
+  updateThemeButtons();
 
-  document.querySelectorAll(".password-toggle").forEach(button => {
-    const input = $(button.dataset.target);
+  // Refresh language-dependent dashboard content.
+  if (typeof bookingsLoaded !== "undefined" && bookingsLoaded) {
+    renderEverything();
+  }
 
-    button.setAttribute(
-      "aria-label",
-      authText(input?.type === "text" ? "hide" : "show")
-    );
-  });
+  if (typeof expenses !== "undefined") {
+    renderExpenses();
+  }
 }
 
-const originalSetLanguage = setLanguage;
 
-setLanguage = function(language) {
-  originalSetLanguage(language);
-  translateNewUI();
-  translateReportLabels();
-  document.querySelectorAll(".theme-toggle").forEach(button => {
-    const dark = document.documentElement.getAttribute("data-theme") === "dark";
-    button.textContent = dark ? (currentLanguage === "ar" ? "☀️ الوضع الفاتح" : "☀️ Light Mode") : (currentLanguage === "ar" ? "🌙 الوضع الداكن" : "🌙 Dark Mode");
-  });
-};
-
+/* =====================================================
+   REPORT LABEL TRANSLATIONS
+   ===================================================== */
 
 function translateReportLabels() {
-  const ar = currentLanguage === "ar";
   const labels = {
-    "report-revenue-label": ["Operating Revenue", "الإيرادات التشغيلية"],
-    "report-expenses-label": ["Operating Expenses", "المصاريف التشغيلية"],
-    "report-profit-label": ["Net Profit", "صافي الربح"],
-    "monthly-occupancy-label": ["Occupancy Rate", "معدل الإشغال"],
-    "cost-coverage-title": ["Annual Cost Coverage", "تغطية التكاليف السنوية"],
-    "cost-coverage-description": ["Track progress toward your annual operating budget", "متابعة تغطية الميزانية التشغيلية السنوية"],
-    "annual-budget-label": ["Annual Budget", "الميزانية السنوية"],
-    "annual-rent-label": ["Annual Rent", "الإيجار السنوي"],
-    "annual-cleaning-label": ["Cleaning Budget", "ميزانية التنظيف"],
-    "annual-reserve-label": ["Emergency Reserve", "احتياطي الطوارئ"],
-    "monthly-booking-details-title": ["Monthly Booking Details", "تفاصيل الحجوزات الشهرية"],
-    "monthly-booking-details-description": ["Bookings, nights and average apartment pricing", "الحجوزات والليالي ومتوسط الأسعار"],
-    "monthly-bookings-label": ["Total Bookings", "عدد الحجوزات"],
-    "monthly-nights-label": ["Booked Nights", "الليالي المحجوزة"],
-    "monthly-nightly-rate-label": ["Average Nightly Rate", "متوسط العائد لليلة"],
-    "monthly-booking-value-label": ["Average Booking Value", "متوسط قيمة الحجز"],
-    "booking-trends-title": ["Bookings by Month", "الحجوزات حسب الشهر"],
-    "booking-trends-description": ["Compare monthly reservation counts", "مقارنة عدد الحجوزات شهريًا"],
-    "financial-trends-title": ["Revenue vs. Expenses", "الإيرادات مقابل المصاريف"],
-    "financial-trends-description": ["Compare income, costs and profit over time", "مقارنة الإيرادات والتكاليف والأرباح عبر الأشهر"]
+    "report-revenue-label": "operatingRevenue",
+    "report-expenses-label": "operatingExpenses",
+    "report-profit-label": "netProfit",
+    "monthly-occupancy-label": "occupancyRate",
+    "cost-coverage-title": "annualCostCoverage",
+    "cost-coverage-description": "annualCostCoverageDesc",
+    "annual-budget-label": "annualBudget",
+    "annual-rent-label": "annualRent",
+    "annual-cleaning-label": "cleaningBudget",
+    "annual-reserve-label": "emergencyReserve",
+    "monthly-booking-details-title": "monthlyBookingDetails",
+    "monthly-booking-details-description": "monthlyBookingDetailsDesc",
+    "monthly-nights-label": "bookedNights",
+    "monthly-nightly-rate-label": "averageNightlyRate",
+    "monthly-booking-value-label": "averageBookingValue",
+    "booking-trends-title": "bookingsByMonth",
+    "booking-trends-description": "bookingsByMonthDesc",
+    "financial-trends-title": "revenueVsExpenses",
+    "financial-trends-description": "revenueVsExpensesDesc"
   };
-  for (const [id, pair] of Object.entries(labels)) {
-    const el = document.getElementById(id);
-    if (el) el.textContent = pair[ar ? 1 : 0];
-  }
-  const panelTranslations = [
-    ["Monthly Performance", "الأداء الشهري", "Revenue, operating expenses and net profit", "الإيرادات والمصاريف التشغيلية وصافي الربح"],
-    ["Annual Cost Coverage", "تغطية التكاليف السنوية", "Track progress toward your annual operating budget", "متابعة تغطية الميزانية التشغيلية السنوية"],
-    ["Monthly Booking Details", "تفاصيل الحجوزات الشهرية", "Bookings, nights and average apartment pricing", "الحجوزات والليالي ومتوسط الأسعار"],
-    ["Earnings by Month", "الإيرادات حسب الشهر", "Compare your apartment's monthly performance", "مقارنة أداء الشقة شهريًا"],
-    ["Bookings by Month", "الحجوزات حسب الشهر", "Compare monthly reservation counts", "مقارنة عدد الحجوزات شهريًا"],
-    ["Revenue vs. Expenses", "الإيرادات مقابل المصاريف", "Compare income, costs and profit over time", "مقارنة الإيرادات والمصاريف والأرباح عبر الأشهر"],
-    ["Bookings by Platform", "الحجوزات حسب المنصة", "See where your reservations come from", "معرفة مصادر الحجوزات"]
-  ];
-  document.querySelectorAll("#tab-reports > .panel").forEach((panel, index) => {
-    const pair = panelTranslations[index];
-    if (!pair) return;
-    const h = panel.querySelector(".section-header h2");
-    const desc = panel.querySelector(".section-header p");
-    if (h) h.textContent = pair[ar ? 1 : 0];
-    if (desc) desc.textContent = pair[ar ? 3 : 2];
+
+  Object.entries(labels).forEach(([id, key]) => {
+    const element = $(id);
+
+    if (element && translations[currentLanguage]?.[key]) {
+      element.textContent = t(key);
+    }
   });
-  const monthSelect = document.getElementById("report-month");
+
+  const reportPanels = [
+    ["monthlyPerformance", "monthlyPerformanceDesc"],
+    ["annualCostCoverage", "annualCostCoverageDesc"],
+    ["monthlyBookingDetails", "monthlyBookingDetailsDesc"],
+    ["earningsByMonth", "earningsByMonthDesc"],
+    ["bookingsByMonth", "bookingsByMonthDesc"],
+    ["revenueVsExpenses", "revenueVsExpensesDesc"],
+    ["bookingsByPlatform", "bookingsByPlatformDesc"]
+  ];
+
+  document.querySelectorAll("#tab-reports > .panel")
+    .forEach((panel, index) => {
+      const keys = reportPanels[index];
+      if (!keys) return;
+
+      const title = panel.querySelector(".section-header h2");
+      const description = panel.querySelector(".section-header p");
+
+      if (title) title.textContent = t(keys[0]);
+
+      if (description) {
+        description.textContent = t(keys[1]);
+      }
+    });
+
+  const monthSelect = $("report-month");
+
   if (monthSelect) {
     for (const option of monthSelect.options) {
       if (!/^\d{4}-\d{2}$/.test(option.value)) continue;
+
       const [year, month] = option.value.split("-").map(Number);
-      option.textContent = new Intl.DateTimeFormat(ar ? "ar-SA" : "en-US", {
-        month: "long", year: "numeric", timeZone: "UTC"
-      }).format(new Date(Date.UTC(year, month - 1, 1)));
+
+      option.textContent = new Intl.DateTimeFormat(
+        currentLanguage === "ar" ? "ar-SA" : "en-US",
+        {
+          month: "long",
+          year: "numeric",
+          timeZone: "UTC"
+        }
+      ).format(new Date(Date.UTC(year, month - 1, 1)));
     }
-    monthSelect.setAttribute("aria-label", ar ? "اختيار شهر التقرير" : "Select report month");
   }
 }
 
+
 /* =====================================================
-   AUTHENTICATION VIEWS
+   LANGUAGE BUTTONS
    ===================================================== */
 
+function toggleLanguage() {
+  setLanguage(currentLanguage === "ar" ? "en" : "ar");
+}
+
+$("language-toggle")?.addEventListener(
+  "click",
+  toggleLanguage
+);
+
+$("auth-language-toggle")?.addEventListener(
+  "click",
+  toggleLanguage
+);
+
+
+/* =====================================================
+   LIGHT / DARK THEME
+   ===================================================== */
+
+const OS_THEME_KEY = "osApartmentsTheme";
+
+function updateThemeButtons() {
+  const isDark =
+    document.documentElement.getAttribute("data-theme") === "dark";
+
+  document.querySelectorAll(".theme-toggle").forEach((button) => {
+    button.textContent = isDark
+      ? currentLanguage === "ar"
+        ? "☀️ الوضع الفاتح"
+        : "☀️ Light Mode"
+      : currentLanguage === "ar"
+        ? "🌙 الوضع الداكن"
+        : "🌙 Dark Mode";
+
+    button.setAttribute("aria-pressed", String(isDark));
+  });
+}
+
+function applyTheme(theme) {
+  const selected = theme === "dark" ? "dark" : "light";
+
+  document.documentElement.setAttribute(
+    "data-theme",
+    selected
+  );
+
+  localStorage.setItem(OS_THEME_KEY, selected);
+
+  updateThemeButtons();
+}
+
+document.addEventListener("click", (event) => {
+  const button = event.target.closest(".theme-toggle");
+
+  if (!button) return;
+
+  const current =
+    document.documentElement.getAttribute("data-theme");
+
+  applyTheme(current === "dark" ? "light" : "dark");
+});
+
+function initializeTheme() {
+  applyTheme(
+    localStorage.getItem(OS_THEME_KEY) === "dark"
+      ? "dark"
+      : "light"
+  );
+}
+
+initializeTheme();
+
+/* =====================================================
+   PART 12 — AUTHENTICATION VIEWS
+   ===================================================== */
 
 function showAuthView(id) {
   [
@@ -3634,26 +3399,19 @@ function showAuthView(id) {
     "forgot-form",
     "reset-form",
     "pending-approval"
-  ].forEach(name => {
-    const el = $(name);
-
-    if (el) {
-      el.hidden = name !== id;
-    }
+  ].forEach((name) => {
+    const element = $(name);
+    if (element) element.hidden = name !== id;
   });
 
-  const loginSection = $("login-section");
-  const dashboardSection = $("dashboard-section");
-
-  if (loginSection) {
-    loginSection.hidden = false;
+  if ($("login-section")) {
+    $("login-section").hidden = false;
   }
 
-  if (dashboardSection) {
-    dashboardSection.hidden = true;
+  if ($("dashboard-section")) {
+    $("dashboard-section").hidden = true;
   }
 }
-
 
 function showLogin() {
   authVersion++;
@@ -3664,6 +3422,9 @@ function showLogin() {
   showAuthView("login-form");
 }
 
+/* =====================================================
+   FAMILY APPROVAL
+   ===================================================== */
 
 async function approvedFamily(user) {
   const { data, error } = await supabaseClient
@@ -3677,15 +3438,12 @@ async function approvedFamily(user) {
     throw error;
   }
 
-  console.log("Family approval diagnostic:", {
-    recordFound: data !== null,
-    approved: data?.approved,
-    isApproved: data?.approved === true
-  });
-
   return data?.approved === true;
 }
 
+/* =====================================================
+   SHOW APPROVED DASHBOARD
+   ===================================================== */
 
 async function showDashboard() {
   const request = ++authVersion;
@@ -3719,34 +3477,33 @@ async function showDashboard() {
     $("login-section").hidden = true;
     $("dashboard-section").hidden = false;
 
-   
     switchTab(currentTab);
 
-try {
-  await loadBookings();
-  await loadExpenses();
-} catch (dashboardError) {
-  console.error("Dashboard loading error:", dashboardError);
+    await loadBookings();
 
-  showMessage(
-    "Dashboard data could not finish loading: " +
-    dashboardError.message,
-    true
-  );
-}
-
-  } catch (err) {
     if (request !== authVersion) return;
 
-    showAuthView("pending-approval");
-    setText("approval-message", authText("checkFailed"));
+    await loadExpenses();
 
-    console.error("Approval check failed", err);
+    if (request !== authVersion) return;
+
+    renderEverything();
+  } catch (error) {
+    if (request !== authVersion) return;
+
+    console.error("Dashboard initialization failed:", error);
+
+    showMessage(
+      currentLanguage === "ar"
+        ? `تعذر تحميل لوحة التحكم: ${error.message}`
+        : `Could not load dashboard: ${error.message}`,
+      true
+    );
   }
 }
 
 /* =====================================================
-   AUTHENTICATION BUTTONS
+   AUTHENTICATION NAVIGATION
    ===================================================== */
 
 $("show-create-account")?.addEventListener(
@@ -3772,20 +3529,13 @@ $("back-to-login-from-forgot")?.addEventListener(
   showLogin
 );
 
-$("auth-language-toggle")?.addEventListener(
-  "click",
-  () => setLanguage(
-    currentLanguage === "ar" ? "en" : "ar"
-  )
-);
-
 /* =====================================================
    SIGN IN
    ===================================================== */
 
 $("login-form")?.addEventListener(
   "submit",
-  async event => {
+  async (event) => {
     event.preventDefault();
 
     const message = $("login-error");
@@ -3807,161 +3557,169 @@ $("login-form")?.addEventListener(
       if (error) throw error;
 
       await showDashboard();
-    } catch (err) {
+    } catch (error) {
       message.textContent =
-        t("loginError") + err.message;
+        t("loginError") + error.message;
     } finally {
       button.disabled = false;
     }
   }
 );
 
-
 /* =====================================================
    FAMILY ACCOUNT REGISTRATION
    ===================================================== */
 
-$("signup-form")?.addEventListener("submit", async event => {
-  event.preventDefault();
+$("signup-form")?.addEventListener(
+  "submit",
+  async (event) => {
+    event.preventDefault();
 
-  const message = $("signup-message");
-  message.textContent = "";
+    const message = $("signup-message");
+    message.textContent = "";
 
-  const password = $("signup-password").value;
+    const password = $("signup-password").value;
 
-  if (password.length < 8) {
-    message.textContent = authText("short");
-    return;
-  }
-
-  if (password !== $("signup-confirm").value) {
-    message.textContent = authText("mismatch");
-    return;
-  }
-
-  const button = event.currentTarget.querySelector(
-    '[type="submit"]'
-  );
-
-  button.disabled = true;
-
-  try {
-    const { data, error } =
-      await supabaseClient.auth.signUp({
-        email: $("signup-email").value.trim(),
-        password,
-        options: {
-          emailRedirectTo: AUTH_REDIRECT
-        }
-      });
-
-    if (error) throw error;
-
-    message.textContent = authText("sent");
-
-    if (data.session) {
-      await supabaseClient.auth.signOut();
+    if (password.length < 8) {
+      message.textContent = authText("short");
+      return;
     }
-  } catch (err) {
-    message.textContent = err.message;
-  } finally {
-    button.disabled = false;
+
+    if (password !== $("signup-confirm").value) {
+      message.textContent = authText("mismatch");
+      return;
+    }
+
+    const button = event.currentTarget.querySelector(
+      '[type="submit"]'
+    );
+
+    button.disabled = true;
+
+    try {
+      const { data, error } =
+        await supabaseClient.auth.signUp({
+          email: $("signup-email").value.trim(),
+          password,
+          options: {
+            emailRedirectTo: AUTH_REDIRECT
+          }
+        });
+
+      if (error) throw error;
+
+      message.textContent = authText("sent");
+
+      if (data.session) {
+        await supabaseClient.auth.signOut();
+      }
+    } catch (error) {
+      message.textContent = error.message;
+    } finally {
+      button.disabled = false;
+    }
   }
-});
+);
 
 /* =====================================================
    FORGOT PASSWORD
    ===================================================== */
 
-$("forgot-form")?.addEventListener("submit", async event => {
-  event.preventDefault();
+$("forgot-form")?.addEventListener(
+  "submit",
+  async (event) => {
+    event.preventDefault();
 
-  const message = $("forgot-message");
-  message.textContent = "";
+    const message = $("forgot-message");
+    message.textContent = "";
 
-  const button = event.currentTarget.querySelector(
-    '[type="submit"]'
-  );
+    const button = event.currentTarget.querySelector(
+      '[type="submit"]'
+    );
 
-  button.disabled = true;
+    button.disabled = true;
 
-  try {
-    const { error } =
-      await supabaseClient.auth.resetPasswordForEmail(
-        $("forgot-email").value.trim(),
-        {
-          redirectTo: AUTH_REDIRECT
-        }
-      );
+    try {
+      const { error } =
+        await supabaseClient.auth.resetPasswordForEmail(
+          $("forgot-email").value.trim(),
+          {
+            redirectTo: AUTH_REDIRECT
+          }
+        );
 
-    if (error) throw error;
+      if (error) throw error;
 
-    message.textContent = authText("resetSent");
-  } catch (err) {
-    message.textContent = err.message;
-  } finally {
-    button.disabled = false;
+      message.textContent = authText("resetSent");
+    } catch (error) {
+      message.textContent = error.message;
+    } finally {
+      button.disabled = false;
+    }
   }
-});
+);
 
 /* =====================================================
    SAVE NEW PASSWORD
    ===================================================== */
 
-$("reset-form")?.addEventListener("submit", async event => {
-  event.preventDefault();
+$("reset-form")?.addEventListener(
+  "submit",
+  async (event) => {
+    event.preventDefault();
 
-  const message = $("reset-message");
-  message.textContent = "";
+    const message = $("reset-message");
+    message.textContent = "";
 
-  const password = $("reset-password").value;
+    const password = $("reset-password").value;
 
-  if (password.length < 8) {
-    message.textContent = authText("short");
-    return;
-  }
+    if (password.length < 8) {
+      message.textContent = authText("short");
+      return;
+    }
 
-  if (password !== $("reset-confirm").value) {
-    message.textContent = authText("mismatch");
-    return;
-  }
+    if (password !== $("reset-confirm").value) {
+      message.textContent = authText("mismatch");
+      return;
+    }
 
-  const button = event.currentTarget.querySelector(
-    '[type="submit"]'
-  );
-
-  button.disabled = true;
-
-  try {
-    const { error } =
-      await supabaseClient.auth.updateUser({
-        password
-      });
-
-    if (error) throw error;
-
-    recoveryMode = false;
-
-    await supabaseClient.auth.signOut();
-
-    showLogin();
-
-    setText("login-error", authText("saved"));
-
-    history.replaceState(
-      null,
-      "",
-      location.pathname
+    const button = event.currentTarget.querySelector(
+      '[type="submit"]'
     );
-  } catch (err) {
-    message.textContent = err.message;
-  } finally {
-    button.disabled = false;
+
+    button.disabled = true;
+
+    try {
+      const { error } =
+        await supabaseClient.auth.updateUser({
+          password
+        });
+
+      if (error) throw error;
+
+      recoveryMode = false;
+
+      await supabaseClient.auth.signOut();
+
+      showLogin();
+
+      setText("login-error", authText("saved"));
+
+      history.replaceState(
+        null,
+        "",
+        location.pathname
+      );
+    } catch (error) {
+      message.textContent = error.message;
+    } finally {
+      button.disabled = false;
+    }
   }
-});
+);
 
 /* =====================================================
-   CHECK FAMILY APPROVAL
+   CHECK APPROVAL AND LOG OUT
    ===================================================== */
 
 $("check-approval")?.addEventListener(
@@ -3969,17 +3727,13 @@ $("check-approval")?.addEventListener(
   showDashboard
 );
 
-/* =====================================================
-   LOG OUT
-   ===================================================== */
-
 async function signOutFamily() {
   const { error } =
     await supabaseClient.auth.signOut();
 
   if (error) {
-    setText("approval-message", error.message);
     showMessage(error.message, true);
+    setText("approval-message", error.message);
     return;
   }
 
@@ -4001,7 +3755,7 @@ $("logout-btn")?.addEventListener(
    ===================================================== */
 
 document.querySelectorAll(".password-toggle").forEach(
-  button => {
+  (button) => {
     button.addEventListener("click", () => {
       const input = $(button.dataset.target);
 
@@ -4027,13 +3781,17 @@ document.querySelectorAll(".password-toggle").forEach(
 );
 
 /* =====================================================
-   SUPABASE AUTHENTICATION EVENTS
+   SUPABASE AUTH EVENTS
    ===================================================== */
 
-supabaseClient.auth.onAuthStateChange(event => {
+supabaseClient.auth.onAuthStateChange((event) => {
   if (event === "PASSWORD_RECOVERY") {
     recoveryMode = true;
     showAuthView("reset-form");
+  }
+
+  if (event === "SIGNED_OUT") {
+    showLogin();
   }
 });
 
@@ -4042,125 +3800,45 @@ supabaseClient.auth.onAuthStateChange(event => {
    ===================================================== */
 
 async function checkSession() {
-  const { data, error } =
-    await supabaseClient.auth.getUser();
+  try {
+    const { data, error } =
+      await supabaseClient.auth.getUser();
 
-  if (recoveryMode) {
-    showAuthView("reset-form");
-    return;
-  }
+    if (recoveryMode) {
+      showAuthView("reset-form");
+      return;
+    }
 
-  if (!error && data.user) {
-    await showDashboard();
-  } else {
+    if (!error && data.user) {
+      await showDashboard();
+    } else {
+      showLogin();
+    }
+  } catch (error) {
+    console.error("Session check failed:", error);
     showLogin();
   }
 }
 
 /* =====================================================
-   REFRESH BOOKINGS
+   REFRESH DASHBOARD DATA
    ===================================================== */
 
 $("refresh-bookings-btn")?.addEventListener(
   "click",
-  loadBookings
+  async () => {
+    await loadBookings();
+    await loadExpenses();
+  }
 );
 
-
-/* Dashboard language button */
-$("language-toggle")?.addEventListener("click", () => {
-  setLanguage(currentLanguage === "ar" ? "en" : "ar");
-});
-
 /* =====================================================
-   INITIALIZE DASHBOARD
+   INITIALIZE OS APARTMENTS DASHBOARD
    ===================================================== */
+
+// Theme is already initialized in Part 11.
+// Do not add another theme initialization here.
 
 setLanguage(currentLanguage);
 checkSession();
 
-
-/* =========================================
-   OS APARTMENTS — LIGHT / DARK MODE
-   ========================================= */
-
-(function () {
-  const storageKey = "osApartmentsTheme";
-
-  function applyTheme(theme) {
-    document.documentElement.setAttribute(
-      "data-theme",
-      theme
-    );
-
-    localStorage.setItem(storageKey, theme);
-
-    document.querySelectorAll(".theme-toggle").forEach(button => {
-      const isDark = theme === "dark";
-
-      button.textContent = isDark
-        ? (currentLanguage === "ar" ? "☀️ الوضع الفاتح" : "☀️ Light Mode")
-        : (currentLanguage === "ar" ? "🌙 الوضع الداكن" : "🌙 Dark Mode");
-
-      button.setAttribute("aria-pressed", String(isDark));
-    });
-  }
-
-  function createThemeButton(parent) {
-    if (!parent) return;
-
-    let button = parent.querySelector(".theme-toggle");
-    if (!button) button = document.createElement("button");
-    button.type = "button";
-    button.className = "theme-toggle";
-
-    // Clicks are handled once at document level, including existing HTML buttons.
-    if (!button.isConnected) parent.appendChild(button);
-  }
-
-  document.addEventListener("click", (event) => {
-    const button = event.target.closest(".theme-toggle");
-    if (!button) return;
-    const current = document.documentElement.getAttribute("data-theme");
-    applyTheme(current === "dark" ? "light" : "dark");
-  });
-
-  function initializeTheme() {
-    createThemeButton(
-      document.querySelector(".admin-header .header-actions")
-    );
-
-    createThemeButton(
-      document.querySelector("#login-section .login-card")
-    );
-
-    applyTheme(
-      localStorage.getItem(storageKey) === "dark"
-        ? "dark"
-        : "light"
-    );
-  }
-
-  if (document.readyState === "loading") {
-    document.addEventListener(
-      "DOMContentLoaded",
-      initializeTheme
-    );
-  } else {
-    initializeTheme();
-  }
-})();
-
-
-/* Fix Cancel button for Delete Expense popup */
-document.addEventListener("click", (event) => {
-  if (event.target.closest("#cancel-delete-expense")) {
-    event.preventDefault();
-
-    const dialog = document.getElementById("delete-expense-dialog");
-
-    if (dialog?.open) {
-      dialog.close();
-    }
-  }
-});
