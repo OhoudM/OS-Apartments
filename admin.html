@@ -7,7 +7,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="admin.css?v=8">
+  <link rel="stylesheet" href="admin.css?v=9">
 </head>
 <body>
 
@@ -285,25 +285,14 @@
         <div id="today-guest-list"></div>
       </section>
 
-      <section class="panel" id="quick-actions-panel">
+      <section class="panel" id="reminders-panel">
         <div class="section-header">
           <div>
-            <h2 data-i18n="quickActions">Quick Actions</h2>
-            <p data-i18n="quickActionsDesc">
-              Common tasks for your family
-            </p>
+            <h2 data-i18n="remindersTitle">Reminders & Tasks</h2>
+            <p data-i18n="remindersDesc">Payments to collect and upcoming check-outs</p>
           </div>
         </div>
-        <div class="quick-actions">
-          <button type="button" id="quick-add-booking"
-            class="primary-btn" data-i18n="addBooking">
-            + Add Booking
-          </button>
-          <button type="button" id="quick-view-bookings"
-            data-i18n="viewBookings">View Bookings</button>
-          <button type="button" id="quick-view-finances"
-            data-i18n="viewFinances">View Finances</button>
-        </div>
+        <div id="dashboard-reminders" class="reminders-list" aria-live="polite"></div>
       </section>
     </section>
 
@@ -887,7 +876,7 @@
   </main>
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <script src="admin.js?v=8"></script>
+  <script src="admin.js?v=9"></script>
 
   
 <!-- DELETE EXPENSE CONFIRMATION -->

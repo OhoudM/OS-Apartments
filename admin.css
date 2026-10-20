@@ -3203,3 +3203,15 @@ html:not([data-theme="dark"]) #tab-overview .stat-card.clickable-card {
 #remaining-payments-body td:nth-child(4) {
   color: #C65B5B !important;
 }
+
+/* Overview reminders — scoped to the replacement panel only */
+#reminders-panel .reminders-list { display: grid; gap: 12px; }
+#reminders-panel .reminder-item { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 14px; padding: 16px 18px; border: 1px solid var(--border); border-radius: 13px; background: var(--surface-soft); }
+#reminders-panel .reminder-info { display: flex; flex-direction: column; gap: 5px; min-width: 0; }
+#reminders-panel .reminder-title { color: var(--text); font-weight: 700; }
+#reminders-panel .reminder-detail { color: var(--text-muted); font-weight: 600; }
+#reminders-panel .reminder-payment { border-inline-start: 4px solid var(--danger); }
+#reminders-panel .reminder-payment .reminder-detail { color: var(--danger); font-size: 17px; }
+#reminders-panel .reminder-checkout { border-inline-start: 4px solid var(--gold); }
+#reminders-panel .reminder-action { white-space: nowrap; }
+#reminders-panel .reminders-empty { margin: 0; padding: 12px 0; }

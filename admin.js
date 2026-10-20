@@ -75,6 +75,13 @@ const translations = {
     departure: "Departure",
     currentGuest: "Currently staying",
 
+    remindersTitle: "Reminders & Tasks",
+    remindersDesc: "Payments to collect and upcoming check-outs",
+    remindersPayment: "Payment remaining",
+    remindersCheckout: "Upcoming check-out",
+    remindersCollect: "Record payment",
+    remindersViewBooking: "View bookings",
+    remindersEmpty: "No reminders at the moment.",
     quickActions: "Quick Actions",
     viewBookings: "View Bookings",
     viewFinances: "View Finances",
@@ -322,6 +329,13 @@ const translations = {
     departure: "مغادرة",
     currentGuest: "مقيم حاليًا",
 
+    remindersTitle: "التنبيهات والمهام",
+    remindersDesc: "المدفوعات المتبقية ومواعيد المغادرة القادمة",
+    remindersPayment: "مبلغ متبقٍ للتحصيل",
+    remindersCheckout: "مغادرة قادمة",
+    remindersCollect: "تسجيل دفعة",
+    remindersViewBooking: "عرض الحجوزات",
+    remindersEmpty: "لا توجد تنبيهات حالياً.",
     quickActions: "إجراءات سريعة",
     quickDesc: "المهام اليومية للعائلة",
     viewBookings: "عرض الحجوزات",
@@ -856,17 +870,6 @@ document.querySelectorAll(".tab-btn").forEach((button) => {
   });
 });
 
-$("quick-view-bookings")?.addEventListener(
-  "click",
-  () => switchTab("bookings")
-);
-
-$("quick-view-finances")?.addEventListener(
-  "click",
-  () => switchTab("finances")
-);
-
-
 /* =====================================================
    SUPABASE — LOAD BOOKINGS
    ===================================================== */
@@ -1251,6 +1254,7 @@ document.addEventListener("click", async (event) => {
 function renderEverything() {
   renderStatistics();
   renderToday();
+  renderDashboardReminders();
   renderCalendar();
   renderTable();
   updateFinanceMonthOptions();
@@ -1356,6 +1360,62 @@ function renderToday() {
     row.append(name, info);
     container.append(row);
   });
+}
+
+/* =====================================================
+   OVERVIEW — REMINDERS (DISPLAY ONLY)
+   ===================================================== */
+function renderDashboardReminders() {
+  const container = $("dashboard-reminders");
+  if (!container) return;
+  container.replaceChildren();
+
+  const today = dateString(new Date());
+  const paymentItems = activeBookings()
+    .filter(booking => outstandingBalance(booking) > 0.005)
+    .sort((a, b) => outstandingBalance(b) - outstandingBalance(a));
+  const checkoutItems = activeBookings()
+    .filter(booking => booking.check_out && booking.check_out >= today)
+    .sort((a, b) => a.check_out.localeCompare(b.check_out))
+    .slice(0, 3);
+
+  function addReminder(type, title, detail, buttonLabel, action) {
+    const item = createElement("div", `reminder-item reminder-${type}`);
+    const info = createElement("div", "reminder-info");
+    info.append(
+      createElement("strong", "reminder-title", title),
+      createElement("span", "reminder-detail", detail)
+    );
+    const button = createElement("button", "reminder-action", buttonLabel);
+    button.type = "button";
+    button.addEventListener("click", action);
+    item.append(info, button);
+    container.append(item);
+  }
+
+  paymentItems.forEach(booking => {
+    addReminder(
+      "payment",
+      `${t("remindersPayment")}: ${booking.guest_name || "—"}`,
+      money(outstandingBalance(booking)),
+      t("remindersCollect"),
+      () => openPaymentDialog(booking)
+    );
+  });
+
+  checkoutItems.forEach(booking => {
+    addReminder(
+      "checkout",
+      `${t("remindersCheckout")}: ${booking.guest_name || "—"}`,
+      formatDate(booking.check_out),
+      t("remindersViewBooking"),
+      () => switchTab("bookings")
+    );
+  });
+
+  if (!paymentItems.length && !checkoutItems.length) {
+    container.append(createElement("p", "reminders-empty", t("remindersEmpty")));
+  }
 }
 
 /* =====================================================
@@ -2924,11 +2984,6 @@ $("open-add-booking")?.addEventListener(
   openBookingDialog
 );
 
-$("quick-add-booking")?.addEventListener(
-  "click",
-  openBookingDialog
-);
-
 $("close-add-booking")?.addEventListener(
   "click",
   () => $("add-booking-dialog").close()
@@ -3418,9 +3473,6 @@ function setLanguage(language) {
   const buttonLabels = {
     "logout-btn": "logout",
     "open-add-booking": "addBooking",
-    "quick-add-booking": "addBooking",
-    "quick-view-bookings": "viewBookings",
-    "quick-view-finances": "viewFinances",
     "refresh-bookings-btn": "refresh",
     "save-manual-booking": "saveBooking",
     "save-payment": "savePayment",
@@ -4133,4 +4185,3 @@ $("refresh-bookings-btn")?.addEventListener(
 
 setLanguage(currentLanguage);
 checkSession();
-
