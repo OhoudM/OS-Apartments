@@ -19,6 +19,7 @@ let displayedMonth = new Date();
 displayedMonth.setDate(1);
 
 let selectedReportMonth = "";
+let selectedFinanceMonth = ""; // Empty means All Time
 
 const translations = {
   en: {
@@ -932,10 +933,63 @@ async function loadExpenses() {
   }
 
   expenses = data || [];
-  renderExpenses();
+  refreshFinanceMonth();
   renderReports();
 }
 
+
+/* Finance-only month selection; does not change Reports or booking data. */
+function financeMonthBookings() {
+  return activeBookings().filter(booking =>
+    !selectedFinanceMonth || String(booking.check_in || "").startsWith(selectedFinanceMonth)
+  );
+}
+
+function financeMonthExpenses() {
+  return expenses.filter(expense =>
+    !selectedFinanceMonth || String(expense.expense_date || "").startsWith(selectedFinanceMonth)
+  );
+}
+
+function updateFinanceMonthOptions() {
+  const select = $("finance-month");
+  if (!select) return;
+  const months = new Set();
+  const today = new Date();
+  months.add(`${today.getFullYear()}-${String(today.getMonth()+1).padStart(2,"0")}`);
+  activeBookings().forEach(booking => {
+    if (/^\d{4}-\d{2}/.test(String(booking.check_in || ""))) months.add(booking.check_in.slice(0,7));
+  });
+  expenses.forEach(expense => {
+    if (/^\d{4}-\d{2}/.test(String(expense.expense_date || ""))) months.add(expense.expense_date.slice(0,7));
+  });
+  if (selectedFinanceMonth) months.add(selectedFinanceMonth);
+  select.replaceChildren();
+  const all = document.createElement("option");
+  all.value = "";
+  all.textContent = currentLanguage === "ar" ? "كل الفترات" : "All Time";
+  select.append(all);
+  [...months].sort().reverse().forEach(key => {
+    const [year, month] = key.split("-").map(Number);
+    const option = document.createElement("option");
+    option.value = key;
+    option.textContent = `${monthName(month-1)} ${year}`;
+    select.append(option);
+  });
+  select.value = selectedFinanceMonth;
+}
+
+function refreshFinanceMonth() {
+  updateFinanceMonthOptions();
+  renderFinanceSummary();
+  renderRemainingPayments();
+  renderExpenses();
+}
+
+$("finance-month")?.addEventListener("change", event => {
+  selectedFinanceMonth = event.target.value;
+  refreshFinanceMonth();
+});
 
 /* =========================================
    DISPLAY EXPENSES
@@ -965,7 +1019,7 @@ function renderExpenses() {
 
   let total = 0;
 
-  expenses.forEach((expense) => {
+  financeMonthExpenses().forEach((expense) => {
     const amount = Number(expense.amount) || 0;
     total += amount;
 
@@ -1014,7 +1068,7 @@ function renderExpenses() {
     tbody.append(row);
   });
 
-  if (!expenses.length) {
+  if (!financeMonthExpenses().length) {
     const row = document.createElement("tr");
     const cell = document.createElement("td");
 
@@ -1177,6 +1231,7 @@ function renderEverything() {
   renderToday();
   renderCalendar();
   renderTable();
+  updateFinanceMonthOptions();
   renderRemainingPayments();
   renderFinanceSummary();
   renderReports();
@@ -1694,10 +1749,12 @@ $("close-breakdown-bottom")?.addEventListener(
 function renderFinanceSummary() {
   setText(
     "finance-earnings",
-    displayTotal("amount")
+    selectedFinanceMonth
+      ? money(monthlyEarningsMap().get(selectedFinanceMonth) || 0)
+      : displayTotal("amount")
   );
 
-  const tracked = activeBookings().filter(
+  const tracked = financeMonthBookings().filter(
     (booking) =>
       outstandingBalance(booking) !== null
   );
@@ -1715,7 +1772,7 @@ function renderFinanceSummary() {
   );
 
   const untrackedCount =
-    activeBookings().length - tracked.length;
+    financeMonthBookings().length - tracked.length;
 
   setText(
     "finance-received",
@@ -1731,7 +1788,7 @@ function renderFinanceSummary() {
       : "—"
   );
 
-  const expenseTotal = expenses.reduce(
+  const expenseTotal = financeMonthExpenses().reduce(
     (sum, expense) => sum + (Number(expense.amount) || 0),
     0
   );
@@ -1750,7 +1807,7 @@ function renderRemainingPayments() {
 
   tbody.replaceChildren();
 
-  const unpaid = activeBookings().filter(
+  const unpaid = financeMonthBookings().filter(
     (booking) => outstandingBalance(booking) > 0
   );
 
@@ -3358,6 +3415,7 @@ function setLanguage(language) {
   }
 
   translateReportLabels();
+  updateFinanceMonthOptions();
   updateThemeButtons();
 
   // Refresh language-dependent dashboard content.

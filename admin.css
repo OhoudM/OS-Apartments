@@ -3179,3 +3179,7 @@ html[data-theme="dark"] .calendar-day .booked-label { color: #f0a1a3; }
 #payment-correction-form input, #payment-correction-form textarea { width: 100%; box-sizing: border-box; }
 .payment-correction-actions { display: flex; flex-wrap: wrap; gap: 10px; }
 #payment-correction-error { color: #db7777; }
+
+/* Finance month dropdown only */
+#finance-month { width: auto; min-width: 170px; max-width: 100%; background: var(--surface); color: var(--text); }
+@media (max-width: 600px) { #tab-finances > .section-header { flex-wrap: wrap; } #finance-month { width: 100%; } }
