@@ -401,31 +401,36 @@
         </div>
       </div>
 
-      <section class="panel" id="remaining-payments-panel">
-        <div class="section-header">
-          <div>
-            <h2 id="remaining-title">Remaining Payments</h2>
-            <p id="remaining-description">
-              Guest balances that still need to be collected
-            </p>
-          </div>
-          <strong id="remaining-total">—</strong>
-        </div>
-        <div class="table-wrapper">
-          <table>
-            <thead>
-              <tr>
-                <th id="remaining-guest-heading">Guest</th>
-                <th id="remaining-total-heading">Total</th>
-                <th id="remaining-paid-heading">Received</th>
-                <th id="remaining-due-heading">Remaining</th>
-                <th id="remaining-action-heading">Action</th>
-              </tr>
-            </thead>
-            <tbody id="remaining-payments-body"></tbody>
-          </table>
-        </div>
-      </section>
+      
+<section class="panel" id="remaining-payments-panel">
+  <div class="section-header">
+    <div>
+      <h2 id="remaining-title" data-i18n="remainingTitle">
+        Remaining Payments
+      </h2>
+      <p id="remaining-description" data-i18n="remainingDesc">
+        Guest balances that still need to be collected
+      </p>
+    </div>
+    <strong id="remaining-total">—</strong>
+  </div>
+
+  <div class="table-wrapper">
+    <table>
+      <thead>
+        <tr>
+          <th id="remaining-guest-heading" data-i18n="guest">Guest</th>
+          <th id="remaining-total-heading" data-i18n="total">Total</th>
+          <th id="remaining-paid-heading" data-i18n="received">Received</th>
+          <th id="remaining-due-heading" data-i18n="remaining">Remaining</th>
+          <th id="remaining-action-heading" data-i18n="action">Action</th>
+        </tr>
+      </thead>
+      <tbody id="remaining-payments-body"></tbody>
+    </table>
+  </div>
+</section>
+
 
       <section class="panel" id="expenses-panel">
         <div class="section-header">
