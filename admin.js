@@ -309,7 +309,7 @@ const translations = {
     overviewSummaryDesc: "نظرة سريعة على الحجوزات والمبالغ",
     netOverviewEarnings: "صافي مبلغ الحجوزات بعد خصم الرسوم",
     guestTotals: "إجمالي قيمة الحجوزات",
-    hostEarnings: "الأرباح المتوقعة",
+    hostEarnings: "صافي مبلغ الحجوزات بعد خصم الرسوم",
     viewDetails: "عرض التفاصيل ←",
 
     today: "ملخص اليوم",
@@ -406,7 +406,7 @@ const translations = {
     otherFees: "رسوم أخرى",
     guestTotal: "إجمالي حجز الضيف",
     platformCommission: "عمولة المنصة",
-    hostTotal: "أرباح المضيف المتوقعة",
+    hostTotal: "صافي مبلغ الحجوزات بعد خصم الرسوم",
     receivedSoFar: "المبلغ المستلم",
     balanceDue: "المبلغ المتبقي",
     refund: "المبلغ المسترد",
@@ -694,13 +694,29 @@ function activeBookings() {
    FINANCIAL CALCULATIONS
    ===================================================== */
 
+/* Confirmed Booking.com guest total for reservation 5747026049.
+ * Display-only correction; no database writes or sync changes.
+ * Other bookings continue to use their recorded guest_total.
+ */
+function overviewGuestTotal(booking) {
+  const recorded = safeNumber(booking.guest_total);
+  if (recorded !== null) return recorded;
+  if (String(booking.platform || "").toLowerCase() === "booking.com" &&
+      String(booking.confirmation_code || "") === "5747026049") {
+    return safeNumber(booking.original_price);
+  }
+  return null;
+}
+
 function sumField(field) {
   const records = activeBookings();
   let total = 0;
   let recorded = 0;
 
   for (const booking of records) {
-    const amount = safeNumber(booking[field]);
+    const amount = field === "guest_total"
+      ? overviewGuestTotal(booking)
+      : safeNumber(booking[field]);
 
     if (amount !== null) {
       total += amount;
@@ -1686,7 +1702,7 @@ function showBreakdown(index) {
 
     addBreakdownRow(
       t("guestTotal"),
-      booking.guest_total
+      overviewGuestTotal(booking)
     );
 
     addBreakdownHeading(t("hostEarnings"));
@@ -1957,7 +1973,7 @@ function showGuestTotalsDetails() {
     if (!groups.has(platform)) groups.set(platform, { total: 0, count: 0, missing: 0 });
     const group = groups.get(platform);
     group.count++;
-    const amount = safeNumber(booking.guest_total);
+    const amount = overviewGuestTotal(booking);
     if (amount === null) group.missing++;
     else group.total += amount;
   });
