@@ -3215,3 +3215,10 @@ html:not([data-theme="dark"]) #tab-overview .stat-card.clickable-card {
 #reminders-panel .reminder-checkout { border-inline-start: 4px solid var(--gold); }
 #reminders-panel .reminder-action { white-space: nowrap; }
 #reminders-panel .reminders-empty { margin: 0; padding: 12px 0; }
+
+/* Excel export toolbar — Reports only */
+.excel-export-toolbar {display:flex;align-items:center;flex-wrap:wrap;gap:12px;padding:15px 18px;margin-bottom:22px;border:1px solid var(--border);border-radius:var(--radius);background:var(--surface);}
+.excel-export-toolbar label {display:block;margin:0;font-weight:600;color:var(--text);}
+.excel-export-toolbar select {width:auto;min-width:190px;max-width:100%;}
+.excel-export-toolbar #export-excel-message {font-size:12px;color:var(--text-muted);}
+@media(max-width:600px){.excel-export-toolbar select,.excel-export-toolbar button {width:100%;}}
