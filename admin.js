@@ -58,7 +58,10 @@ const translations = {
 
     totalBookings: "Total Bookings",
     upcomingBookings: "Upcoming Bookings",
-    guestTotals: "Guest Booking Totals",
+    overviewSummaryTitle: "Booking & Earnings Summary",
+    overviewSummaryDesc: "A quick look at bookings and amounts",
+    netOverviewEarnings: "Net Booking Earnings (after fees)",
+    guestTotals: "Total Booking Value",
     hostEarnings: "Estimated Host Earnings",
     viewDetails: "View details →",
 
@@ -302,6 +305,9 @@ const translations = {
 
     totalBookings: "إجمالي الحجوزات",
     upcomingBookings: "الحجوزات القادمة",
+    overviewSummaryTitle: "ملخص الحجوزات والأرباح",
+    overviewSummaryDesc: "نظرة سريعة على الحجوزات والمبالغ",
+    netOverviewEarnings: "صافي مبلغ الحجوزات بعد خصم الرسوم",
     guestTotals: "إجمالي قيمة الحجوزات",
     hostEarnings: "الأرباح المتوقعة",
     viewDetails: "عرض التفاصيل ←",
@@ -1938,6 +1944,46 @@ function showEarningsDetails() {
   dialog.showModal();
 }
 
+/* Guest booking totals details: same active bookings and guest_total field as Overview. */
+function showGuestTotalsDetails() {
+  const dialog = $("guest-totals-dialog");
+  const content = $("guest-totals-breakdown-content");
+  if (!dialog || !content) return;
+  content.replaceChildren();
+
+  const groups = new Map();
+  activeBookings().forEach((booking) => {
+    const platform = booking.platform || "Other";
+    if (!groups.has(platform)) groups.set(platform, { total: 0, count: 0, missing: 0 });
+    const group = groups.get(platform);
+    group.count++;
+    const amount = safeNumber(booking.guest_total);
+    if (amount === null) group.missing++;
+    else group.total += amount;
+  });
+
+  function addLine(label, value) {
+    const row = createElement("div", "breakdown-row");
+    row.append(createElement("span", "", label), createElement("strong", "", value));
+    content.append(row);
+  }
+
+  for (const [platform, group] of groups.entries()) {
+    addLine(`${platform} (${group.count})`, `${money(group.total)}${group.missing ? " *" : ""}`);
+  }
+  addLine(t("guestTotals"), displayTotal("guest_total"));
+  dialog.showModal();
+}
+
+$("guest-totals-card")?.addEventListener("click", showGuestTotalsDetails);
+$("guest-totals-card")?.addEventListener("keydown", (event) => {
+  if (event.key === "Enter" || event.key === " ") {
+    event.preventDefault();
+    showGuestTotalsDetails();
+  }
+});
+$("close-guest-totals-dialog")?.addEventListener("click", () => $("guest-totals-dialog").close());
+
 $("earnings-card")?.addEventListener(
   "click",
   showEarningsDetails
@@ -3426,13 +3472,6 @@ function setLanguage(language) {
   if (typeof expenses !== "undefined") {
     renderExpenses();
   }
-
-  
-document.querySelectorAll("#expense-category option").forEach(option => {
-  option.textContent = currentLanguage === "ar"
-    ? option.dataset.ar
-    : option.dataset.en;
-});
 }
 
 

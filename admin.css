@@ -3183,3 +3183,6 @@ html[data-theme="dark"] .calendar-day .booked-label { color: #f0a1a3; }
 /* Finance month dropdown only */
 #finance-month { width: auto; min-width: 170px; max-width: 100%; background: var(--surface); color: var(--text); }
 @media (max-width: 600px) { #tab-finances > .section-header { flex-wrap: wrap; } #finance-month { width: 100%; } }
+
+/* Overview summary panel: layout only */
+#overview-summary-panel .stats-grid { margin-bottom: 0; }

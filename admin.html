@@ -225,6 +225,13 @@
         </div>
       </div>
 
+      <section class="panel" id="overview-summary-panel">
+        <div class="section-header">
+          <div>
+            <h2 data-i18n="overviewSummaryTitle">Booking & Earnings Summary</h2>
+            <p data-i18n="overviewSummaryDesc">A quick look at bookings and amounts</p>
+          </div>
+        </div>
       <div class="stats-grid">
         <div class="stat-card">
           <span data-i18n="totalBookings">Total Bookings</span>
@@ -234,18 +241,22 @@
           <span data-i18n="upcomingBookings">Upcoming Bookings</span>
           <h3 id="upcoming-bookings">—</h3>
         </div>
-        <div class="stat-card">
+        <div class="stat-card clickable-card" id="guest-totals-card"
+          role="button" tabindex="0" aria-label="View guest booking totals details">
           <span data-i18n="guestTotals">Guest Booking Totals</span>
           <h3 id="guest-payments">—</h3>
+          <small data-i18n="viewDetails">View details →</small>
         </div>
         <div class="stat-card clickable-card" id="earnings-card"
           role="button" tabindex="0"
           aria-label="View estimated host earnings details">
-          <span data-i18n="hostEarnings">Estimated Host Earnings</span>
+          <span data-i18n="netOverviewEarnings">Net Booking Earnings (after fees)</span>
           <h3 id="host-payouts">—</h3>
           <small data-i18n="viewDetails">View details →</small>
         </div>
       </div>
+
+      </section>
 
       <section class="panel" id="today-panel">
         <div class="section-header">
@@ -401,36 +412,31 @@
         </div>
       </div>
 
-      
-<section class="panel" id="remaining-payments-panel">
-  <div class="section-header">
-    <div>
-      <h2 id="remaining-title" data-i18n="remainingTitle">
-        Remaining Payments
-      </h2>
-      <p id="remaining-description" data-i18n="remainingDesc">
-        Guest balances that still need to be collected
-      </p>
-    </div>
-    <strong id="remaining-total">—</strong>
-  </div>
-
-  <div class="table-wrapper">
-    <table>
-      <thead>
-        <tr>
-          <th id="remaining-guest-heading" data-i18n="guest">Guest</th>
-          <th id="remaining-total-heading" data-i18n="total">Total</th>
-          <th id="remaining-paid-heading" data-i18n="received">Received</th>
-          <th id="remaining-due-heading" data-i18n="remaining">Remaining</th>
-          <th id="remaining-action-heading" data-i18n="action">Action</th>
-        </tr>
-      </thead>
-      <tbody id="remaining-payments-body"></tbody>
-    </table>
-  </div>
-</section>
-
+      <section class="panel" id="remaining-payments-panel">
+        <div class="section-header">
+          <div>
+            <h2 id="remaining-title" data-i18n="remainingTitle">Remaining Payments</h2>
+            <p id="remaining-description" data-i18n="remainingDesc">
+              Guest balances that still need to be collected
+            </p>
+          </div>
+          <strong id="remaining-total">—</strong>
+        </div>
+        <div class="table-wrapper">
+          <table>
+            <thead>
+              <tr>
+                <th id="remaining-guest-heading" data-i18n="guest">Guest</th>
+                <th id="remaining-total-heading" data-i18n="total">Total</th>
+                <th id="remaining-paid-heading" data-i18n="received">Received</th>
+                <th id="remaining-due-heading" data-i18n="remaining">Remaining</th>
+                <th id="remaining-action-heading" data-i18n="action">Action</th>
+              </tr>
+            </thead>
+            <tbody id="remaining-payments-body"></tbody>
+          </table>
+        </div>
+      </section>
 
       <section class="panel" id="expenses-panel">
         <div class="section-header">
@@ -812,6 +818,15 @@
       </form>
     </dialog>
 
+    <!-- GUEST BOOKING TOTALS DETAILS (OVERVIEW ONLY) -->
+    <dialog id="guest-totals-dialog" class="admin-dialog">
+      <div class="dialog-header">
+        <h2 data-i18n="guestTotals">Guest Booking Totals</h2>
+        <button type="button" id="close-guest-totals-dialog" aria-label="Close">×</button>
+      </div>
+      <div id="guest-totals-breakdown-content"></div>
+    </dialog>
+
     <!-- EARNINGS DETAILS -->
     <dialog id="earnings-dialog" class="admin-dialog">
       <div class="dialog-header">
@@ -840,16 +855,13 @@
 
         <label>
           <span data-i18n="category">Category</span>
-          
-<select id="expense-category" required>
-  <option value="Cleaning" data-en="Cleaning" data-ar="تنظيف">Cleaning</option>
-  <option value="Maintenance" data-en="Maintenance" data-ar="صيانة">Maintenance</option>
-  <option value="Utilities" data-en="Utilities" data-ar="فواتير الخدمات">Utilities</option>
-  <option value="Supplies" data-en="Supplies" data-ar="مستلزمات">Supplies</option>
-  <option value="Pest Control" data-en="Pest Control Company" data-ar="شركة المبيدات">Pest Control Company</option>
-  <option value="Other" data-en="Other" data-ar="أخرى">Other</option>
-</select>
-
+          <select id="expense-category" required>
+            <option value="Cleaning">Cleaning</option>
+            <option value="Maintenance">Maintenance</option>
+            <option value="Utilities">Utilities</option>
+            <option value="Supplies">Supplies</option>
+            <option value="Other">Other</option>
+          </select>
         </label>
 
         <label>
