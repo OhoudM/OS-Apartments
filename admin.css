@@ -3195,3 +3195,11 @@ html:not([data-theme="dark"]) #tab-overview .today-card {
 html:not([data-theme="dark"]) #tab-overview .stat-card.clickable-card {
   background: #eee7d9;
 }
+
+
+/* Remaining Payments - Red Amounts */
+#finance-remaining,
+#remaining-total,
+#remaining-payments-body td:nth-child(4) {
+  color: #C65B5B !important;
+}
