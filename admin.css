@@ -3186,3 +3186,12 @@ html[data-theme="dark"] .calendar-day .booked-label { color: #f0a1a3; }
 
 /* Overview summary panel: layout only */
 #overview-summary-panel .stats-grid { margin-bottom: 0; }
+
+/* Overview cards only: slightly deeper warm beige, no layout or behavior changes */
+html:not([data-theme="dark"]) #tab-overview .stat-card,
+html:not([data-theme="dark"]) #tab-overview .today-card {
+  background: #f0ebe1;
+}
+html:not([data-theme="dark"]) #tab-overview .stat-card.clickable-card {
+  background: #eee7d9;
+}
