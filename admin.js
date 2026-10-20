@@ -3426,6 +3426,13 @@ function setLanguage(language) {
   if (typeof expenses !== "undefined") {
     renderExpenses();
   }
+
+  
+document.querySelectorAll("#expense-category option").forEach(option => {
+  option.textContent = currentLanguage === "ar"
+    ? option.dataset.ar
+    : option.dataset.en;
+});
 }
 
 
