@@ -3227,3 +3227,7 @@ html:not([data-theme="dark"]) #tab-overview .stat-card.clickable-card {
 #edit-booking-dialog .edit-booking-actions { display:flex; justify-content:flex-end; flex-wrap:wrap; gap:10px; margin-top:16px; }
 #edit-booking-dialog .edit-booking-info { margin:8px 0; color:var(--text-muted); }
 #edit-booking-error { color:var(--danger); }
+
+/* Direct booking quick-edit action beside View details */
+.booking-quick-edit { margin-inline-start: 8px; border-color: var(--olive); color: var(--olive); }
+.booking-quick-edit:hover { background: var(--olive-light); }

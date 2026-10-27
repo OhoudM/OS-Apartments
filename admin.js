@@ -1609,6 +1609,14 @@ function renderTable() {
     });
 
     actionCell.append(button);
+
+    // Quick edit is available directly from the table for Direct bookings only.
+    if (String(booking.platform || "").toLowerCase() === "direct" && !cancelledBooking(booking)) {
+      const editButton = createElement("button", "booking-quick-edit", currentLanguage === "ar" ? "تعديل" : "Edit");
+      editButton.type = "button";
+      editButton.addEventListener("click", () => openEditBooking(booking.id));
+      actionCell.append(editButton);
+    }
     row.append(actionCell);
     tbody.append(row);
   });
@@ -1805,9 +1813,6 @@ function showBreakdown(index) {
   }
 
   // Booking edits are limited to Direct bookings; channel-managed stays are not modified.
-  const editButton = $("open-edit-booking");
-  editButton.hidden = String(booking.platform || "").toLowerCase() !== "direct" || cancelledBooking(booking);
-  editButton.onclick = () => openEditBooking(booking.id);
 
   // Payment corrections are available only for manually entered Direct bookings.
   const correctionButton = $("open-payment-correction");
