@@ -792,10 +792,35 @@
 
       <div id="breakdown-content"></div>
 
+      <button type="button" id="open-edit-booking" class="primary-btn" hidden>Edit Booking</button>
       <button type="button" id="open-payment-correction" hidden>Edit payment</button>
       <p id="payment-correction-message" role="status"></p>
       <button type="button" id="close-breakdown-bottom"
         data-i18n="close">Close</button>
+    </dialog>
+
+    <!-- EDIT MANUAL DIRECT BOOKING: other platform bookings remain sync-managed -->
+    <dialog id="edit-booking-dialog" class="admin-dialog">
+      <div class="dialog-header">
+        <h2 id="edit-booking-heading">Edit Direct Booking</h2>
+        <button type="button" id="close-edit-booking" aria-label="Close">×</button>
+      </div>
+      <form id="edit-booking-form">
+        <div class="form-grid">
+          <label><span id="edit-guest-label">Guest name</span><input id="edit-booking-guest" required></label>
+          <label><span id="edit-checkin-label">Check-in</span><input id="edit-booking-checkin" type="date" required></label>
+          <label><span id="edit-checkout-label">Check-out</span><input id="edit-booking-checkout" type="date" required></label>
+          <label><span id="edit-total-label">Final booking total (SAR)</span><input id="edit-booking-total" type="number" min="0" step="0.01" required></label>
+        </div>
+        <p id="edit-booking-received" class="edit-booking-info"></p>
+        <p id="edit-booking-balance" class="edit-booking-info"></p>
+        <label><span id="edit-notes-label">Notes</span><textarea id="edit-booking-notes" rows="3"></textarea></label>
+        <p id="edit-booking-error" role="alert"></p>
+        <div class="edit-booking-actions">
+          <button type="button" id="cancel-edit-booking">Cancel</button>
+          <button type="submit" class="primary-btn" id="save-edit-booking">Save Changes</button>
+        </div>
+      </form>
     </dialog>
 
     <!-- DIRECT BOOKING PAYMENT CORRECTION -->

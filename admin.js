@@ -1804,6 +1804,11 @@ function showBreakdown(index) {
     );
   }
 
+  // Booking edits are limited to Direct bookings; channel-managed stays are not modified.
+  const editButton = $("open-edit-booking");
+  editButton.hidden = String(booking.platform || "").toLowerCase() !== "direct" || cancelledBooking(booking);
+  editButton.onclick = () => openEditBooking(booking.id);
+
   // Payment corrections are available only for manually entered Direct bookings.
   const correctionButton = $("open-payment-correction");
   correctionButton.hidden = String(booking.platform || "").toLowerCase() !== "direct" || cancelledBooking(booking);
@@ -2871,6 +2876,115 @@ function renderMonthlyFinancialChart(
   container.append(legend, chart);
 }
 
+
+
+/* =====================================================
+   EDIT DIRECT BOOKING — does not touch OTA sync or payment received
+   ===================================================== */
+let editBookingId = null;
+let editBookingSaving = false;
+function editBookingLabel(en, ar) {
+  return currentLanguage === "ar" ? ar : en;
+}
+function updateEditBookingPreview() {
+  const booking = bookings.find(b => String(b.id) === String(editBookingId));
+  if (!booking) return;
+  const paid = safeNumber(booking.original_guest_payment) ?? 0;
+  const total = Number($("edit-booking-total").value);
+  setText("edit-booking-received", `${editBookingLabel("Already received", "المبلغ المستلم سابقاً")}: ${money(paid)}`);
+  setText("edit-booking-balance", Number.isFinite(total) && total >= 0
+    ? `${editBookingLabel("Remaining balance", "المبلغ المتبقي")}: ${money(Math.max(0, (cents(total) - cents(paid)) / 100))}`
+    : "");
+}
+function openEditBooking(id) {
+  const booking = bookings.find(b => String(b.id) === String(id));
+  if (!booking || String(booking.platform || "").toLowerCase() !== "direct" || cancelledBooking(booking)) return;
+  editBookingId = booking.id;
+  setText("edit-booking-heading", editBookingLabel("Edit Direct Booking", "تعديل الحجز المباشر"));
+  setText("edit-guest-label", editBookingLabel("Guest name", "اسم الضيف"));
+  setText("edit-checkin-label", editBookingLabel("Check-in", "تاريخ الوصول"));
+  setText("edit-checkout-label", editBookingLabel("Check-out", "تاريخ المغادرة"));
+  setText("edit-total-label", editBookingLabel("Final booking total (SAR)", "قيمة الحجز النهائية (ريال)"));
+  setText("edit-notes-label", editBookingLabel("Notes", "ملاحظات"));
+  setText("cancel-edit-booking", editBookingLabel("Cancel", "إلغاء"));
+  setText("save-edit-booking", editBookingLabel("Save Changes", "حفظ التعديلات"));
+  $("edit-booking-guest").value = booking.guest_name || "";
+  $("edit-booking-checkin").value = booking.check_in || "";
+  $("edit-booking-checkout").value = booking.check_out || "";
+  $("edit-booking-total").value = String(safeNumber(booking.guest_total) ?? 0);
+  $("edit-booking-notes").value = booking.notes || "";
+  setText("edit-booking-error", "");
+  updateEditBookingPreview();
+  $("breakdown-dialog").close();
+  $("edit-booking-dialog").showModal();
+}
+$("edit-booking-total")?.addEventListener("input", updateEditBookingPreview);
+["close-edit-booking", "cancel-edit-booking"].forEach(id => {
+  $(id)?.addEventListener("click", () => $("edit-booking-dialog").close());
+});
+$("edit-booking-form")?.addEventListener("submit", async event => {
+  event.preventDefault();
+  if (editBookingSaving || !bookingsLoaded) return;
+  const booking = bookings.find(b => String(b.id) === String(editBookingId));
+  if (!booking || String(booking.platform || "").toLowerCase() !== "direct" || cancelledBooking(booking)) return;
+  const guest = $("edit-booking-guest").value.trim();
+  const checkIn = $("edit-booking-checkin").value;
+  const checkOut = $("edit-booking-checkout").value;
+  const total = Number($("edit-booking-total").value);
+  const paid = safeNumber(booking.original_guest_payment) ?? 0;
+  const commission = safeNumber(booking.platform_commission) ?? 0;
+  const errorBox = $("edit-booking-error");
+  errorBox.textContent = "";
+  if (!guest || !parseDate(checkIn) || !parseDate(checkOut) || checkOut <= checkIn) {
+    errorBox.textContent = t("invalidDates"); return;
+  }
+  if (!Number.isFinite(total) || total < 0 || cents(total) < cents(paid) || cents(total) < cents(commission)) {
+    errorBox.textContent = editBookingLabel(
+      "Final amount must be at least the amount already received and the platform commission.",
+      "يجب ألا يقل المبلغ النهائي عن المبلغ المستلم أو عمولة المنصة."
+    ); return;
+  }
+  const conflict = activeBookings().some(b => String(b.id) !== String(booking.id) && overlaps(checkIn, checkOut, b.check_in, b.check_out));
+  if (conflict) { errorBox.textContent = t("bookingConflict"); return; }
+  editBookingSaving = true;
+  const save = $("save-edit-booking");
+  save.disabled = true;
+  try {
+    const { data: authData, error: authError } = await supabaseClient.auth.getUser();
+    if (authError || !authData?.user) throw new Error(t("sessionExpired"));
+    // Re-fetch this record so edits do not overwrite another family member's changes.
+    const { data: fresh, error: fetchError } = await supabaseClient.from("Bookings")
+      .select("id,platform,guest_name,check_in,check_out,guest_total,original_guest_payment,platform_commission,notes,status")
+      .eq("id", booking.id).single();
+    if (fetchError) throw fetchError;
+    const fields = ["platform", "guest_name", "check_in", "check_out", "guest_total", "original_guest_payment", "platform_commission", "notes", "status"];
+    if (!fresh || fields.some(field => (fresh[field] ?? null) !== (booking[field] ?? null))) {
+      throw new Error(editBookingLabel("Booking changed elsewhere. Refresh and try again.", "تم تعديل الحجز من جهاز آخر. يرجى التحديث والمحاولة مجدداً."));
+    }
+    if (String(fresh.platform).toLowerCase() !== "direct" || cancelledBooking(fresh)) throw new Error(t("stalePayment"));
+    const finalTotal = cents(total) / 100;
+    const update = {
+      guest_name: guest, check_in: checkIn, check_out: checkOut,
+      original_price: finalTotal, accommodation_total: finalTotal, guest_total: finalTotal,
+      discount_amount: 0, occupancy_tax: 0, other_fees: 0,
+      amount: (cents(total) - cents(commission)) / 100,
+      financial_status: cents(paid) >= cents(total) ? "paid" : cents(paid) === 0 ? "unpaid" : "partially_paid",
+      notes: $("edit-booking-notes").value.trim() || null
+    };
+    const { data, error } = await supabaseClient.from("Bookings").update(update)
+      .eq("id", booking.id).eq("platform", "Direct").select("id");
+    if (error) throw error;
+    if (!data || data.length !== 1) throw new Error(editBookingLabel("Update not permitted. Check Supabase permissions.", "تعذر التعديل. تحققي من صلاحيات Supabase."));
+    $("edit-booking-dialog").close();
+    await loadBookings();
+    if (bookingsLoaded) showMessage(editBookingLabel("Booking updated successfully.", "تم تحديث الحجز بنجاح."));
+  } catch (error) {
+    errorBox.textContent = t("saveError") + error.message;
+  } finally {
+    editBookingSaving = false;
+    save.disabled = false;
+  }
+});
 
 /* =====================================================
    DIRECT BOOKING PAYMENT CORRECTION ONLY
