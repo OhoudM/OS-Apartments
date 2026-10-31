@@ -1543,129 +1543,47 @@ $("next-month")?.addEventListener("click", () => {
 function renderTable() {
   const tbody = $("bookings-table-body");
   if (!tbody) return;
-
-  const guestHeading = $("guest-payment-column");
-  if (guestHeading) guestHeading.textContent = currentLanguage === "ar" ? "حالة دفع الضيف" : "Guest Payment Status";
+  const ar = currentLanguage === "ar";
+  const paymentHeading = $("guest-payment-column");
+  if (paymentHeading) paymentHeading.textContent = ar ? "الدفع" : "Payment";
+  const dateHeading = $("simple-dates-head");
+  if (dateHeading) dateHeading.textContent = ar ? "التواريخ" : "Dates";
   tbody.replaceChildren();
-
   if (!bookings.length) {
-    const row = createElement("tr");
-    const cell = createElement(
-      "td",
-      "",
-      t("noBookings")
-    );
-
-    cell.colSpan = 8;
-    row.append(cell);
-    tbody.append(row);
+    const tr = createElement("tr");
+    const td = createElement("td", "", t("noBookings"));
+    td.colSpan = 6;
+    tr.append(td);
+    tbody.append(tr);
     return;
   }
-
-  const sorted = [...bookings].sort(
-    (a, b) =>
-      String(b.check_in || "").localeCompare(
-        String(a.check_in || "")
-      )
-  );
-
-  sorted.forEach((booking) => {
-    const row = createElement("tr");
-
-    const fields = [
-      booking.guest_name || "—",
-      booking.platform || "—",
-      formatDate(booking.check_in),
-      formatDate(booking.check_out)
-    ];
-
-    fields.forEach((value) => {
-      row.append(createElement("td", "", value));
-    });
-
-    const statusCell = createElement("td");
-
-    const badge = createElement(
-      "span",
-      `status-badge ${statusClass(booking.status)}`,
-      translateStatus(booking.status)
-    );
-
-    statusCell.append(badge);
-    row.append(statusCell);
-
-    // Display independently recorded guest payments and bank payouts.
-    // A cancelled reservation is not treated as an unpaid active booking.
-    const isCancelled = cancelledBooking(booking);
-    const guestState = isCancelled ? "cancelled" : osGuestPaymentState(booking);
-    const state = guestState;
-    const paymentCell = createElement("td", "os-payment-status-cell");
-    const label = state === "cancelled"
-      ? (currentLanguage === "ar" ? "ملغي" : "Cancelled") : osStateLabel(state);
-    const compactLabel = state === "not_verified"
-      ? (currentLanguage === "ar" ? "غير مؤكد" : "Not verified") : label;
-    const statusBadge = createElement("span", `os-payment-pill os-payment-${state}`, compactLabel);
-    statusBadge.title = label;
-    paymentCell.append(statusBadge);
-    row.append(paymentCell);
-
-    row.append(
-      createElement(
-        "td",
-        "",
-        money(booking.amount)
-      )
-    );
-
-    const actionCell = createElement("td");
-
-    const button = createElement(
-      "button",
-      "",
-      t("breakdown")
-    );
-
-    button.type = "button";
-    button.addEventListener("click", () => {
-      showBreakdown(bookings.indexOf(booking));
-    });
-
-    actionCell.append(button);
-
-    if (!cancelledBooking(booking)) {
-      const paymentButton = createElement("button", "booking-quick-edit", currentLanguage === "ar" ? "تعديل الدفع" : "Edit Payment");
-      paymentButton.type = "button";
-      paymentButton.addEventListener("click", () => osOpenGuestPayment(booking.id));
-      actionCell.append(paymentButton);
-    }
-
-    // Quick edit is available directly from the table for Direct bookings only.
-    if (String(booking.platform || "").toLowerCase() === "direct" && !cancelledBooking(booking)) {
-      const editButton = createElement("button", "booking-quick-edit", currentLanguage === "ar" ? "تعديل" : "Edit");
-      editButton.type = "button";
-      editButton.addEventListener("click", () => openEditBooking(booking.id));
-      actionCell.append(editButton);
-    }
-    // Financial-only correction for Gathern reservations. OTA stay details remain read-only.
-    if (String(booking.platform || "").toLowerCase() === "gathern" && !cancelledBooking(booking)) {
-      const financialButton = createElement("button", "booking-quick-edit", currentLanguage === "ar" ? "تعديل المالية" : "Edit Financials");
-      financialButton.type = "button";
-      financialButton.addEventListener("click", () => openGathernFinancialEdit(booking.id));
-      actionCell.append(financialButton);
-    }
-    if (String(booking.platform || "").toLowerCase() !== "direct" && !cancelledBooking(booking)) {
-      const payoutButton = createElement("button", "booking-quick-edit", currentLanguage === "ar" ? "تعديل التحويل" : (osPayoutState(booking) === "received" ? "Update Payout" : "Record Payout"));
-      payoutButton.type = "button";
-      payoutButton.addEventListener("click", () => osOpenPayout(booking.id));
-      actionCell.append(payoutButton);
-    }
+  const sorted = [...bookings].sort((a,b) => String(b.check_in || "").localeCompare(String(a.check_in || "")));
+  sorted.forEach(booking => {
+    const row = createElement("tr", "os-simple-booking-row");
+    const cancelled = cancelledBooking(booking);
+    const state = cancelled ? "cancelled" : osGuestPaymentState(booking);
+    row.append(createElement("td", "os-simple-guest", booking.guest_name || "—"));
+    const dates = `${formatDate(booking.check_in)} – ${formatDate(booking.check_out)}`;
+    row.append(createElement("td", "os-simple-dates", dates));
+    row.append(createElement("td", "", booking.platform || "—"));
+    const payCell = createElement("td");
+    const payText = state === "cancelled" ? (ar ? "ملغي" : "Cancelled") : osStateLabel(state);
+    payCell.append(createElement("span", `os-payment-pill os-payment-${state}`, payText));
+    row.append(payCell);
+    row.append(createElement("td", "os-simple-earnings", cancelled ? "—" : money(booking.amount)));
+    const actionCell = createElement("td", "os-simple-open-cell");
+    const openButton = createElement("button", "os-simple-open", ar ? "عرض" : "View");
+    openButton.type = "button";
+    openButton.addEventListener("click", () => showBreakdown(bookings.indexOf(booking)));
+    actionCell.append(openButton);
     row.append(actionCell);
+    row.addEventListener("click", event => {
+      if (!event.target.closest("button, a, input, select")) showBreakdown(bookings.indexOf(booking));
+    });
     tbody.append(row);
   });
 }
 
-
-/* Guest payment and bank payout are separate records. */
 function osGuestPaymentState(b) {
   const explicit = String(b.guest_payment_status || "").trim().toLowerCase();
   if (["paid", "partially_paid", "unpaid", "not_verified"].includes(explicit)) return explicit;
@@ -1897,7 +1815,64 @@ function showBreakdown(index) {
   correctionButton.onclick = () => openPaymentCorrection(booking.id);
   setText("payment-correction-message", "");
 
+  osPrepareSimpleDetailTabs(booking);
   dialog.showModal();
+}
+
+function osPrepareSimpleDetailTabs(booking) {
+  const ar = currentLanguage === "ar";
+  const bookingTab = $("os-detail-booking-tab");
+  const paymentTab = $("os-detail-payment-tab");
+  const bookingPanel = $("breakdown-content");
+  const paymentPanel = $("os-detail-payment-panel");
+  if (!bookingTab || !paymentTab || !bookingPanel || !paymentPanel) return;
+  bookingTab.textContent = ar ? "الحجز" : "Booking";
+  paymentTab.textContent = ar ? "المدفوعات" : "Payments";
+  paymentPanel.replaceChildren();
+  const showTab = (isPayment) => {
+    bookingPanel.hidden = isPayment;
+    paymentPanel.hidden = !isPayment;
+    bookingTab.classList.toggle("os-tab-active", !isPayment);
+    paymentTab.classList.toggle("os-tab-active", isPayment);
+    bookingTab.setAttribute("aria-selected", String(!isPayment));
+    paymentTab.setAttribute("aria-selected", String(isPayment));
+    $("open-payment-correction").hidden = true;
+  };
+  bookingTab.onclick = () => showTab(false);
+  paymentTab.onclick = () => showTab(true);
+  const addInfo = (label, value) => {
+    const line = createElement("div", "breakdown-row");
+    line.append(createElement("span", "", label), createElement("strong", "", value == null || value === "" ? "—" : value));
+    paymentPanel.append(line);
+  };
+  const cancelled = cancelledBooking(booking);
+  addInfo(ar ? "حالة دفع الضيف" : "Guest payment", cancelled ? (ar ? "ملغي" : "Cancelled") : osStateLabel(osGuestPaymentState(booking)));
+  addInfo(ar ? "طريقة الدفع" : "Payment method", booking.guest_payment_method || (ar ? "غير مسجلة" : "Not recorded"));
+  if (String(booking.platform || "").toLowerCase() !== "direct") {
+    addInfo(ar ? "التحويل إلى البنك" : "Bank payout", cancelled ? (ar ? "ملغي" : "Cancelled") : osStateLabel(osPayoutState(booking)));
+    addInfo(ar ? "المبلغ المستلم" : "Amount received", booking.host_payout_received == null ? "—" : money(booking.host_payout_received));
+    addInfo(ar ? "تاريخ التحويل" : "Transfer date", booking.host_payout_date || "—");
+  }
+  if (!cancelled) {
+    const actions = createElement("div", "os-simple-detail-actions");
+    const makeAction = (label, fn) => {
+      const btn = createElement("button", "os-simple-detail-btn", label);
+      btn.type = "button";
+      btn.addEventListener("click", () => { $("breakdown-dialog").close(); fn(); });
+      actions.append(btn);
+    };
+    makeAction(ar ? "تعديل دفع الضيف" : "Update guest payment", () => osOpenGuestPayment(booking.id));
+    if (String(booking.platform || "").toLowerCase() !== "direct") {
+      makeAction(ar ? "تحديث التحويل البنكي" : "Update bank payout", () => osOpenPayout(booking.id));
+    } else {
+      makeAction(ar ? "تعديل الحجز" : "Edit booking", () => openEditBooking(booking.id));
+    }
+    if (String(booking.platform || "").toLowerCase() === "gathern") {
+      makeAction(ar ? "تصحيح التفاصيل المالية" : "Correct financial details", () => openGathernFinancialEdit(booking.id));
+    }
+    paymentPanel.append(actions);
+  }
+  showTab(false);
 }
 
 $("close-breakdown")?.addEventListener(
