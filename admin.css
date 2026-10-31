@@ -3239,3 +3239,38 @@ html:not([data-theme="dark"]) #tab-overview .stat-card.clickable-card {
 .os-payout-form p { margin:0; }
 .os-payout-actions { display:flex; gap:10px; justify-content:flex-end; flex-wrap:wrap; }
 #os-payout-error { color:var(--danger); }
+
+/* Booking table: guest payment and host payout status (read-only) */
+.os-payment-status-cell { white-space: nowrap; }
+.os-payment-pill { display: inline-block; border-radius: 999px; padding: 5px 10px; font-size: 12px; font-weight: 700; background: var(--surface-soft); border: 1px solid var(--border); color: var(--text-muted); }
+.os-payment-paid, .os-payment-received { background: var(--success-bg); color: var(--success); border-color: transparent; }
+.os-payment-partially_paid, .os-payment-partially_received { background: var(--warning-bg); color: var(--warning); border-color: transparent; }
+.os-payment-unpaid { background: var(--danger-bg); color: var(--danger); border-color: transparent; }
+
+/* All Bookings: compact actions, readable rows; other tables unaffected */
+.bookings-table { table-layout: auto; }
+.bookings-table th, .bookings-table td { padding: 13px 12px; }
+.bookings-table th:nth-child(3), .bookings-table th:nth-child(4),
+.bookings-table td:nth-child(3), .bookings-table td:nth-child(4) { white-space: nowrap; }
+.bookings-table th:nth-child(7), .bookings-table td:nth-child(7) { white-space: nowrap; }
+.bookings-table td:nth-child(1) { min-width: 135px; max-width: 210px; font-weight: 600; }
+.bookings-table td:nth-child(8) { min-width: 205px; }
+.os-booking-action-bar { display: flex; align-items: center; gap: 8px; }
+.bookings-table .os-view-details, .os-booking-manage > summary {
+  display: inline-flex; align-items: center; justify-content: center;
+  min-height: 35px; box-sizing: border-box; padding: 8px 11px;
+  font: inherit; font-size: 12px; font-weight: 650; line-height: 1.2;
+  white-space: nowrap; border: 1px solid var(--border); border-radius: 9px;
+  background: var(--surface); color: var(--text); cursor: pointer;
+}
+.os-booking-manage > summary { list-style: none; color: var(--olive); border-color: var(--olive); }
+.os-booking-manage > summary::-webkit-details-marker { display: none; }
+.os-booking-manage > summary::after { content: "⌄"; margin-inline-start: 7px; font-size: 14px; }
+.os-booking-manage[open] > summary::after { content: "⌃"; }
+.os-booking-manage-items { display: grid; gap: 6px; padding-top: 9px; }
+.bookings-table .os-booking-manage-items button {
+  width: 100%; margin: 0; text-align: start; white-space: nowrap;
+  padding: 8px 10px; font-size: 12px; border-radius: 8px;
+}
+.bookings-table .os-booking-manage-items .booking-quick-edit { margin-inline-start: 0; }
+@media (max-width: 900px) { .bookings-table { min-width: 1050px; } }
