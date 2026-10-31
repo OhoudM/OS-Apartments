@@ -1545,7 +1545,7 @@ function renderTable() {
   if (!tbody) return;
   const ar = currentLanguage === "ar";
   const paymentHeading = $("guest-payment-column");
-  if (paymentHeading) paymentHeading.textContent = ar ? "الدفع" : "Payment";
+  if (paymentHeading) paymentHeading.textContent = ar ? "الحالة" : "Status";
   const dateHeading = $("simple-dates-head");
   if (dateHeading) dateHeading.textContent = ar ? "التواريخ" : "Dates";
   tbody.replaceChildren();
@@ -1561,14 +1561,14 @@ function renderTable() {
   sorted.forEach(booking => {
     const row = createElement("tr", "os-simple-booking-row");
     const cancelled = cancelledBooking(booking);
-    const state = cancelled ? "cancelled" : osGuestPaymentState(booking);
+    const state = normalizedStatus(booking);
     row.append(createElement("td", "os-simple-guest", booking.guest_name || "—"));
     const dates = `${formatDate(booking.check_in)} – ${formatDate(booking.check_out)}`;
     row.append(createElement("td", "os-simple-dates", dates));
     row.append(createElement("td", "", booking.platform || "—"));
     const payCell = createElement("td");
-    const payText = state === "cancelled" ? (ar ? "ملغي" : "Cancelled") : osStateLabel(state);
-    payCell.append(createElement("span", `os-payment-pill os-payment-${state}`, payText));
+    const statusText = translateStatus(booking.status);
+    payCell.append(createElement("span", `status-badge ${statusClass(booking.status)}`, statusText));
     row.append(payCell);
     row.append(createElement("td", "os-simple-earnings", cancelled ? "—" : money(booking.amount)));
     const actionCell = createElement("td", "os-simple-open-cell");
