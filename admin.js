@@ -1617,6 +1617,13 @@ function renderTable() {
       editButton.addEventListener("click", () => openEditBooking(booking.id));
       actionCell.append(editButton);
     }
+    // Financial-only correction for Gathern reservations. OTA stay details remain read-only.
+    if (String(booking.platform || "").toLowerCase() === "gathern" && !cancelledBooking(booking)) {
+      const financialButton = createElement("button", "booking-quick-edit", currentLanguage === "ar" ? "تعديل المالية" : "Edit Financials");
+      financialButton.type = "button";
+      financialButton.addEventListener("click", () => openGathernFinancialEdit(booking.id));
+      actionCell.append(financialButton);
+    }
     row.append(actionCell);
     tbody.append(row);
   });
@@ -2989,6 +2996,85 @@ $("edit-booking-form")?.addEventListener("submit", async event => {
     editBookingSaving = false;
     save.disabled = false;
   }
+});
+
+/* =====================================================
+   GATHERN FINANCIAL CORRECTION — does not change OTA dates/status
+   ===================================================== */
+let gathernFinancialId = null;
+let gathernFinancialSaving = false;
+const gathernFinancialFields = ["original_price", "discount_amount", "accommodation_total", "guest_total", "platform_commission", "other_fees", "original_guest_payment"];
+function gathernFinancialText(en, ar) { return currentLanguage === "ar" ? ar : en; }
+function openGathernFinancialEdit(id) {
+  const b = bookings.find(item => String(item.id) === String(id));
+  if (!b || String(b.platform || "").toLowerCase() !== "gathern" || cancelledBooking(b)) return;
+  gathernFinancialId = b.id;
+  $("gathern-financial-heading").textContent = gathernFinancialText("Edit Gathern Financials", "تعديل مالية حجز جاذر إن");
+  $("gathern-financial-subtitle").textContent = `${b.guest_name || ""} · ${b.confirmation_code || ""}`;
+  for (const field of gathernFinancialFields) {
+    const input = $("gathern-financial-" + field);
+    const value = safeNumber(b[field]);
+    input.value = value === null ? "" : String(value);
+  }
+  $("gathern-financial-error").textContent = "";
+  updateGathernFinancialPreview();
+  $("gathern-financial-dialog").showModal();
+}
+function updateGathernFinancialPreview() {
+  const total = Number($("gathern-financial-guest_total").value);
+  const commission = Number($("gathern-financial-platform_commission").value);
+  const fees = Number($("gathern-financial-other_fees").value);
+  const valid = [total, commission, fees].every(Number.isFinite) && ["guest_total", "platform_commission", "other_fees"].every(f => $("gathern-financial-" + f).value !== "");
+  $("gathern-financial-net").textContent = valid ? money((cents(total) - cents(commission) - cents(fees))/100) : "—";
+}
+for (const field of gathernFinancialFields) $("gathern-financial-" + field)?.addEventListener("input", updateGathernFinancialPreview);
+$("gathern-financial-cancel")?.addEventListener("click", () => $("gathern-financial-dialog").close());
+$("gathern-financial-close")?.addEventListener("click", () => $("gathern-financial-dialog").close());
+$("gathern-financial-form")?.addEventListener("submit", async event => {
+  event.preventDefault();
+  if (gathernFinancialSaving || !bookingsLoaded) return;
+  const b = bookings.find(item => String(item.id) === String(gathernFinancialId));
+  if (!b || String(b.platform || "").toLowerCase() !== "gathern" || cancelledBooking(b)) return;
+  const errorBox = $("gathern-financial-error");
+  errorBox.textContent = "";
+  const values = {};
+  for (const field of gathernFinancialFields) {
+    const input = $("gathern-financial-" + field);
+    if (input.value === "") { errorBox.textContent = gathernFinancialText("Complete every amount. Enter 0 where applicable.", "أدخلي جميع المبالغ، واكتبي صفر عند عدم وجود رسوم."); return; }
+    const num = Number(input.value);
+    if (!Number.isFinite(num) || num < 0) { errorBox.textContent = t("invalidAmounts"); return; }
+    values[field] = cents(num) / 100;
+  }
+  const netCents = cents(values.guest_total) - cents(values.platform_commission) - cents(values.other_fees);
+  if (netCents < 0 || cents(values.original_guest_payment) > cents(values.guest_total) ||
+      Math.abs(cents(values.original_price) - cents(values.discount_amount) - cents(values.accommodation_total)) > 1 ||
+      Math.abs(cents(values.accommodation_total) - cents(values.guest_total)) > 1) {
+    errorBox.textContent = gathernFinancialText("Check amounts: price minus discount must equal accommodation/guest total; received cannot exceed total; fees cannot exceed total.", "راجعي المبالغ: السعر بعد الخصم يجب أن يساوي إجمالي الإقامة والحجز، والمدفوع لا يتجاوز الإجمالي، والرسوم لا تتجاوز الإجمالي."); return;
+  }
+  gathernFinancialSaving = true;
+  const saveButton = $("gathern-financial-save"); saveButton.disabled = true;
+  try {
+    const { data: authData, error: authError } = await supabaseClient.auth.getUser();
+    if (authError || !authData?.user) throw new Error(t("sessionExpired"));
+    const selectFields = ["id", "platform", "status", "check_in", "check_out", "confirmation_code", ...gathernFinancialFields, "amount", "financial_status"];
+    const { data: fresh, error: fetchError } = await supabaseClient.from("Bookings").select(selectFields.join(",")).eq("id", b.id).single();
+    if (fetchError) throw fetchError;
+    if (!fresh || selectFields.slice(1).some(field => String(fresh[field] ?? "") !== String(b[field] ?? ""))) {
+      throw new Error(gathernFinancialText("Booking changed since it loaded. Refresh and retry.", "تغير الحجز منذ تحميله. حدثي الصفحة وحاولي مجدداً."));
+    }
+    if (String(fresh.platform || "").toLowerCase() !== "gathern" || cancelledBooking(fresh)) throw new Error(t("stalePayment"));
+    const paid = cents(values.original_guest_payment), total = cents(values.guest_total);
+    const update = { ...values, amount: netCents / 100,
+      financial_status: paid >= total ? "paid" : paid === 0 ? "unpaid" : "partially_paid" };
+    const { data, error } = await supabaseClient.from("Bookings").update(update)
+      .eq("id", b.id).eq("platform", fresh.platform).select("id");
+    if (error) throw error;
+    if (!data || data.length !== 1) throw new Error(gathernFinancialText("Update not permitted. Check Supabase permissions.", "التعديل غير مسموح. تحققي من صلاحيات Supabase."));
+    $("gathern-financial-dialog").close();
+    await loadBookings();
+    if (bookingsLoaded) showMessage(gathernFinancialText("Gathern financials updated.", "تم تحديث مالية حجز جاذر إن."));
+  } catch (error) { errorBox.textContent = t("saveError") + error.message; }
+  finally { gathernFinancialSaving = false; saveButton.disabled = false; }
 });
 
 /* =====================================================
