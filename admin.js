@@ -1858,7 +1858,7 @@ function osPrepareSimpleDetailTabs(booking) {
     const makeAction = (label, fn) => {
       const btn = createElement("button", "os-simple-detail-btn", label);
       btn.type = "button";
-      btn.addEventListener("click", () => { $("breakdown-dialog").close(); fn(); });
+      btn.addEventListener("click", () => { osReturnDetailsId = booking.id; $("breakdown-dialog").close(); fn(); });
       actions.append(btn);
     };
     makeAction(ar ? "تعديل دفع الضيف" : "Update guest payment", () => osOpenGuestPayment(booking.id));
@@ -4435,6 +4435,29 @@ $("refresh-bookings-btn")?.addEventListener(
 
 // Theme is already initialized in Part 11.
 // Do not add another theme initialization here.
+
+
+/* Return to the same booking's Payments tab after editing, cancelling, or saving. */
+let osReturnDetailsId = null;
+function osReturnToDetails() {
+  const id = osReturnDetailsId;
+  osReturnDetailsId = null;
+  if (id == null) return;
+  const index = bookings.findIndex(b => String(b.id) === String(id));
+  if (index < 0) return;
+  showBreakdown(index);
+  $("os-detail-payment-tab")?.click();
+}
+for (const dialogId of ["os-guest-payment-dialog", "os-payout-dialog", "edit-booking-dialog", "gathern-financial-dialog"]) {
+  const modal = $(dialogId);
+  modal?.addEventListener("close", () => {
+    // Defer until any in-progress save refresh has finished; no data is changed here.
+    osReturnToDetails();
+  });
+}
+document.querySelectorAll("[data-return-details]").forEach(button => {
+  button.addEventListener("click", () => button.closest("dialog")?.close());
+});
 
 setLanguage(currentLanguage);
 checkSession();

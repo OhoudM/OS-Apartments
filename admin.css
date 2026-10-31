@@ -3296,3 +3296,7 @@ html:not([data-theme="dark"]) #tab-overview .stat-card.clickable-card {
 .os-simple-detail-btn { border: 1px solid #71825e; border-radius: 9px; background: transparent; color: inherit; padding: 10px 14px; cursor: pointer; }
 .os-simple-detail-btn:hover { background: rgba(140,160,120,.12); }
 @media(max-width: 900px) { .bookings-table { min-width: 780px; } }
+
+/* Small, clear return navigation for payment editors. */
+.os-return-details { display: inline-flex; align-items: center; margin: 0 0 18px; padding: 8px 0; border: 0; background: transparent; color: var(--text-secondary, #c5c7c1); font: inherit; font-size: 0.9rem; cursor: pointer; text-align: start; }
+.os-return-details:hover { color: var(--text-primary, #fff); text-decoration: underline; }
