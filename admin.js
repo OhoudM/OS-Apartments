@@ -2464,7 +2464,7 @@ function renderYearlyExpenseTracker(year) {
   if (container) {
     container.replaceChildren();
     const max = Math.max(1,emergencySpent,...groups.map(g => g.amount));
-    [...groups, {key:"Emergency",en:"Emergency",ar:"الطوارئ",amount:emergencySpent}].forEach(g => {
+    [...groups, {key:"Emergency",en:"Emergency",ar:"الطوارئ",amount:emergencySpent}].filter(g => g.amount > 0).forEach(g => {
       const row = document.createElement("div"); row.className="os-yearly-bar-row";
       const heading=document.createElement("div"); heading.className="os-yearly-bar-label";
       const name=document.createElement("span"); name.textContent=ar?g.ar:g.en;

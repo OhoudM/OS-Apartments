@@ -3417,3 +3417,7 @@ html[data-theme="dark"] .os-emergency-btn {color:#e7b781;border-color:#a4764b}
 .os-emergency-budget-card {margin-top:14px}
 #os-emergency-bar {height:100%;background:#bd9367;border-radius:inherit;transition:width .2s}
 #os-emergency-bar.os-over-budget {background:#b84d4d}
+
+/* Emergency reserve is separate from operating allocations */
+.os-yearly-tracker > .os-emergency-budget-card {margin:18px 0 22px;max-width:none;}
+.os-yearly-tracker > .os-emergency-budget-card .os-yearly-footnote {margin-top:12px;}

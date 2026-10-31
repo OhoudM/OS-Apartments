@@ -7,7 +7,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="admin.css?v=20261101-yearly-tracker">
+  <link rel="stylesheet" href="admin.css?v=20261101-emergency-visible">
 </head>
 <body>
 
@@ -552,6 +552,12 @@
         <div class="os-yearly-track"><div id="os-other-bar"></div></div>
       </div>
     </div>
+    <div class="os-yearly-budget-card os-emergency-budget-card">
+      <div class="os-yearly-budget-top"><h3 id="os-emergency-title">Emergency Reserve</h3><strong>5,000 SAR</strong></div>
+      <div class="os-yearly-budget-numbers"><span id="os-emergency-spent-label">Used</span><b id="os-emergency-spent">0.00 SAR</b><span id="os-emergency-left-label">Remaining</span><b id="os-emergency-left">5,000.00 SAR</b></div>
+      <div class="os-yearly-track"><div id="os-emergency-bar"></div></div>
+      <p id="os-emergency-note" class="os-yearly-footnote">Separate reserve — not included in the 39,000 SAR annual operating budget.</p>
+    </div>
     <div class="os-yearly-chart-card">
       <div class="os-yearly-chart-heading"><h3 id="os-categories-title">Expenses by Category</h3><span id="os-categories-note">Actual recorded expenses</span></div>
       <div id="os-category-bars" class="os-yearly-bars"></div>
@@ -987,7 +993,7 @@
     </form>
   </dialog>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <script src="admin.js?v=20261101-category-options-fix"></script>
+  <script src="admin.js?v=20261101-emergency-visible"></script>
   <script src="https://cdn.jsdelivr.net/npm/exceljs@4.4.0/dist/exceljs.min.js"></script>
   <script src="export-excel.js?v=2"></script>
 
