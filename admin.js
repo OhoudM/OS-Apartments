@@ -2446,6 +2446,22 @@ function renderYearlyExpenseTracker(year) {
 function renderAnnualCoverage(earningsMap) {
   const year = selectedReportMonth === "all" ? new Date().getFullYear() : Number(selectedReportMonth.slice(0, 4));
   renderYearlyExpenseTracker(year);
+  // Coverage uses recorded booking earnings, not actual expense payments.
+  const annualBudget = 39000;
+  let earned = 0;
+  for (const [monthKey, amount] of earningsMap.entries()) {
+    if (String(monthKey).startsWith(`${year}-`)) earned += Number(amount) || 0;
+  }
+  const percentage = annualBudget > 0 ? earned / annualBudget * 100 : 0;
+  const clamped = Math.min(100, Math.max(0, percentage));
+  setText("os-annual-coverage-label", currentLanguage === "ar" ? "تغطية الميزانية من إيرادات الحجوزات" : "Annual budget covered by earnings");
+  setText("os-annual-coverage-percent", `${percentage.toFixed(1)}%`);
+  setText("os-annual-coverage-earned", currentLanguage === "ar" ? `${money(earned)} إيرادات مسجلة` : `${money(earned)} earned`);
+  setText("os-annual-coverage-remaining", currentLanguage === "ar" ? `${money(Math.max(0,annualBudget-earned))} متبقي للوصول للهدف` : `${money(Math.max(0,annualBudget-earned))} to target`);
+  const fill = $("os-annual-coverage-fill");
+  if (fill) fill.style.width = `${clamped}%`;
+  const track = document.querySelector(".os-annual-coverage-track");
+  if (track) track.setAttribute("aria-valuenow", String(Math.round(clamped)));
 }
 
 /* =====================================================
@@ -3869,6 +3885,17 @@ function translateReportLabels() {
         description.textContent = t(keys[1]);
       }
     });
+
+  // Keep Monthly Booking Details entirely in English, including Arabic UI mode.
+  const bookingDetailEnglish = {
+    "monthly-booking-details-title": "Monthly Booking Details",
+    "monthly-booking-details-description": "Bookings, nights and average apartment pricing",
+    "monthly-bookings-label": "Total Bookings",
+    "monthly-nights-label": "Booked Nights",
+    "monthly-nightly-rate-label": "Average Nightly Rate",
+    "monthly-booking-value-label": "Average Booking Value"
+  };
+  Object.entries(bookingDetailEnglish).forEach(([id, label]) => setText(id, label));
 
   const monthSelect = $("report-month");
 

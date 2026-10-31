@@ -3400,3 +3400,11 @@ html[data-theme="dark"] .os-yearly-allocations span,html[data-theme="dark"] .os-
 html[data-theme="dark"] .os-yearly-allocations strong,html[data-theme="dark"] .os-yearly-budget-top h3,html[data-theme="dark"] .os-yearly-budget-top strong,html[data-theme="dark"] .os-yearly-chart-heading h3,html[data-theme="dark"] .os-yearly-budget-numbers b,html[data-theme="dark"] .os-yearly-bar-label,html[data-theme="dark"] .os-yearly-bar-label strong { color:#f1f5ef; }
 html[data-theme="dark"] .os-yearly-track { background:#414c41; }
 @media(max-width:700px) { .os-yearly-budgets { grid-template-columns:1fr; } .os-yearly-allocations { grid-template-columns:1fr; } .os-yearly-chart-heading { flex-direction:column; } }
+
+/* Annual earnings coverage, restored under annual budget hero */
+.os-annual-coverage { margin-top:15px; display:grid; gap:10px; }
+.os-annual-coverage-head,.os-annual-coverage-foot { display:flex; justify-content:space-between; align-items:center; gap:14px; flex-wrap:wrap; }
+.os-yearly-hero .os-annual-coverage-head span,.os-yearly-hero .os-annual-coverage-foot span { color:#e4ece0; font-size:13px; }
+.os-yearly-hero .os-annual-coverage-head strong { font-size:17px; color:#fff; }
+.os-annual-coverage-track { width:100%; height:11px; background:#566653; border-radius:99px; overflow:hidden; }
+.os-annual-coverage-track>div { height:100%; width:0; border-radius:99px; background:#b9d2a5; transition:width .25s ease; }
