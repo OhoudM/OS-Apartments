@@ -9,7 +9,7 @@
     overview:'الملخص', bookings:'الحجوزات', finances:'المالية', expenses:'المصاريف', monthly:'الأداء الشهري',
     metric:'المؤشر', value:'القيمة', period:'الفترة', all:'كل الفترات', count:'عدد الحجوزات',
     guest:'الضيف', platform:'المنصة', checkin:'الوصول', checkout:'المغادرة', status:'الحالة',
-    guestTotal:'إجمالي قيمة الحجز', net:'صافي مبلغ الحجز بعد الرسوم', received:'المبلغ المستلم',
+    guestTotal:'إجمالي قيمة الحجز', net:'صافي مبلغ الحجز بعد الرسوم', received:'المبلغ المدفوع من الضيف', discount:'الخصم', original:'السعر الأصلي', guestStatus:'حالة دفع الضيف', payoutStatus:'حالة تحويل المستحقات',
     remaining:'المتبقي', code:'رقم التأكيد', date:'التاريخ', category:'الفئة', description:'الوصف',
     amount:'المبلغ', month:'الشهر', revenue:'الإيرادات التشغيلية', cost:'المصاريف التشغيلية',
     profit:'صافي الربح', occupancy:'نسبة الإشغال', nights:'الليالي المحجوزة',
@@ -18,7 +18,7 @@
     overview:'Overview', bookings:'Bookings', finances:'Finances', expenses:'Expenses', monthly:'Monthly Performance',
     metric:'Metric', value:'Value', period:'Period', all:'All Time', count:'Bookings',
     guest:'Guest', platform:'Platform', checkin:'Check-in', checkout:'Check-out', status:'Status',
-    guestTotal:'Guest Booking Total', net:'Net Booking Earnings (after fees)', received:'Received',
+    guestTotal:'Guest Booking Total', net:'Net Booking Earnings (after fees)', received:'Guest Payment Tracked', discount:'Discount', original:'Original Price', guestStatus:'Guest Payment Status', payoutStatus:'Host Payout Status',
     remaining:'Remaining', code:'Confirmation Code', date:'Date', category:'Category', description:'Description',
     amount:'Amount', month:'Month', revenue:'Operating Revenue', cost:'Operating Expenses',
     profit:'Net Profit', occupancy:'Occupancy Rate', nights:'Booked Nights',
@@ -104,13 +104,23 @@
         [L.received,received],[L.remaining,remaining],
         [L.partial,'']
       ],[2]);
-      addSheet(workbook,L.bookings,[L.guest,L.platform,L.checkin,L.checkout,L.status,L.guestTotal,L.net,L.received,L.remaining,L.code],
+       const paymentState = b => {
+         const paid = amountReceived(b), total = safeNumber(b.guest_total);
+         if (paid === null || total === null) return currentLanguage === 'ar' ? 'غير مؤكد' : 'Not verified';
+         if (Math.round(paid*100) >= Math.round(total*100)) return currentLanguage === 'ar' ? 'مدفوع' : 'Paid';
+         if (paid > 0) return currentLanguage === 'ar' ? 'مدفوع جزئياً' : 'Partially paid';
+         return currentLanguage === 'ar' ? 'غير مدفوع' : 'Unpaid';
+       };
+       const payoutState = b => String(b.platform||'').toLowerCase()==='direct'
+         ? (currentLanguage==='ar' ? 'لا ينطبق' : 'Not applicable')
+         : (currentLanguage==='ar' ? 'غير مؤكد' : 'Not verified');
+       addSheet(workbook,L.bookings,[L.guest,L.platform,L.checkin,L.checkout,L.status,L.original,L.discount,L.guestTotal,L.net,L.received,L.remaining,L.guestStatus,L.payoutStatus,L.code],
         chosenBookings.map(b=>[b.guest_name||'',b.platform||'',excelDate(b.check_in),excelDate(b.check_out),b.status||'',
-          overviewGuestTotal(b) ?? '',safeNumber(b.amount) ?? '',amountReceived(b) ?? '',outstandingBalance(b) ?? '',b.confirmation_code||'']),
-        [6,7,8,9],[3,4]);
-      addSheet(workbook,L.finances,[L.guest,L.platform,L.checkin,L.net,L.received,L.remaining],
-        chosenActive.map(b=>[b.guest_name||'',b.platform||'',excelDate(b.check_in),safeNumber(b.amount) ?? '',
-          amountReceived(b) ?? '',outstandingBalance(b) ?? '']),[4,5,6],[3]);
+           safeNumber(b.original_price) ?? '',safeNumber(b.discount_amount) ?? '',overviewGuestTotal(b) ?? '',safeNumber(b.amount) ?? '',amountReceived(b) ?? '',outstandingBalance(b) ?? '',paymentState(b),payoutState(b),b.confirmation_code||'']),
+         [6,7,8,9,10,11],[3,4]);
+       addSheet(workbook,L.finances,[L.guest,L.platform,L.checkin,L.original,L.discount,L.guestTotal,L.net,L.received,L.remaining,L.guestStatus,L.payoutStatus],
+        chosenActive.map(b=>[b.guest_name||'',b.platform||'',excelDate(b.check_in),safeNumber(b.original_price) ?? '',safeNumber(b.discount_amount) ?? '',overviewGuestTotal(b) ?? '',safeNumber(b.amount) ?? '',
+          amountReceived(b) ?? '',outstandingBalance(b) ?? '',paymentState(b),payoutState(b)]),[4,5,6,7,8,9],[3]);
       addSheet(workbook,L.expenses,[L.date,L.category,L.description,L.amount],
         chosenExpenses.map(e=>[excelDate(e.expense_date),e.category||'',e.description||'',safeNumber(e.amount) ?? '']),[4],[1]);
       addSheet(workbook,L.monthly,[L.month,L.revenue,L.cost,L.profit,L.occupancy,L.count,L.nights],

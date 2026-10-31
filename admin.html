@@ -714,10 +714,15 @@
 
           <label>
             <span data-i18n="totalBookingAmount">
-              Total Booking Amount (SAR)
+              Booking amount after discount (SAR) / قيمة الحجز بعد الخصم
             </span>
             <input id="manual-total" type="number"
               min="0" step="0.01" required>
+          </label>
+
+          <label>
+            <span>Discount / الخصم (SAR)</span>
+            <input id="manual-discount" type="number" min="0" step="0.01" value="0" required>
           </label>
 
           <label>

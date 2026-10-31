@@ -1794,6 +1794,21 @@ function showBreakdown(index) {
     );
 
     const balance = outstandingBalance(booking);
+    const guestPaid = amountReceived(booking);
+    const guestTotal = safeNumber(booking.guest_total);
+    const guestPaymentLabel = guestPaid === null || guestTotal === null
+      ? editBookingLabel("Not verified", "غير مؤكد")
+      : cents(guestPaid) >= cents(guestTotal)
+        ? editBookingLabel("Paid", "مدفوع")
+        : cents(guestPaid) > 0
+          ? editBookingLabel("Partially paid", "مدفوع جزئياً")
+          : editBookingLabel("Unpaid", "غير مدفوع");
+    addBreakdownHeading(editBookingLabel("Guest payment", "دفع الضيف"));
+    addBreakdownTextRow(editBookingLabel("Guest payment status", "حالة دفع الضيف"), guestPaymentLabel);
+    addBreakdownTextRow(editBookingLabel("Host payout status", "حالة تحويل مستحقات المضيف"),
+      String(booking.platform || "").toLowerCase() === "direct"
+        ? editBookingLabel("Not applicable (Direct)", "لا ينطبق (حجز مباشر)")
+        : editBookingLabel("Not verified — check platform/bank", "غير مؤكد — يرجى مراجعة المنصة أو البنك"));
 
     if (balance !== null) {
       addBreakdownHeading(t("paymentDetails"));
@@ -3009,7 +3024,7 @@ function openGathernFinancialEdit(id) {
   const b = bookings.find(item => String(item.id) === String(id));
   if (!b || String(b.platform || "").toLowerCase() !== "gathern" || cancelledBooking(b)) return;
   gathernFinancialId = b.id;
-  $("gathern-financial-heading").textContent = gathernFinancialText("Edit Gathern Financials", "تعديل مالية حجز جاذر إن");
+  $("gathern-financial-heading").textContent = gathernFinancialText("Edit Gathern Financials (Guest Paid ≠ Host Payout)", "تعديل مالية جاذر إن (دفع الضيف لا يعني استلام المستحقات)");
   $("gathern-financial-subtitle").textContent = `${b.guest_name || ""} · ${b.confirmation_code || ""}`;
   for (const field of gathernFinancialFields) {
     const input = $("gathern-financial-" + field);
@@ -3237,6 +3252,7 @@ $("add-booking-form")?.addEventListener(
     const checkOut = $("manual-check-out").value;
 
     const total = Number($("manual-total").value);
+    const discount = Number($("manual-discount").value);
     const commission = Number(
       $("manual-commission").value
     );
@@ -3267,6 +3283,8 @@ $("add-booking-form")?.addEventListener(
     if (
       !Number.isFinite(total) ||
       !Number.isFinite(commission) ||
+      !Number.isFinite(discount) ||
+      discount < 0 ||
       !Number.isFinite(received) ||
       total < 0 ||
       commission < 0 ||
@@ -3316,8 +3334,8 @@ $("add-booking-form")?.addEventListener(
       check_out: checkOut,
       status: "confirmed",
 
-      original_price: total,
-      discount_amount: 0,
+      original_price: (cents(total) + cents(discount)) / 100,
+      discount_amount: cents(discount) / 100,
       accommodation_total: total,
       guest_total: total,
 
