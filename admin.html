@@ -438,6 +438,7 @@
   data-i18n="addExpense">
   + Add Expense
 </button>
+<button type="button" id="open-emergency-expense" class="primary-btn" style="margin-inline-start:8px">+ Emergency Expense</button>
 
         </div>
 
@@ -893,11 +894,14 @@
           <span data-i18n="category">Category</span>
           <select id="expense-category" required>
             <option value="Cleaning">Cleaning</option>
+            <option value="WiFi">WiFi</option>
+            <option value="Electricity">Electricity</option>
             <option value="Maintenance">Maintenance</option>
-            <option value="Utilities">Utilities</option>
             <option value="Supplies">Supplies</option>
             <option value="Pest Control">Pest Control</option>
             <option value="Other">Other</option>
+            <option value="Emergency">Emergency</option>
+            <option value="Utilities">Utilities (legacy)</option>
           </select>
         </label>
 
@@ -983,7 +987,7 @@
     </form>
   </dialog>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <script src="admin.js?v=20261101-yearly-tracker"></script>
+  <script src="admin.js?v=20261101-category-options-fix"></script>
   <script src="https://cdn.jsdelivr.net/npm/exceljs@4.4.0/dist/exceljs.min.js"></script>
   <script src="export-excel.js?v=2"></script>
 
