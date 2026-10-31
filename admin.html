@@ -351,18 +351,14 @@
 
         <div class="table-wrapper">
           <table class="bookings-table">
-            <thead>
-              <tr>
-                <th data-i18n="guest">Guest</th>
-                <th data-i18n="platform">Platform</th>
-                <th data-i18n="checkIn">Check-in</th>
-                <th data-i18n="checkOut">Check-out</th>
-                <th data-i18n="status">Status</th>
-                <th id="guest-payment-column">Guest Payment Status</th>
-                <th data-i18n="hostEarnings">Host Earnings</th>
-                <th data-i18n="details">Details</th>
-              </tr>
-            </thead>
+            <thead><tr>
+              <th data-i18n="guest">Guest</th>
+              <th id="simple-dates-head">Dates</th>
+              <th data-i18n="platform">Platform</th>
+              <th id="guest-payment-column">Payment</th>
+              <th data-i18n="hostEarnings">Earnings (SAR)</th>
+              <th aria-label="Open booking"></th>
+            </tr></thead>
             <tbody id="bookings-table-body"></tbody>
           </table>
         </div>
@@ -796,7 +792,12 @@
           aria-label="Close">×</button>
       </div>
 
+      <div class="os-detail-tabs" role="tablist" aria-label="Booking details sections">
+        <button type="button" id="os-detail-booking-tab" class="os-tab-active" role="tab" aria-selected="true">Booking</button>
+        <button type="button" id="os-detail-payment-tab" role="tab" aria-selected="false">Payments</button>
+      </div>
       <div id="breakdown-content"></div>
+      <div id="os-detail-payment-panel" hidden></div>
 
       <button type="button" id="open-payment-correction" hidden>Edit payment</button>
       <p id="payment-correction-message" role="status"></p>
