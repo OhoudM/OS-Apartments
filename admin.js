@@ -2370,6 +2370,44 @@ function monthlyBookingDetails(monthKey) {
    ANNUAL BUDGET COVERAGE
    ===================================================== */
 
+function renderTrackedFunds(year) {
+  const ar = currentLanguage === "ar";
+  // Count only platform payouts explicitly recorded as received, and recorded
+  // direct guest payments. Do not mistake guest OTA payments for host income.
+  const received = activeBookings().reduce((sum, b) => {
+    const isDirect = String(b.platform || "").trim().toLowerCase() === "direct";
+    if (isDirect) {
+      const date = String(b.check_in || "");
+      const amount = amountReceived(b);
+      return sum + (date.startsWith(`${year}-`) && amount !== null ? Math.max(0, amount) : 0);
+    }
+    const payoutDate = String(b.host_payout_date || "");
+    const payout = safeNumber(b.host_payout_received);
+    const state = osPayoutState(b);
+    return sum + (payoutDate.startsWith(`${year}-`) &&
+      ["received", "partially_received"].includes(state) && payout !== null
+      ? Math.max(0, payout) : 0);
+  }, 0);
+  const spent = expenses.reduce((sum, e) =>
+    sum + (String(e.expense_date || "").startsWith(`${year}-`) ? (Number(e.amount) || 0) : 0), 0);
+  const balance = received - spent;
+  setText("os-funds-label", ar ? "الأموال المتاحة · حسب السجلات" : "Available Funds · Tracked");
+  setText("os-funds-total", money(balance));
+  setText("os-funds-note", ar ? "المبالغ المستلمة المسجلة − المصروفات المسجلة. ليس رصيداً بنكياً مباشراً." : "Recorded money received − recorded expenses. Not a live bank balance.");
+  setText("os-received-label", ar ? "المبالغ المستلمة" : "Money Received");
+  setText("os-received-total", money(received));
+  setText("os-received-note", ar ? "تحويلات المنصات المسجلة والمدفوعات المباشرة" : "Recorded platform payouts and direct payments");
+  setText("os-spent-label", ar ? "المصروفات المسجلة" : "Recorded Expenses");
+  setText("os-spent-total", money(spent));
+  setText("os-spent-note", ar ? "تُخصم عند تسجيل المصروف" : "Automatically deducted when an expense is recorded");
+  setText("os-budget-title", ar ? "تغطية الميزانية السنوية" : "Annual Budget Coverage");
+  setText("os-budget-subtitle", ar ? "التقدم نحو الميزانية السنوية وفق الأرباح المسجلة" : "Progress toward your annual target based on recorded earnings");
+  setText("os-budget-year", year);
+  setText("os-budget-breakdown-label", ar ? "تفاصيل الميزانية السنوية" : "Annual budget breakdown");
+  const funds = $("os-funds-total");
+  funds?.classList.toggle("os-funds-negative", balance < 0);
+}
+
 function renderAnnualCoverage(earningsMap) {
   const ANNUAL_BUDGET = 42000;
 
@@ -2395,6 +2433,9 @@ function renderAnnualCoverage(earningsMap) {
   );
 
   const isArabic = currentLanguage === "ar";
+  renderTrackedFunds(year);
+  setText("os-budget-earned", money(annualRevenue));
+  setText("os-budget-percent", `${covered.toFixed(1)}%`);
 
   // Signed annual budget balance: negative until annual revenue covers the target.
   const budgetBalance = annualRevenue - ANNUAL_BUDGET;
@@ -3806,8 +3847,6 @@ function translateReportLabels() {
     "report-expenses-label": "operatingExpenses",
     "report-profit-label": "netProfit",
     "monthly-occupancy-label": "occupancyRate",
-    "cost-coverage-title": "annualCostCoverage",
-    "cost-coverage-description": "annualCostCoverageDesc",
     "annual-budget-label": "annualBudget",
     "annual-rent-label": "annualRent",
     "annual-cleaning-label": "cleaningBudget",

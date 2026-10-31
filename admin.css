@@ -3300,3 +3300,35 @@ html:not([data-theme="dark"]) #tab-overview .stat-card.clickable-card {
 /* Small, clear return navigation for payment editors. */
 .os-return-details { display: inline-flex; align-items: center; margin: 0 0 18px; padding: 8px 0; border: 0; background: transparent; color: var(--text-secondary, #c5c7c1); font: inherit; font-size: 0.9rem; cursor: pointer; text-align: start; }
 .os-return-details:hover { color: var(--text-primary, #fff); text-decoration: underline; }
+
+/* Apartment Financial Overview — scoped to the combined annual section */
+.os-overview-panel { display: grid; gap: 22px; }
+.os-funds-feature { background: linear-gradient(125deg,#303b30,#29312a); border: 1px solid #596d53; border-radius: 18px; padding: 27px 30px; }
+.os-funds-heading { color: #c4d6bd; font-size: 15px; font-weight: 650; }
+.os-funds-feature strong { display: block; font-size: clamp(30px,3vw,43px); color: #f5f8f3; margin: 12px 0 7px; }
+.os-funds-feature strong.os-funds-negative { color: #e8a4a1; }
+.os-funds-feature p { margin: 0; color: #c2cbbf; font-size: 13px; }
+.os-funds-summary { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 15px; }
+.os-funds-tile { background: #2b2d30; border: 1px solid #414448; border-radius: 15px; padding: 21px 24px; display: flex; flex-direction: column; gap: 9px; }
+.os-funds-tile span { color: #c6c8c8; font-size: 14px; }
+.os-funds-tile strong { color: #e7ece4; font-size: clamp(23px,2.4vw,32px); }
+.os-funds-tile small { color: #aeb2ad; line-height: 1.5; }
+.os-budget-section { border-top: 1px solid #414448; padding-top: 22px; }
+.os-budget-heading { display: flex; justify-content: space-between; align-items: flex-start; gap: 16px; }
+.os-budget-heading h3 { font-size: 19px; margin: 0 0 6px; }
+.os-budget-heading p { margin: 0; color: #afb3ae; font-size: 13px; }
+.os-budget-heading > span { border: 1px solid #464a48; border-radius: 10px; padding: 7px 12px; }
+.os-budget-main { display: flex; justify-content: space-between; align-items: baseline; gap: 15px; margin: 21px 0 14px; }
+.os-budget-main strong:first-child { font-size: clamp(23px,2.5vw,33px); }
+.os-budget-main strong:last-child { color: #b4c9a3; font-size: 22px; }
+.os-budget-section #annual-coverage-status, .os-budget-section #annual-coverage-details { color: #b8bdb7; font-size: 13px; margin: 9px 0; }
+.os-budget-breakdown { border-top: 1px solid #414448; margin-top: 22px; padding-top: 18px; }
+.os-budget-breakdown summary { cursor: pointer; font-weight: 650; padding: 6px 0; }
+.os-budget-items { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 12px; margin-top: 14px; }
+.os-budget-items > div { border: 1px solid #414448; border-radius: 12px; padding: 15px; display: flex; flex-direction: column; gap: 8px; }
+.os-budget-items span { color: #b7bab6; font-size: 13px; }
+.os-budget-items strong { font-size: 18px; }
+.os-budget-difference { margin-top: 14px; display: flex; flex-wrap: wrap; align-items: center; gap: 12px; color: #b8bbb7; }
+.os-budget-difference strong { color: #e4a3a0; }
+.os-budget-difference.budget-covered strong { color: #b4c9a3; }
+@media(max-width:650px) { .os-funds-summary,.os-budget-items { grid-template-columns: 1fr; } .os-funds-feature { padding: 22px; } }
