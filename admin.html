@@ -822,6 +822,25 @@
       </form>
     </dialog>
 
+    <!-- GATHERN FINANCIAL CORRECTION: booking sync fields stay unchanged -->
+    <dialog id="gathern-financial-dialog" class="admin-dialog">
+      <div class="dialog-header"><h2 id="gathern-financial-heading">Edit Gathern Financials</h2>
+      <button type="button" id="gathern-financial-close" aria-label="Close">×</button></div>
+      <p id="gathern-financial-subtitle"></p>
+      <p>Financial amounts only. Reservation dates, status and confirmation code are unchanged. Gathern sync may overwrite these amounts if it imports financial data later.</p>
+      <form id="gathern-financial-form"><div class="form-grid"><label><span>Original price / السعر الأصلي (SAR)</span><input id="gathern-financial-original_price" type="number" min="0" step="0.01" required></label>
+<label><span>Discount / الخصم (SAR)</span><input id="gathern-financial-discount_amount" type="number" min="0" step="0.01" required></label>
+<label><span>Accommodation total / إجمالي الإقامة (SAR)</span><input id="gathern-financial-accommodation_total" type="number" min="0" step="0.01" required></label>
+<label><span>Guest booking total / إجمالي الحجز (SAR)</span><input id="gathern-financial-guest_total" type="number" min="0" step="0.01" required></label>
+<label><span>Platform commission / عمولة المنصة (SAR)</span><input id="gathern-financial-platform_commission" type="number" min="0" step="0.01" required></label>
+<label><span>Commission VAT / VAT on commission / ضريبة العمولة والرسوم الأخرى (SAR)</span><input id="gathern-financial-other_fees" type="number" min="0" step="0.01" required></label>
+<label><span>Amount received / المبلغ المستلم (SAR)</span><input id="gathern-financial-original_guest_payment" type="number" min="0" step="0.01" required></label></div>
+      <p><strong>Estimated host earnings / صافي المستحق: <span id="gathern-financial-net">—</span></strong></p>
+      <p id="gathern-financial-error" role="alert"></p>
+      <div class="edit-booking-actions"><button type="button" id="gathern-financial-cancel">Cancel / إلغاء</button>
+      <button type="submit" class="primary-btn" id="gathern-financial-save">Save Financials / حفظ المالية</button></div>
+      </form></dialog>
+
     <!-- DIRECT BOOKING PAYMENT CORRECTION -->
     <dialog id="payment-correction-dialog" class="admin-dialog">
       <div class="dialog-header">
