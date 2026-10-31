@@ -433,11 +433,12 @@
             </p>
           </div>
           
+<div class="os-expense-top-actions"><button type="button" id="open-emergency-expense" class="os-emergency-btn">Emergency Expense</button>
 <button type="button" id="open-add-expense"
   class="primary-btn"
   data-i18n="addExpense">
   + Add Expense
-</button>
+</button></div>
 
         </div>
 
@@ -550,6 +551,12 @@
         <div class="os-yearly-budget-numbers"><span id="os-other-spent-label">Spent</span><b id="os-other-spent">—</b><span id="os-other-left-label">Remaining</span><b id="os-other-left">—</b></div>
         <div class="os-yearly-track"><div id="os-other-bar"></div></div>
       </div>
+    </div>
+    <div class="os-yearly-budget-card os-emergency-budget-card">
+      <div class="os-yearly-budget-top"><h3 id="os-emergency-title">Emergency Reserve</h3><strong>5,000 SAR</strong></div>
+      <div class="os-yearly-budget-numbers"><span id="os-emergency-spent-label">Used</span><b id="os-emergency-spent">—</b><span id="os-emergency-left-label">Remaining</span><b id="os-emergency-left">—</b></div>
+      <div class="os-yearly-track"><div id="os-emergency-bar"></div></div>
+      <p id="os-emergency-note" class="os-yearly-footnote">Separate reserve — not included in the 39,000 SAR annual operating budget.</p>
     </div>
     <div class="os-yearly-chart-card">
       <div class="os-yearly-chart-heading"><h3 id="os-categories-title">Expenses by Category</h3><span id="os-categories-note">Actual recorded expenses</span></div>
@@ -893,10 +900,13 @@
           <span data-i18n="category">Category</span>
           <select id="expense-category" required>
             <option value="Cleaning">Cleaning</option>
+            <option value="WiFi">WiFi</option>
+            <option value="Electricity">Electricity</option>
             <option value="Maintenance">Maintenance</option>
-            <option value="Utilities">Utilities</option>
             <option value="Supplies">Supplies</option>
             <option value="Other">Other</option>
+            <option value="Emergency">Emergency</option>
+            <option value="Utilities" hidden>Utilities (legacy)</option>
           </select>
         </label>
 

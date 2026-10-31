@@ -1021,6 +1021,24 @@ $("finance-month")?.addEventListener("change", event => {
   refreshFinanceMonth();
 });
 
+const OS_EXPENSE_LABELS = {
+  Cleaning: ["Cleaning", "التنظيف"], WiFi: ["WiFi", "الإنترنت"],
+  Electricity: ["Electricity", "الكهرباء"], Maintenance: ["Maintenance", "الصيانة"],
+  Supplies: ["Supplies", "المستلزمات"], Other: ["Other", "أخرى"],
+  Emergency: ["Emergency", "الطوارئ"], Utilities: ["Utilities (legacy)", "الخدمات (سابقاً)"]
+};
+function osExpenseLabel(value) {
+  const labels = OS_EXPENSE_LABELS[String(value || "").trim()];
+  return labels ? labels[currentLanguage === "ar" ? 1 : 0] : value;
+}
+function osTranslateExpenseOptions() {
+  const select = $("expense-category");
+  if (!select) return;
+  for (const option of select.options) option.textContent = osExpenseLabel(option.value);
+  const emergencyButton = $("open-emergency-expense");
+  if (emergencyButton) emergencyButton.textContent = currentLanguage === "ar" ? "+ مصروف طوارئ" : "+ Emergency Expense";
+}
+
 /* =========================================
    DISPLAY EXPENSES
    ========================================= */
@@ -1057,7 +1075,7 @@ function renderExpenses() {
 
     [
       expense.expense_date,
-      expense.category,
+      osExpenseLabel(expense.category),
       expense.description || "—",
       money(amount)
     ].forEach((value) => {
@@ -2379,21 +2397,36 @@ function renderYearlyExpenseTracker(year) {
   const otherBudget = 2000;
   const groups = [
     {key: "Cleaning", en: "Cleaning", ar: "التنظيف", amount: 0},
-    {key: "Utilities", en: "Electricity & Utilities", ar: "الكهرباء والخدمات", amount: 0},
+    {key: "Electricity", en: "Electricity", ar: "الكهرباء", amount: 0},
+    {key: "WiFi", en: "WiFi", ar: "الإنترنت", amount: 0},
+    {key: "Utilities", en: "Utilities (legacy)", ar: "الخدمات (سابقاً)", amount: 0},
     {key: "Maintenance", en: "Maintenance", ar: "الصيانة", amount: 0},
     {key: "Supplies", en: "Supplies", ar: "المستلزمات", amount: 0},
     {key: "Other", en: "Other", ar: "أخرى", amount: 0}
   ];
   let rentPaid = 0;
+  let emergencySpent = 0;
   expenses.forEach(e => {
     if (!String(e.expense_date || "").startsWith(`${year}-`)) return;
     const amount = Number(e.amount) || 0;
     const category = String(e.category || "").trim().toLowerCase();
     if (category === "rent") { rentPaid += amount; return; }
+    if (category === "emergency") { emergencySpent += amount; return; }
     const group = groups.find(g => g.key.toLowerCase() === category) || groups[4];
     group.amount += amount;
   });
   const cleaningSpent = groups[0].amount;
+  putEmergencyValues();
+  function putEmergencyValues() {
+    setText("os-emergency-title", currentLanguage === "ar" ? "احتياطي الطوارئ" : "Emergency Reserve");
+    setText("os-emergency-spent-label", currentLanguage === "ar" ? "المستخدم" : "Used");
+    setText("os-emergency-left-label", currentLanguage === "ar" ? "المتبقي" : "Remaining");
+    setText("os-emergency-note", currentLanguage === "ar" ? "احتياطي منفصل، غير مشمول في ميزانية التشغيل السنوية البالغة ٣٩٬٠٠٠ ريال." : "Separate reserve — not included in the 39,000 SAR annual operating budget.");
+    setText("os-emergency-spent", money(emergencySpent));
+    setText("os-emergency-left", money(5000-emergencySpent));
+    const bar = $("os-emergency-bar");
+    if (bar) { bar.style.width = `${Math.min(100,Math.max(0,emergencySpent/5000*100))}%`; bar.classList.toggle("os-over-budget",emergencySpent>5000); }
+  }
   const otherSpent = groups.slice(1).reduce((total,g) => total + g.amount,0);
   const put = (id,value) => setText(id,value);
   const labels = {
@@ -2429,8 +2462,8 @@ function renderYearlyExpenseTracker(year) {
   const container = $("os-category-bars");
   if (container) {
     container.replaceChildren();
-    const max = Math.max(1,...groups.map(g => g.amount));
-    groups.forEach(g => {
+    const max = Math.max(1,emergencySpent,...groups.map(g => g.amount));
+    [...groups, {key:"Emergency",en:"Emergency",ar:"الطوارئ",amount:emergencySpent}].forEach(g => {
       const row = document.createElement("div"); row.className="os-yearly-bar-row";
       const heading=document.createElement("div"); heading.className="os-yearly-bar-label";
       const name=document.createElement("span"); name.textContent=ar?g.ar:g.en;
@@ -3598,6 +3631,16 @@ $("record-payment-form")?.addEventListener(
    ADD OR EDIT EXPENSES
    ===================================================== */
 
+$("open-emergency-expense")?.addEventListener("click", () => {
+  editingExpenseId = null;
+  $("add-expense-form").reset();
+  $("expense-date").value = dateString(new Date());
+  $("expense-category").value = "Emergency";
+  setText("expense-message", "");
+  setText("save-expense", currentLanguage === "ar" ? "حفظ مصروف الطوارئ" : "Save Emergency Expense");
+  $("add-expense-dialog").showModal();
+});
+
 $("open-add-expense")?.addEventListener("click", () => {
   editingExpenseId = null;
 
@@ -3793,25 +3836,7 @@ function setLanguage(language) {
     }
   });
 
-  const expenseCategories = {
-    Cleaning: "cleaning",
-    Maintenance: "maintenance",
-    Utilities: "utilities",
-    Supplies: "supplies",
-    Other: "other"
-  };
-
-  const categorySelect = $("expense-category");
-
-  if (categorySelect) {
-    for (const option of categorySelect.options) {
-      const key = expenseCategories[option.value];
-
-      if (key && translations[currentLanguage]?.[key]) {
-        option.textContent = t(key);
-      }
-    }
-  }
+  osTranslateExpenseOptions();
 
   translateReportLabels();
   updateFinanceMonthOptions();
