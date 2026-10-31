@@ -7,7 +7,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="admin.css?v=13-finance">
+  <link rel="stylesheet" href="admin.css?v=20261101-yearly-tracker">
 </head>
 <body>
 
@@ -518,37 +518,39 @@
     </div>
   </section>
 
-  <!-- COMBINED FINANCIAL OVERVIEW: recorded receipts less recorded expenses -->
-  <section class="panel os-overview-panel">
+  <!-- Annual expense budget tracker; does not change booking earnings -->
+  <section class="panel os-yearly-tracker">
     <div class="section-header"><div>
-      <h2 id="cost-coverage-title">Apartment Financial Overview</h2>
-      <p id="cost-coverage-description">Money received, expenses and annual budget in one place</p>
-    </div></div>
-    <div class="os-funds-feature">
-      <div class="os-funds-heading" id="os-funds-label">Available Funds · Tracked</div>
-      <strong id="os-funds-total">—</strong>
-      <p id="os-funds-note">Recorded payments received − recorded expenses. Not a live bank balance.</p>
+      <h2 id="os-yearly-title">Annual Budget Overview</h2>
+      <p id="os-yearly-desc">Annual allocations, actual spending and remaining budgets</p>
+    </div><span class="os-year-tag" id="os-yearly-year">2026</span></div>
+    <div class="os-yearly-hero">
+      <span id="os-yearly-total-label">Total Annual Budget</span>
+      <strong>39,000 SAR</strong>
+      <small id="os-yearly-total-note">31,000 rent + 6,000 cleaning + 2,000 other expenses</small>
     </div>
-    <div class="os-funds-summary">
-      <div class="os-funds-tile"><span id="os-received-label">Money Received</span><strong id="os-received-total">—</strong><small id="os-received-note">Confirmed platform payouts and recorded direct payments</small></div>
-      <div class="os-funds-tile"><span id="os-spent-label">Recorded Expenses</span><strong id="os-spent-total">—</strong><small id="os-spent-note">Deducted automatically when an expense is recorded</small></div>
+    <div class="os-yearly-allocations">
+      <div><span id="os-rent-label">Annual Rent</span><strong>31,000 SAR</strong></div>
+      <div><span id="os-clean-alloc-label">Cleaning</span><strong>6,000 SAR</strong></div>
+      <div><span id="os-other-alloc-label">Other Expenses</span><strong>2,000 SAR</strong></div>
     </div>
-    <div class="os-budget-section">
-      <div class="os-budget-heading"><div><h3 id="os-budget-title">Annual Budget Coverage</h3><p id="os-budget-subtitle">Progress toward your annual operating target, based on recorded earnings</p></div><span id="os-budget-year"></span></div>
-      <div class="os-budget-main"><strong id="os-budget-earned">—</strong><strong id="os-budget-percent">—</strong></div>
-      <div class="report-progress-track" role="progressbar" aria-label="Annual cost coverage" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" id="annual-coverage-progress"><div id="annual-coverage-bar" class="report-progress-fill"></div></div>
-      <p id="annual-coverage-status" role="status"></p>
-      <p id="annual-coverage-details"></p>
-      <details class="os-budget-breakdown"><summary id="os-budget-breakdown-label">Annual budget breakdown</summary>
-        <div class="os-budget-items">
-          <div><span id="annual-budget-label">Annual Budget</span><strong>42,000 SAR</strong></div>
-          <div><span id="annual-rent-label">Annual Rent</span><strong>31,000 SAR</strong></div>
-          <div><span id="annual-cleaning-label">Cleaning Budget</span><strong>6,000 SAR</strong></div>
-          <div><span id="annual-reserve-label">Emergency Reserve</span><strong>5,000 SAR</strong></div>
-        </div>
-        <div class="os-budget-difference" id="annual-budget-balance-card"><span id="annual-budget-balance-label">Annual Budget Balance</span><strong id="annual-budget-balance">—</strong><small id="annual-budget-balance-note"></small></div>
-      </details>
+    <div class="os-yearly-budgets">
+      <div class="os-yearly-budget-card">
+        <div class="os-yearly-budget-top"><h3 id="os-clean-title">Cleaning Budget</h3><strong>6,000 SAR</strong></div>
+        <div class="os-yearly-budget-numbers"><span id="os-clean-spent-label">Spent</span><b id="os-clean-spent">—</b><span id="os-clean-left-label">Remaining</span><b id="os-clean-left">—</b></div>
+        <div class="os-yearly-track"><div id="os-clean-bar"></div></div>
+      </div>
+      <div class="os-yearly-budget-card">
+        <div class="os-yearly-budget-top"><h3 id="os-other-title">Other Expenses Budget</h3><strong>2,000 SAR</strong></div>
+        <div class="os-yearly-budget-numbers"><span id="os-other-spent-label">Spent</span><b id="os-other-spent">—</b><span id="os-other-left-label">Remaining</span><b id="os-other-left">—</b></div>
+        <div class="os-yearly-track"><div id="os-other-bar"></div></div>
+      </div>
     </div>
+    <div class="os-yearly-chart-card">
+      <div class="os-yearly-chart-heading"><h3 id="os-categories-title">Expenses by Category</h3><span id="os-categories-note">Actual recorded expenses</span></div>
+      <div id="os-category-bars" class="os-yearly-bars"></div>
+    </div>
+    <p class="os-yearly-footnote" id="os-yearly-footnote">Budgets are planned allocations. Only recorded expenses reduce remaining budgets. Rent is tracked separately.</p>
   </section>
 
   <!-- MONTHLY BOOKING DETAILS -->
@@ -975,7 +977,7 @@
     </form>
   </dialog>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <script src="admin.js?v=13-finance"></script>
+  <script src="admin.js?v=20261101-yearly-tracker"></script>
   <script src="https://cdn.jsdelivr.net/npm/exceljs@4.4.0/dist/exceljs.min.js"></script>
   <script src="export-excel.js?v=2"></script>
 

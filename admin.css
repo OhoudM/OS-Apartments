@@ -3332,3 +3332,71 @@ html:not([data-theme="dark"]) #tab-overview .stat-card.clickable-card {
 .os-budget-difference strong { color: #e4a3a0; }
 .os-budget-difference.budget-covered strong { color: #b4c9a3; }
 @media(max-width:650px) { .os-funds-summary,.os-budget-items { grid-template-columns: 1fr; } .os-funds-feature { padding: 22px; } }
+
+/* Financial overview: accessible contrast in light and dark themes */
+.os-overview-panel .os-funds-feature { background: #e8eee4; border-color: #b6c5ae; }
+.os-overview-panel .os-funds-heading { color: #344c35; }
+.os-overview-panel .os-funds-feature strong { color: #1e3628; }
+.os-overview-panel .os-funds-feature strong.os-funds-negative { color: #a33236; }
+.os-overview-panel .os-funds-feature p { color: #425345; }
+.os-overview-panel .os-funds-tile { background: #f5f5f0; border-color: #d6dbd0; }
+.os-overview-panel .os-funds-tile span, .os-overview-panel .os-funds-tile small { color: #4d584c; }
+.os-overview-panel .os-funds-tile strong { color: #263a2b; }
+.os-overview-panel .os-budget-section { border-color: #d8ddd3; }
+.os-overview-panel .os-budget-heading h3, .os-overview-panel .os-budget-main strong:first-child { color: #273327; }
+.os-overview-panel .os-budget-heading p, .os-overview-panel #annual-coverage-status, .os-overview-panel #annual-coverage-details { color: #4e5b4c; }
+.os-overview-panel .os-budget-main strong:last-child { color: #49643b; }
+.os-overview-panel .os-budget-heading > span, .os-overview-panel .os-budget-breakdown, .os-overview-panel .os-budget-items > div { border-color: #d6dbd0; }
+.os-overview-panel .os-budget-items span, .os-overview-panel .os-budget-difference { color: #4c574b; }
+.os-overview-panel .os-budget-difference strong { color: #a33236; }
+.os-overview-panel .os-budget-difference.budget-covered strong { color: #28663d; }
+.os-funds-breakdown { border-top: 1px solid #d6dbd0; margin-top: 7px; padding-top: 12px; display: grid; grid-template-columns: minmax(0,1fr) auto; gap: 9px 12px; align-items: center; font-size: 13px; }
+.os-overview-panel .os-funds-breakdown b { color: #263a2b; font-size: 13px; text-align: end; }
+html[data-theme="dark"] .os-overview-panel .os-funds-feature { background: #303b30; border-color: #596d53; }
+html[data-theme="dark"] .os-overview-panel .os-funds-heading { color: #c4d6bd; }
+html[data-theme="dark"] .os-overview-panel .os-funds-feature strong { color: #f5f8f3; }
+html[data-theme="dark"] .os-overview-panel .os-funds-feature strong.os-funds-negative { color: #e8a4a1; }
+html[data-theme="dark"] .os-overview-panel .os-funds-feature p { color: #c2cbbf; }
+html[data-theme="dark"] .os-overview-panel .os-funds-tile { background: #2b2d30; border-color: #414448; }
+html[data-theme="dark"] .os-overview-panel .os-funds-tile span, html[data-theme="dark"] .os-overview-panel .os-funds-tile small { color: #c6c8c8; }
+html[data-theme="dark"] .os-overview-panel .os-funds-tile strong, html[data-theme="dark"] .os-overview-panel .os-funds-breakdown b { color: #e7ece4; }
+html[data-theme="dark"] .os-overview-panel .os-budget-section, html[data-theme="dark"] .os-overview-panel .os-budget-breakdown, html[data-theme="dark"] .os-overview-panel .os-budget-items > div, html[data-theme="dark"] .os-overview-panel .os-budget-heading > span { border-color: #414448; }
+html[data-theme="dark"] .os-overview-panel .os-budget-heading h3, html[data-theme="dark"] .os-overview-panel .os-budget-main strong:first-child { color: #f2f4ef; }
+html[data-theme="dark"] .os-overview-panel .os-budget-heading p, html[data-theme="dark"] .os-overview-panel #annual-coverage-status, html[data-theme="dark"] .os-overview-panel #annual-coverage-details, html[data-theme="dark"] .os-overview-panel .os-budget-items span, html[data-theme="dark"] .os-overview-panel .os-budget-difference { color: #c3c9c0; }
+html[data-theme="dark"] .os-overview-panel .os-budget-main strong:last-child { color: #b4c9a3; }
+html[data-theme="dark"] .os-overview-panel .os-budget-difference strong { color: #e4a3a0; }
+html[data-theme="dark"] .os-overview-panel .os-budget-difference.budget-covered strong { color: #b4c9a3; }
+html[data-theme="dark"] .os-funds-breakdown { border-color: #414448; }
+
+/* Compact annual budget tracker, isolated from booking/payment UI */
+.os-yearly-tracker { display:grid; gap:20px; }
+.os-year-tag { padding:7px 12px; border:1px solid var(--border-color,#d8ded5); border-radius:9px; font-weight:600; }
+.os-yearly-hero { background:#2d3c30; color:#fff; border-radius:17px; padding:25px 28px; display:grid; gap:9px; }
+.os-yearly-hero span { color:#d6e4d1; font-size:14px; }
+.os-yearly-hero strong { font-size:clamp(29px,3.5vw,41px); color:#fff; }
+.os-yearly-hero small { color:#d5dfd0; font-size:13px; }
+.os-yearly-allocations { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:12px; }
+.os-yearly-allocations>div,.os-yearly-budget-card,.os-yearly-chart-card { background:#fff; border:1px solid #dce3da; border-radius:14px; padding:18px; }
+.os-yearly-allocations>div { display:grid; gap:9px; }
+.os-yearly-allocations span,.os-yearly-budget-numbers span { color:#526353; font-size:13px; }
+.os-yearly-allocations strong { color:#25392a; font-size:20px; }
+.os-yearly-budgets { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:14px; }
+.os-yearly-budget-top,.os-yearly-bar-label { display:flex; justify-content:space-between; gap:12px; align-items:center; }
+.os-yearly-budget-top h3,.os-yearly-chart-heading h3 { margin:0; font-size:17px; color:#27392b; }
+.os-yearly-budget-top strong,.os-yearly-bar-label strong { color:#304832; }
+.os-yearly-budget-numbers { display:grid; grid-template-columns:1fr auto; gap:10px; margin:18px 0; }
+.os-yearly-budget-numbers b { color:#25392a; text-align:end; }
+.os-yearly-track { height:9px; border-radius:99px; background:#e8eee6; overflow:hidden; }
+.os-yearly-track>div { height:100%; width:0; border-radius:99px; background:#829c77; transition:width .25s ease; }
+.os-yearly-track>div.os-over-budget { background:#bc6b5c; }
+.os-yearly-chart-heading { display:flex; justify-content:space-between; gap:12px; align-items:baseline; margin-bottom:18px; }
+.os-yearly-chart-heading span,.os-yearly-footnote { color:#536355; font-size:13px; }
+.os-yearly-bars { display:grid; gap:15px; }
+.os-yearly-bar-row { display:grid; gap:7px; }
+.os-yearly-bar-label { font-size:13px; color:#344a37; }
+.os-yearly-footnote { margin:0; }
+html[data-theme="dark"] .os-yearly-allocations>div,html[data-theme="dark"] .os-yearly-budget-card,html[data-theme="dark"] .os-yearly-chart-card { background:#292d2b; border-color:#414b41; }
+html[data-theme="dark"] .os-yearly-allocations span,html[data-theme="dark"] .os-yearly-budget-numbers span,html[data-theme="dark"] .os-yearly-chart-heading span,html[data-theme="dark"] .os-yearly-footnote { color:#c5d0c4; }
+html[data-theme="dark"] .os-yearly-allocations strong,html[data-theme="dark"] .os-yearly-budget-top h3,html[data-theme="dark"] .os-yearly-budget-top strong,html[data-theme="dark"] .os-yearly-chart-heading h3,html[data-theme="dark"] .os-yearly-budget-numbers b,html[data-theme="dark"] .os-yearly-bar-label,html[data-theme="dark"] .os-yearly-bar-label strong { color:#f1f5ef; }
+html[data-theme="dark"] .os-yearly-track { background:#414c41; }
+@media(max-width:700px) { .os-yearly-budgets { grid-template-columns:1fr; } .os-yearly-allocations { grid-template-columns:1fr; } .os-yearly-chart-heading { flex-direction:column; } }

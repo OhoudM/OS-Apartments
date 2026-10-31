@@ -243,8 +243,8 @@ const translations = {
     operatingExpenses: "Operating Expenses",
     netProfit: "Net Profit",
     occupancyRate: "Occupancy Rate",
-    annualCostCoverage: "Annual Cost Coverage",
-    annualCostCoverageDesc: "Track progress toward your annual operating budget",
+    annualCostCoverage: "Apartment Financial Overview",
+    annualCostCoverageDesc: "Money received, expenses, and annual budget in one place",
     annualBudget: "Annual Budget",
     annualRent: "Annual Rent",
     cleaningBudget: "Cleaning Budget",
@@ -495,8 +495,8 @@ const translations = {
     operatingExpenses: "المصاريف التشغيلية",
     netProfit: "صافي الربح",
     occupancyRate: "نسبة الإشغال",
-    annualCostCoverage: "تغطية التكاليف السنوية",
-    annualCostCoverageDesc: "متابعة التقدم نحو تغطية الميزانية التشغيلية السنوية",
+    annualCostCoverage: "الملخص المالي للشقة",
+    annualCostCoverageDesc: "المبالغ المستلمة والمصروفات والميزانية السنوية في مكان واحد",
     annualBudget: "الميزانية السنوية",
     annualRent: "الإيجار السنوي",
     cleaningBudget: "ميزانية النظافة",
@@ -2263,12 +2263,15 @@ function reportMonthOptions() {
 
   if (
     !selectedReportMonth ||
-    !months.has(selectedReportMonth)
+    (selectedReportMonth !== "all" && !months.has(selectedReportMonth))
   ) {
     selectedReportMonth = currentKey;
   }
 
   select.replaceChildren();
+  const allOption = createElement("option", "", currentLanguage === "ar" ? "كل الفترات" : "All time");
+  allOption.value = "all";
+  select.append(allOption);
 
   sorted.forEach((key) => {
     const [year, month] = key.split("-").map(Number);
@@ -2370,123 +2373,79 @@ function monthlyBookingDetails(monthKey) {
    ANNUAL BUDGET COVERAGE
    ===================================================== */
 
-function renderTrackedFunds(year) {
+function renderYearlyExpenseTracker(year) {
   const ar = currentLanguage === "ar";
-  // Count only platform payouts explicitly recorded as received, and recorded
-  // direct guest payments. Do not mistake guest OTA payments for host income.
-  const received = activeBookings().reduce((sum, b) => {
-    const isDirect = String(b.platform || "").trim().toLowerCase() === "direct";
-    if (isDirect) {
-      const date = String(b.check_in || "");
-      const amount = amountReceived(b);
-      return sum + (date.startsWith(`${year}-`) && amount !== null ? Math.max(0, amount) : 0);
-    }
-    const payoutDate = String(b.host_payout_date || "");
-    const payout = safeNumber(b.host_payout_received);
-    const state = osPayoutState(b);
-    return sum + (payoutDate.startsWith(`${year}-`) &&
-      ["received", "partially_received"].includes(state) && payout !== null
-      ? Math.max(0, payout) : 0);
-  }, 0);
-  const spent = expenses.reduce((sum, e) =>
-    sum + (String(e.expense_date || "").startsWith(`${year}-`) ? (Number(e.amount) || 0) : 0), 0);
-  const balance = received - spent;
-  setText("os-funds-label", ar ? "الأموال المتاحة · حسب السجلات" : "Available Funds · Tracked");
-  setText("os-funds-total", money(balance));
-  setText("os-funds-note", ar ? "المبالغ المستلمة المسجلة − المصروفات المسجلة. ليس رصيداً بنكياً مباشراً." : "Recorded money received − recorded expenses. Not a live bank balance.");
-  setText("os-received-label", ar ? "المبالغ المستلمة" : "Money Received");
-  setText("os-received-total", money(received));
-  setText("os-received-note", ar ? "تحويلات المنصات المسجلة والمدفوعات المباشرة" : "Recorded platform payouts and direct payments");
-  setText("os-spent-label", ar ? "المصروفات المسجلة" : "Recorded Expenses");
-  setText("os-spent-total", money(spent));
-  setText("os-spent-note", ar ? "تُخصم عند تسجيل المصروف" : "Automatically deducted when an expense is recorded");
-  setText("os-budget-title", ar ? "تغطية الميزانية السنوية" : "Annual Budget Coverage");
-  setText("os-budget-subtitle", ar ? "التقدم نحو الميزانية السنوية وفق الأرباح المسجلة" : "Progress toward your annual target based on recorded earnings");
-  setText("os-budget-year", year);
-  setText("os-budget-breakdown-label", ar ? "تفاصيل الميزانية السنوية" : "Annual budget breakdown");
-  const funds = $("os-funds-total");
-  funds?.classList.toggle("os-funds-negative", balance < 0);
+  const cleaningBudget = 6000;
+  const otherBudget = 2000;
+  const groups = [
+    {key: "Cleaning", en: "Cleaning", ar: "التنظيف", amount: 0},
+    {key: "Utilities", en: "Electricity & Utilities", ar: "الكهرباء والخدمات", amount: 0},
+    {key: "Maintenance", en: "Maintenance", ar: "الصيانة", amount: 0},
+    {key: "Supplies", en: "Supplies", ar: "المستلزمات", amount: 0},
+    {key: "Other", en: "Other", ar: "أخرى", amount: 0}
+  ];
+  let rentPaid = 0;
+  expenses.forEach(e => {
+    if (!String(e.expense_date || "").startsWith(`${year}-`)) return;
+    const amount = Number(e.amount) || 0;
+    const category = String(e.category || "").trim().toLowerCase();
+    if (category === "rent") { rentPaid += amount; return; }
+    const group = groups.find(g => g.key.toLowerCase() === category) || groups[4];
+    group.amount += amount;
+  });
+  const cleaningSpent = groups[0].amount;
+  const otherSpent = groups.slice(1).reduce((total,g) => total + g.amount,0);
+  const put = (id,value) => setText(id,value);
+  const labels = {
+    "os-yearly-title": ["Annual Budget Overview","نظرة عامة على الميزانية السنوية"],
+    "os-yearly-desc": ["Annual allocations, actual spending and remaining budgets","المخصصات السنوية والمصروفات الفعلية والمبالغ المتبقية"],
+    "os-yearly-total-label": ["Total Annual Budget","إجمالي الميزانية السنوية"],
+    "os-yearly-total-note": ["31,000 rent + 6,000 cleaning + 2,000 other expenses","٣١٬٠٠٠ إيجار + ٦٬٠٠٠ تنظيف + ٢٬٠٠٠ مصروفات أخرى"],
+    "os-rent-label": ["Annual Rent","الإيجار السنوي"],
+    "os-clean-alloc-label": ["Cleaning","التنظيف"],
+    "os-other-alloc-label": ["Other Expenses","مصروفات أخرى"],
+    "os-clean-title": ["Cleaning Budget","ميزانية التنظيف"],
+    "os-other-title": ["Other Expenses Budget","ميزانية المصروفات الأخرى"],
+    "os-clean-spent-label": ["Spent","المصروف"],
+    "os-other-spent-label": ["Spent","المصروف"],
+    "os-clean-left-label": ["Remaining","المتبقي"],
+    "os-other-left-label": ["Remaining","المتبقي"],
+    "os-categories-title": ["Expenses by Category","المصروفات حسب الفئة"],
+    "os-categories-note": ["Actual recorded expenses","المصروفات المسجلة فعلياً"],
+    "os-yearly-footnote": ["Budget allocations are not expenses. Only recorded spending reduces the remaining budget. Annual rent is separate.","المخصصات ليست مصروفات فعلية. تُخصم المصروفات المسجلة فقط من المتبقي، والإيجار السنوي منفصل."]
+  };
+  Object.entries(labels).forEach(([id,v]) => put(id,v[ar ? 1 : 0]));
+  put("os-yearly-year",String(year));
+  put("os-clean-spent",money(cleaningSpent));
+  put("os-other-spent",money(otherSpent));
+  put("os-clean-left",money(cleaningBudget-cleaningSpent));
+  put("os-other-left",money(otherBudget-otherSpent));
+  const setBar = (id,spent,budget) => {
+    const bar = $(id);
+    if (bar) { bar.style.width = `${Math.min(100,Math.max(0,spent/budget*100))}%`; bar.classList.toggle("os-over-budget",spent>budget); }
+  };
+  setBar("os-clean-bar",cleaningSpent,cleaningBudget);
+  setBar("os-other-bar",otherSpent,otherBudget);
+  const container = $("os-category-bars");
+  if (container) {
+    container.replaceChildren();
+    const max = Math.max(1,...groups.map(g => g.amount));
+    groups.forEach(g => {
+      const row = document.createElement("div"); row.className="os-yearly-bar-row";
+      const heading=document.createElement("div"); heading.className="os-yearly-bar-label";
+      const name=document.createElement("span"); name.textContent=ar?g.ar:g.en;
+      const value=document.createElement("strong"); value.textContent=money(g.amount);
+      heading.append(name,value);
+      const track=document.createElement("div"); track.className="os-yearly-track";
+      const fill=document.createElement("div"); fill.style.width=`${Math.max(0,g.amount/max*100)}%`;
+      track.append(fill); row.append(heading,track); container.append(row);
+    });
+  }
 }
 
 function renderAnnualCoverage(earningsMap) {
-  const ANNUAL_BUDGET = 42000;
-
-  const year = Number(selectedReportMonth.slice(0, 4));
-
-  const annualRevenue = [...earningsMap.entries()]
-    .filter(([key]) => key.startsWith(`${year}-`))
-    .reduce((sum, [, amount]) => sum + amount, 0);
-
-  const covered = Math.min(
-    100,
-    Math.max(0, annualRevenue / ANNUAL_BUDGET * 100)
-  );
-
-  const remaining = Math.max(
-    0,
-    ANNUAL_BUDGET - annualRevenue
-  );
-
-  const surplus = Math.max(
-    0,
-    annualRevenue - ANNUAL_BUDGET
-  );
-
-  const isArabic = currentLanguage === "ar";
-  renderTrackedFunds(year);
-  setText("os-budget-earned", money(annualRevenue));
-  setText("os-budget-percent", `${covered.toFixed(1)}%`);
-
-  // Signed annual budget balance: negative until annual revenue covers the target.
-  const budgetBalance = annualRevenue - ANNUAL_BUDGET;
-  const budgetBalanceCard = $("annual-budget-balance-card");
-  setText(
-    "annual-budget-balance-label",
-    isArabic ? "رصيد الميزانية السنوية" : "Annual Budget Balance"
-  );
-  setText(
-    "annual-budget-balance",
-    `${budgetBalance < 0 ? "−" : budgetBalance > 0 ? "+" : ""}${money(Math.abs(budgetBalance))}`
-  );
-  setText(
-    "annual-budget-balance-note",
-    budgetBalance < 0
-      ? (isArabic ? "لم تتم تغطية الميزانية بعد" : "Budget not yet covered")
-      : (isArabic ? "تمت تغطية الميزانية" : "Annual budget covered")
-  );
-  if (budgetBalanceCard) {
-    budgetBalanceCard.classList.toggle("budget-below", budgetBalance < 0);
-    budgetBalanceCard.classList.toggle("budget-covered", budgetBalance >= 0);
-  }
-
-  setText(
-    "annual-coverage-status",
-    isArabic
-      ? `تغطية الميزانية السنوية ${year}: ${covered.toFixed(1)}%`
-      : `Annual budget coverage ${year}: ${covered.toFixed(1)}%`
-  );
-
-  setText(
-    "annual-coverage-details",
-    remaining > 0
-      ? (isArabic
-          ? `المتبقي للوصول للميزانية: ${money(remaining)}`
-          : `Remaining to budget target: ${money(remaining)}`)
-      : (isArabic
-          ? `تجاوز الإيرادات للميزانية: ${money(surplus)}`
-          : `Revenue above budget target: ${money(surplus)}`)
-  );
-
-  const bar = $("annual-coverage-bar");
-
-  if (bar) {
-    bar.style.width = `${covered}%`;
-  }
-
-  $("annual-coverage-progress")?.setAttribute(
-    "aria-valuenow",
-    covered.toFixed(1)
-  );
+  const year = selectedReportMonth === "all" ? new Date().getFullYear() : Number(selectedReportMonth.slice(0, 4));
+  renderYearlyExpenseTracker(year);
 }
 
 /* =====================================================
@@ -2501,22 +2460,38 @@ function renderReports() {
 
   const month = selectedReportMonth;
 
-  const revenue = earningsMap.get(month) || 0;
-  const expenseTotal = expenseMap.get(month) || 0;
+  const isAllTime = month === "all";
+  const revenue = isAllTime ? [...earningsMap.values()].reduce((a,b)=>a+b,0) : (earningsMap.get(month) || 0);
+  const expenseTotal = isAllTime ? [...expenseMap.values()].reduce((a,b)=>a+b,0) : (expenseMap.get(month) || 0);
   const profit = revenue - expenseTotal;
 
   setText("monthly-earnings", money(revenue));
   setText("monthly-expenses", money(expenseTotal));
   setText("monthly-profit", money(profit));
 
-  const occupancy = monthlyOccupancy(month);
+  const occupancy = isAllTime ? (() => {
+    const valid = activeBookings().filter(b => parseDate(b.check_in) && parseDate(b.check_out) && b.check_out > b.check_in);
+    if (!valid.length) return null;
+    const first = valid.reduce((v,b)=>b.check_in < v ? b.check_in : v, valid[0].check_in);
+    const last = valid.reduce((v,b)=>b.check_out > v ? b.check_out : v, valid[0].check_out);
+    const start = parseDate(first), end = parseDate(last);
+    const days = Math.round((Date.UTC(end.getFullYear(),end.getMonth(),end.getDate())-Date.UTC(start.getFullYear(),start.getMonth(),start.getDate()))/86400000);
+    if (days <= 0) return null;
+    const occupied = new Set();
+    valid.forEach(b => { const d = parseDate(b.check_in); for(let i=0;i<bookingNights(b);i++){const n=new Date(d.getFullYear(),d.getMonth(),d.getDate()+i);occupied.add(dateString(n));}});
+    return Math.round(occupied.size / days * 100);
+  })() : monthlyOccupancy(month);
 
   setText(
     "monthly-occupancy",
     occupancy === null ? "—" : `${occupancy}%`
   );
 
-  const details = monthlyBookingDetails(month);
+  const details = isAllTime ? {
+    count: activeBookings().length,
+    nights: activeBookings().reduce((sum,b)=>sum+bookingNights(b),0),
+    revenue
+  } : monthlyBookingDetails(month);
 
   setText("report-booking-count", details.count);
   setText("report-booked-nights", details.nights);
@@ -2529,7 +2504,7 @@ function renderReports() {
   );
 
   const startingBookings = activeBookings().filter(
-    (booking) => booking.check_in?.startsWith(month)
+    (booking) => isAllTime || booking.check_in?.startsWith(month)
   );
 
   const bookingValues = startingBookings
@@ -3898,6 +3873,8 @@ function translateReportLabels() {
   const monthSelect = $("report-month");
 
   if (monthSelect) {
+    const allOption = [...monthSelect.options].find(option => option.value === "all");
+    if (allOption) allOption.textContent = currentLanguage === "ar" ? "كل الفترات" : "All time";
     for (const option of monthSelect.options) {
       if (!/^\d{4}-\d{2}$/.test(option.value)) continue;
 
