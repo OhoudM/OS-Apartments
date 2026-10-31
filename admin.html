@@ -7,7 +7,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="admin.css?v=10">
+  <link rel="stylesheet" href="admin.css?v=11">
 </head>
 <body>
 
@@ -934,10 +934,34 @@
 
   </main>
 
+  <dialog id="os-payout-dialog" class="admin-dialog os-payout-dialog">
+    <form id="os-payout-form" class="os-payout-form">
+      <h2 id="os-payout-title">Record Host Payout</h2>
+      <p id="os-payout-description"></p>
+      <label>Host payout status | حالة تحويل المستحقات
+        <select id="os-payout-status" required>
+          <option value="not_verified">Not verified | غير مؤكد</option>
+          <option value="partially_received">Partially received | مستلم جزئياً</option>
+          <option value="received">Received in bank | تم الاستلام في البنك</option>
+        </select>
+      </label>
+      <label>Amount received in bank (SAR) | المبلغ المستلم في البنك
+        <input id="os-payout-amount" type="number" min="0" step="0.01" placeholder="0.00">
+      </label>
+      <label>Payout received date | تاريخ استلام التحويل
+        <input id="os-payout-date" type="date">
+      </label>
+      <p id="os-payout-error" role="alert"></p>
+      <div class="os-payout-actions">
+        <button type="button" id="os-payout-cancel">Cancel | إلغاء</button>
+        <button type="submit" id="os-payout-save" class="primary-btn">Save payout | حفظ التحويل</button>
+      </div>
+    </form>
+  </dialog>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <script src="admin.js?v=10"></script>
+  <script src="admin.js?v=11"></script>
   <script src="https://cdn.jsdelivr.net/npm/exceljs@4.4.0/dist/exceljs.min.js"></script>
-  <script src="export-excel.js?v=1"></script>
+  <script src="export-excel.js?v=2"></script>
 
   
 <!-- DELETE EXPENSE CONFIRMATION -->

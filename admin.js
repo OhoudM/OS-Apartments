@@ -906,6 +906,10 @@ async function loadBookings() {
             "refund_amount",
             "refund_status",
             "financial_status",
+            "guest_payment_status",
+            "host_payout_status",
+            "host_payout_received",
+            "host_payout_date",
             "confirmation_code",
             "notes"
           ].join(",")
@@ -1624,12 +1628,42 @@ function renderTable() {
       financialButton.addEventListener("click", () => openGathernFinancialEdit(booking.id));
       actionCell.append(financialButton);
     }
+    if (String(booking.platform || "").toLowerCase() !== "direct" && !cancelledBooking(booking)) {
+      const payoutButton = createElement("button", "booking-quick-edit", currentLanguage === "ar" ? "تسجيل التحويل" : "Record Payout");
+      payoutButton.type = "button";
+      payoutButton.addEventListener("click", () => osOpenPayout(booking.id));
+      actionCell.append(payoutButton);
+    }
     row.append(actionCell);
     tbody.append(row);
   });
 }
 
 
+/* Guest payment and bank payout are separate records. */
+function osGuestPaymentState(b) {
+  const explicit = String(b.guest_payment_status || "").trim().toLowerCase();
+  if (["paid", "partially_paid", "unpaid", "not_verified"].includes(explicit)) return explicit;
+  const paid = amountReceived(b), total = safeNumber(b.guest_total);
+  if (paid === null || total === null) return "not_verified";
+  return cents(paid) >= cents(total) ? "paid" : paid > 0 ? "partially_paid" : "unpaid";
+}
+function osPayoutState(b) {
+  if (String(b.platform || "").trim().toLowerCase() === "direct") return "not_applicable";
+  const explicit = String(b.host_payout_status || "").trim().toLowerCase();
+  return ["received", "partially_received", "not_verified"].includes(explicit) ? explicit : "not_verified";
+}
+function osStateLabel(state) {
+  const labels = {
+    paid: ["Paid", "مدفوع"], partially_paid: ["Partially paid", "مدفوع جزئياً"],
+    unpaid: ["Unpaid", "غير مدفوع"], not_verified: ["Not verified — check platform/bank", "غير مؤكد — يرجى مراجعة المنصة أو البنك"],
+    not_applicable: ["Not applicable (Direct)", "لا ينطبق (حجز مباشر)"],
+    received: ["Received in bank", "تم الاستلام في البنك"],
+    partially_received: ["Partially received in bank", "تم استلام جزء في البنك"]
+  };
+  const pair = labels[state] || labels.not_verified;
+  return currentLanguage === "ar" ? pair[1] : pair[0];
+}
 /* =====================================================
    BOOKING DETAILS DIALOG
    ===================================================== */
@@ -1796,19 +1830,13 @@ function showBreakdown(index) {
     const balance = outstandingBalance(booking);
     const guestPaid = amountReceived(booking);
     const guestTotal = safeNumber(booking.guest_total);
-    const guestPaymentLabel = guestPaid === null || guestTotal === null
-      ? editBookingLabel("Not verified", "غير مؤكد")
-      : cents(guestPaid) >= cents(guestTotal)
-        ? editBookingLabel("Paid", "مدفوع")
-        : cents(guestPaid) > 0
-          ? editBookingLabel("Partially paid", "مدفوع جزئياً")
-          : editBookingLabel("Unpaid", "غير مدفوع");
     addBreakdownHeading(editBookingLabel("Guest payment", "دفع الضيف"));
-    addBreakdownTextRow(editBookingLabel("Guest payment status", "حالة دفع الضيف"), guestPaymentLabel);
-    addBreakdownTextRow(editBookingLabel("Host payout status", "حالة تحويل مستحقات المضيف"),
-      String(booking.platform || "").toLowerCase() === "direct"
-        ? editBookingLabel("Not applicable (Direct)", "لا ينطبق (حجز مباشر)")
-        : editBookingLabel("Not verified — check platform/bank", "غير مؤكد — يرجى مراجعة المنصة أو البنك"));
+    addBreakdownTextRow(editBookingLabel("Guest payment status", "حالة دفع الضيف"), osStateLabel(osGuestPaymentState(booking)));
+    addBreakdownTextRow(editBookingLabel("Host payout status", "حالة تحويل مستحقات المضيف"), osStateLabel(osPayoutState(booking)));
+    if (String(booking.platform || "").toLowerCase() !== "direct") {
+      addBreakdownRow(editBookingLabel("Host payout received in bank", "المستلم في البنك من المنصة"), booking.host_payout_received);
+      addBreakdownTextRow(editBookingLabel("Host payout date", "تاريخ استلام المستحقات"), booking.host_payout_date || "—");
+    }
 
     if (balance !== null) {
       addBreakdownHeading(t("paymentDetails"));
@@ -4408,3 +4436,68 @@ $("refresh-bookings-btn")?.addEventListener(
 
 setLanguage(currentLanguage);
 checkSession();
+
+/* OS Apartments: independently tracked bank payouts; does not modify booking totals. */
+let osPayoutBookingId = null;
+let osPayoutSaving = false;
+function osOpenPayout(id) {
+  const b = bookings.find(item => String(item.id) === String(id));
+  if (!b || cancelledBooking(b) || String(b.platform || "").toLowerCase() === "direct") return;
+  osPayoutBookingId = id;
+  $("os-payout-title").textContent = currentLanguage === "ar" ? "تسجيل مستحقات المنصة" : "Record Host Payout";
+  $("os-payout-description").textContent = `${b.guest_name || "—"} · ${b.platform || "—"} · ${b.confirmation_code || "—"}`;
+  $("os-payout-status").value = osPayoutState(b);
+  $("os-payout-amount").value = safeNumber(b.host_payout_received) ?? "";
+  $("os-payout-date").value = b.host_payout_date || "";
+  $("os-payout-error").textContent = "";
+  $("os-payout-dialog").showModal();
+}
+$("os-payout-cancel")?.addEventListener("click", () => $("os-payout-dialog").close());
+$("os-payout-form")?.addEventListener("submit", async event => {
+  event.preventDefault();
+  if (osPayoutSaving || !bookingsLoaded) return;
+  const b = bookings.find(item => String(item.id) === String(osPayoutBookingId));
+  if (!b || cancelledBooking(b) || String(b.platform || "").toLowerCase() === "direct") return;
+  const status = $("os-payout-status").value;
+  const amountText = $("os-payout-amount").value.trim();
+  const date = $("os-payout-date").value;
+  const amount = amountText === "" ? null : Number(amountText);
+  const errorBox = $("os-payout-error");
+  errorBox.textContent = "";
+  if (!Number.isFinite(amount) && amount !== null || amount !== null && amount < 0 ||
+      status !== "not_verified" && (amount === null || amount <= 0 || !date) ||
+      status === "not_verified" && (amount !== null || date)) {
+    errorBox.textContent = currentLanguage === "ar" ? "أدخلي مبلغاً موجباً وتاريخاً عند تأكيد التحويل، أو اتركيهما فارغين إذا لم يتم التحقق." : "Enter a positive amount and date for a confirmed payout, or leave both blank if not verified.";
+    return;
+  }
+  if (status === "received" && safeNumber(b.amount) !== null && cents(amount) !== cents(b.amount)) {
+    errorBox.textContent = currentLanguage === "ar" ? "المبلغ المستلم بالكامل يجب أن يساوي صافي مستحقات الحجز. استخدمي استلام جزئي إذا كان المبلغ أقل." : "A fully received payout must equal the booking's net earnings. Use Partially received for a smaller amount.";
+    return;
+  }
+  if (amount !== null && safeNumber(b.amount) !== null && cents(amount) > cents(b.amount)) {
+    errorBox.textContent = currentLanguage === "ar" ? "المبلغ المستلم يتجاوز صافي مستحقات الحجز." : "Received payout exceeds the booking's net earnings.";
+    return;
+  }
+  osPayoutSaving = true;
+  const button = $("os-payout-save"); button.disabled = true;
+  try {
+    const {data:auth,error:authError} = await supabaseClient.auth.getUser();
+    if (authError || !auth?.user) throw Error(t("sessionExpired"));
+    const {data:fresh,error:readError} = await supabaseClient.from("Bookings")
+      .select("id,platform,status,amount,host_payout_status,host_payout_received,host_payout_date")
+      .eq("id", b.id).single();
+    if (readError) throw readError;
+    for (const field of ["platform","status","amount","host_payout_status","host_payout_received","host_payout_date"]) {
+      if (String(fresh[field] ?? "") !== String(b[field] ?? "")) throw Error(t("stalePayment"));
+    }
+    const {data,error} = await supabaseClient.from("Bookings")
+      .update({host_payout_status:status,host_payout_received:amount,host_payout_date:date || null})
+      .eq("id",b.id).eq("platform",fresh.platform).select("id");
+    if (error) throw error;
+    if (!data || data.length !== 1) throw Error(currentLanguage === "ar" ? "تعذر الحفظ. تحققي من صلاحيات Supabase." : "Save failed. Check Supabase permissions.");
+    $("os-payout-dialog").close();
+    await loadBookings();
+    if (bookingsLoaded) showMessage(currentLanguage === "ar" ? "تم حفظ حالة تحويل المستحقات." : "Host payout status saved.");
+  } catch (error) { errorBox.textContent = t("saveError") + error.message; }
+  finally { osPayoutSaving = false; button.disabled = false; }
+});

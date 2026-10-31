@@ -3231,3 +3231,11 @@ html:not([data-theme="dark"]) #tab-overview .stat-card.clickable-card {
 /* Direct booking quick-edit action beside View details */
 .booking-quick-edit { margin-inline-start: 8px; border-color: var(--olive); color: var(--olive); }
 .booking-quick-edit:hover { background: var(--olive-light); }
+
+/* Isolated host payout form */
+.os-payout-dialog { width:min(480px,calc(100vw - 32px)); max-width:480px; color:var(--text); background:var(--surface); border:1px solid var(--border); border-radius:16px; padding:25px; }
+.os-payout-form { display:flex; flex-direction:column; gap:16px; }
+.os-payout-form h2 { margin:0; }
+.os-payout-form p { margin:0; }
+.os-payout-actions { display:flex; gap:10px; justify-content:flex-end; flex-wrap:wrap; }
+#os-payout-error { color:var(--danger); }
