@@ -1024,7 +1024,7 @@ $("finance-month")?.addEventListener("change", event => {
 const OS_EXPENSE_LABELS = {
   Cleaning: ["Cleaning", "التنظيف"], WiFi: ["WiFi", "الإنترنت"],
   Electricity: ["Electricity", "الكهرباء"], Maintenance: ["Maintenance", "الصيانة"],
-  Supplies: ["Supplies", "المستلزمات"], Other: ["Other", "أخرى"],
+  Supplies: ["Supplies", "المستلزمات"], "Pest Control": ["Pest Control", "شركة المبيدات"], Other: ["Other", "أخرى"],
   Emergency: ["Emergency", "الطوارئ"], Utilities: ["Utilities (legacy)", "الخدمات (سابقاً)"]
 };
 function osExpenseLabel(value) {
@@ -2402,6 +2402,7 @@ function renderYearlyExpenseTracker(year) {
     {key: "Utilities", en: "Utilities (legacy)", ar: "الخدمات (سابقاً)", amount: 0},
     {key: "Maintenance", en: "Maintenance", ar: "الصيانة", amount: 0},
     {key: "Supplies", en: "Supplies", ar: "المستلزمات", amount: 0},
+    {key: "Pest Control", en: "Pest Control", ar: "شركة المبيدات", amount: 0},
     {key: "Other", en: "Other", ar: "أخرى", amount: 0}
   ];
   let rentPaid = 0;
