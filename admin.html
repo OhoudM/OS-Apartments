@@ -358,6 +358,7 @@
                 <th data-i18n="checkIn">Check-in</th>
                 <th data-i18n="checkOut">Check-out</th>
                 <th data-i18n="status">Status</th>
+                <th id="guest-payment-column">Guest Payment Status</th>
                 <th data-i18n="hostEarnings">Host Earnings</th>
                 <th data-i18n="details">Details</th>
               </tr>
@@ -934,6 +935,38 @@
 
   </main>
 
+
+  <dialog id="os-guest-payment-dialog" class="admin-dialog os-payout-dialog">
+    <form id="os-guest-payment-form" class="os-payout-form">
+      <h2>Guest Payment | دفع الضيف</h2>
+      <p id="os-guest-payment-description"></p>
+      <label>Payment status | حالة الدفع
+        <select id="os-guest-payment-status" required>
+          <option value="not_verified">Not verified | غير مؤكد</option>
+          <option value="unpaid">Unpaid | غير مدفوع</option>
+          <option value="partially_paid">Partially paid | مدفوع جزئياً</option>
+          <option value="paid">Paid | مدفوع</option>
+        </select>
+      </label>
+      <label>Payment method | طريقة الدفع
+        <select id="os-guest-payment-method">
+          <option value="">Not recorded | غير مسجلة</option>
+          <option value="Apple Pay">Apple Pay</option>
+          <option value="Tabby">Tabby</option>
+          <option value="Cash">Cash | نقداً</option>
+          <option value="Bank Transfer">Bank Transfer | تحويل بنكي</option>
+          <option value="Card">Card | بطاقة</option>
+          <option value="Other">Other | أخرى</option>
+        </select>
+      </label>
+      <p id="os-guest-payment-error" role="alert"></p>
+      <div class="os-payout-actions">
+        <button type="button" id="os-guest-payment-cancel">Cancel | إلغاء</button>
+        <button type="submit" id="os-guest-payment-save" class="primary-btn">Save payment | حفظ الدفع</button>
+      </div>
+    </form>
+  </dialog>
+
   <dialog id="os-payout-dialog" class="admin-dialog os-payout-dialog">
     <form id="os-payout-form" class="os-payout-form">
       <h2 id="os-payout-title">Record Host Payout</h2>
@@ -941,6 +974,7 @@
       <label>Host payout status | حالة تحويل المستحقات
         <select id="os-payout-status" required>
           <option value="not_verified">Not verified | غير مؤكد</option>
+          <option value="pending">Pending transfer | بانتظار التحويل</option>
           <option value="partially_received">Partially received | مستلم جزئياً</option>
           <option value="received">Received in bank | تم الاستلام في البنك</option>
         </select>

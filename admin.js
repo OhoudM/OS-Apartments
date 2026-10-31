@@ -907,6 +907,7 @@ async function loadBookings() {
             "refund_status",
             "financial_status",
             "guest_payment_status",
+            "guest_payment_method",
             "host_payout_status",
             "host_payout_received",
             "host_payout_date",
@@ -1543,6 +1544,8 @@ function renderTable() {
   const tbody = $("bookings-table-body");
   if (!tbody) return;
 
+  const guestHeading = $("guest-payment-column");
+  if (guestHeading) guestHeading.textContent = currentLanguage === "ar" ? "حالة دفع الضيف" : "Guest Payment Status";
   tbody.replaceChildren();
 
   if (!bookings.length) {
@@ -1553,7 +1556,7 @@ function renderTable() {
       t("noBookings")
     );
 
-    cell.colSpan = 7;
+    cell.colSpan = 8;
     row.append(cell);
     tbody.append(row);
     return;
@@ -1591,6 +1594,21 @@ function renderTable() {
     statusCell.append(badge);
     row.append(statusCell);
 
+    // Display independently recorded guest payments and bank payouts.
+    // A cancelled reservation is not treated as an unpaid active booking.
+    const isCancelled = cancelledBooking(booking);
+    const guestState = isCancelled ? "cancelled" : osGuestPaymentState(booking);
+    const state = guestState;
+    const paymentCell = createElement("td", "os-payment-status-cell");
+    const label = state === "cancelled"
+      ? (currentLanguage === "ar" ? "ملغي" : "Cancelled") : osStateLabel(state);
+    const compactLabel = state === "not_verified"
+      ? (currentLanguage === "ar" ? "غير مؤكد" : "Not verified") : label;
+    const statusBadge = createElement("span", `os-payment-pill os-payment-${state}`, compactLabel);
+    statusBadge.title = label;
+    paymentCell.append(statusBadge);
+    row.append(paymentCell);
+
     row.append(
       createElement(
         "td",
@@ -1614,6 +1632,13 @@ function renderTable() {
 
     actionCell.append(button);
 
+    if (!cancelledBooking(booking)) {
+      const paymentButton = createElement("button", "booking-quick-edit", currentLanguage === "ar" ? "تعديل الدفع" : "Edit Payment");
+      paymentButton.type = "button";
+      paymentButton.addEventListener("click", () => osOpenGuestPayment(booking.id));
+      actionCell.append(paymentButton);
+    }
+
     // Quick edit is available directly from the table for Direct bookings only.
     if (String(booking.platform || "").toLowerCase() === "direct" && !cancelledBooking(booking)) {
       const editButton = createElement("button", "booking-quick-edit", currentLanguage === "ar" ? "تعديل" : "Edit");
@@ -1629,7 +1654,7 @@ function renderTable() {
       actionCell.append(financialButton);
     }
     if (String(booking.platform || "").toLowerCase() !== "direct" && !cancelledBooking(booking)) {
-      const payoutButton = createElement("button", "booking-quick-edit", currentLanguage === "ar" ? "تسجيل التحويل" : "Record Payout");
+      const payoutButton = createElement("button", "booking-quick-edit", currentLanguage === "ar" ? "تعديل التحويل" : (osPayoutState(booking) === "received" ? "Update Payout" : "Record Payout"));
       payoutButton.type = "button";
       payoutButton.addEventListener("click", () => osOpenPayout(booking.id));
       actionCell.append(payoutButton);
@@ -1651,13 +1676,14 @@ function osGuestPaymentState(b) {
 function osPayoutState(b) {
   if (String(b.platform || "").trim().toLowerCase() === "direct") return "not_applicable";
   const explicit = String(b.host_payout_status || "").trim().toLowerCase();
-  return ["received", "partially_received", "not_verified"].includes(explicit) ? explicit : "not_verified";
+  return ["received", "partially_received", "pending", "not_verified"].includes(explicit) ? explicit : "not_verified";
 }
 function osStateLabel(state) {
   const labels = {
     paid: ["Paid", "مدفوع"], partially_paid: ["Partially paid", "مدفوع جزئياً"],
     unpaid: ["Unpaid", "غير مدفوع"], not_verified: ["Not verified — check platform/bank", "غير مؤكد — يرجى مراجعة المنصة أو البنك"],
     not_applicable: ["Not applicable (Direct)", "لا ينطبق (حجز مباشر)"],
+    pending: ["Pending bank transfer", "بانتظار التحويل البنكي"],
     received: ["Received in bank", "تم الاستلام في البنك"],
     partially_received: ["Partially received in bank", "تم استلام جزء في البنك"]
   };
@@ -1832,6 +1858,7 @@ function showBreakdown(index) {
     const guestTotal = safeNumber(booking.guest_total);
     addBreakdownHeading(editBookingLabel("Guest payment", "دفع الضيف"));
     addBreakdownTextRow(editBookingLabel("Guest payment status", "حالة دفع الضيف"), osStateLabel(osGuestPaymentState(booking)));
+    addBreakdownTextRow(editBookingLabel("Payment method", "طريقة الدفع"), booking.guest_payment_method || editBookingLabel("Not recorded", "غير مسجلة"));
     addBreakdownTextRow(editBookingLabel("Host payout status", "حالة تحويل مستحقات المضيف"), osStateLabel(osPayoutState(booking)));
     if (String(booking.platform || "").toLowerCase() !== "direct") {
       addBreakdownRow(editBookingLabel("Host payout received in bank", "المستلم في البنك من المنصة"), booking.host_payout_received);
@@ -4465,9 +4492,9 @@ $("os-payout-form")?.addEventListener("submit", async event => {
   const errorBox = $("os-payout-error");
   errorBox.textContent = "";
   if (!Number.isFinite(amount) && amount !== null || amount !== null && amount < 0 ||
-      status !== "not_verified" && (amount === null || amount <= 0 || !date) ||
-      status === "not_verified" && (amount !== null || date)) {
-    errorBox.textContent = currentLanguage === "ar" ? "أدخلي مبلغاً موجباً وتاريخاً عند تأكيد التحويل، أو اتركيهما فارغين إذا لم يتم التحقق." : "Enter a positive amount and date for a confirmed payout, or leave both blank if not verified.";
+      ["received", "partially_received"].includes(status) && (amount === null || amount <= 0 || !date) ||
+      ["not_verified", "pending"].includes(status) && (amount !== null || date)) {
+    errorBox.textContent = currentLanguage === "ar" ? "عند الاستلام أدخلي المبلغ والتاريخ، وعند الانتظار اتركيهما فارغين." : "For received payouts enter amount and date; for pending or unverified payouts leave both blank.";
     return;
   }
   if (status === "received" && safeNumber(b.amount) !== null && cents(amount) !== cents(b.amount)) {
@@ -4500,4 +4527,54 @@ $("os-payout-form")?.addEventListener("submit", async event => {
     if (bookingsLoaded) showMessage(currentLanguage === "ar" ? "تم حفظ حالة تحويل المستحقات." : "Host payout status saved.");
   } catch (error) { errorBox.textContent = t("saveError") + error.message; }
   finally { osPayoutSaving = false; button.disabled = false; }
+});
+
+
+/* Guest payment method/status editing, separate from host bank payout. */
+let osGuestPaymentBookingId = null;
+let osGuestPaymentSaving = false;
+function osOpenGuestPayment(id) {
+  const b = bookings.find(item => String(item.id) === String(id));
+  if (!b || cancelledBooking(b)) return;
+  osGuestPaymentBookingId = id;
+  $("os-guest-payment-description").textContent = `${b.guest_name || "—"} · ${b.platform || "—"} · ${b.confirmation_code || "—"}`;
+  $("os-guest-payment-status").value = osGuestPaymentState(b);
+  $("os-guest-payment-method").value = b.guest_payment_method || "";
+  $("os-guest-payment-error").textContent = "";
+  $("os-guest-payment-dialog").showModal();
+}
+$("os-guest-payment-cancel")?.addEventListener("click", () => $("os-guest-payment-dialog").close());
+$("os-guest-payment-form")?.addEventListener("submit", async event => {
+  event.preventDefault();
+  if (osGuestPaymentSaving || !bookingsLoaded) return;
+  const b = bookings.find(item => String(item.id) === String(osGuestPaymentBookingId));
+  if (!b || cancelledBooking(b)) return;
+  const status = $("os-guest-payment-status").value;
+  const method = $("os-guest-payment-method").value;
+  const errorBox = $("os-guest-payment-error");
+  errorBox.textContent = "";
+  if (!["paid", "partially_paid", "unpaid", "not_verified"].includes(status) ||
+      !["", "Apple Pay", "Tabby", "Cash", "Bank Transfer", "Card", "Other"].includes(method)) return;
+  osGuestPaymentSaving = true;
+  $("os-guest-payment-save").disabled = true;
+  try {
+    const {data:auth,error:authError} = await supabaseClient.auth.getUser();
+    if (authError || !auth?.user) throw Error(t("sessionExpired"));
+    const {data:fresh,error:readError} = await supabaseClient.from("Bookings")
+      .select("id,status,guest_payment_status,guest_payment_method")
+      .eq("id", b.id).single();
+    if (readError) throw readError;
+    for (const field of ["status", "guest_payment_status", "guest_payment_method"]) {
+      if (String(fresh[field] ?? "") !== String(b[field] ?? "")) throw Error(t("stalePayment"));
+    }
+    const {data,error} = await supabaseClient.from("Bookings")
+      .update({guest_payment_status:status,guest_payment_method:method || null})
+      .eq("id",b.id).eq("status",fresh.status).select("id");
+    if (error) throw error;
+    if (!data || data.length !== 1) throw Error(currentLanguage === "ar" ? "تعذر الحفظ. تحققي من صلاحيات Supabase." : "Save failed. Check Supabase permissions.");
+    $("os-guest-payment-dialog").close();
+    await loadBookings();
+    if (bookingsLoaded) showMessage(currentLanguage === "ar" ? "تم حفظ تفاصيل الدفع." : "Guest payment details saved.");
+  } catch (error) { errorBox.textContent = t("saveError") + error.message; }
+  finally { osGuestPaymentSaving = false; $("os-guest-payment-save").disabled = false; }
 });
