@@ -10,6 +10,33 @@
     bookings:['Bookings','الحجوزات'], finances:['Finances','المالية'], expenses:['Expenses','المصروفات'],
     monthly:['Monthly Performance','الأداء الشهري'], overview:['Overview','الملخص']
   };
+  const monthName = (value) => {
+    const [year, m] = value.split('-').map(Number);
+    return new Intl.DateTimeFormat(isAr() ? 'ar-SA-u-ca-gregory' : 'en-US', {month:'long',year:'numeric'}).format(new Date(year,m-1,1));
+  };
+  function refreshMonths() {
+    const previous = period.value;
+    const available = new Set();
+    // Reuse the months displayed by Monthly Performance and include months with expenses.
+    const reportSelect = $('report-month');
+    if (reportSelect) for (const opt of reportSelect.options) if (/^\d{4}-\d{2}$/.test(opt.value)) available.add(opt.value);
+    if (typeof bookings !== 'undefined' && Array.isArray(bookings)) for (const b of bookings) {
+      const m = String(b.check_in || '').slice(0,7);
+      if (/^\d{4}-\d{2}$/.test(m)) available.add(m);
+    }
+    if (typeof expenses !== 'undefined' && Array.isArray(expenses)) for (const e of expenses) {
+      const m = String(e.expense_date || '').slice(0,7);
+      if (/^\d{4}-\d{2}$/.test(m)) available.add(m);
+    }
+    const months = [...available].sort().reverse();
+    const signature = (isAr()?'ar':'en')+'|'+months.join('|');
+    if (period.dataset.monthSignature === signature) return;
+    period.dataset.monthSignature = signature;
+    period.replaceChildren();
+    period.add(new Option(isAr()?'كل الفترات':'All time','all'));
+    for (const m of months) period.add(new Option(monthName(m),m));
+    period.value = [...period.options].some(o=>o.value===previous) ? previous : 'all';
+  }
   function translate() {
     const ar=isAr();
     $('csv-export-title').textContent=ar?'تصدير التقارير':'Export reports';
@@ -17,9 +44,13 @@
     $('export-excel-period-label').textContent=ar?'الفترة':'Period';
     $('csv-download-label').textContent=ar?'تحميل CSV':'Download CSV';
     period.options[0].textContent=ar?'كل الفترات':'All time';
-    period.options[1].textContent=ar?'الشهر المحدد أدناه':'Selected month below';
+    refreshMonths();
   }
   translate();
+  period.addEventListener('focus',refreshMonths);
+  period.addEventListener('pointerdown',refreshMonths);
+  $('report-month')?.addEventListener('change',refreshMonths);
+  if ($('report-month')) new MutationObserver(refreshMonths).observe($('report-month'),{childList:true});
   // Language toggle updates this toolbar even when other dashboard sections rerender.
   const observer=new MutationObserver(()=>translate());
   observer.observe(document.documentElement,{attributes:true,attributeFilter:['lang','dir']});
@@ -45,8 +76,9 @@
     }
     button.disabled=true;
     try {
-      const selected=period.value==='month'?$('report-month')?.value:'';
-      if(period.value==='month'&&!/^\d{4}-\d{2}$/.test(selected||'')) throw Error(isAr()?'اختر شهراً من التقرير أولاً.':'Select a report month first.');
+      refreshMonths();
+      const selected=period.value==='all'?'':period.value;
+      if(selected&&!/^\d{4}-\d{2}$/.test(selected)) throw Error(isAr()?'اختر شهراً صحيحاً.':'Select a valid month.');
       const allBookings=selected?bookings.filter(b=>month(b.check_in)===selected):bookings.slice();
       const active=allBookings.filter(activeBooking);
       const costs=selected?expenses.filter(e=>month(e.expense_date)===selected):expenses.slice();
