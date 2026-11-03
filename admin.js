@@ -2394,94 +2394,68 @@ function monthlyBookingDetails(monthKey) {
 function renderYearlyExpenseTracker(year) {
   const ar = currentLanguage === "ar";
   const cleaningBudget = 6000;
-  const otherBudget = 2000;
-  const groups = [
-    {key: "Cleaning", en: "Cleaning", ar: "التنظيف", amount: 0},
-    {key: "Electricity", en: "Electricity", ar: "الكهرباء", amount: 0},
-    {key: "WiFi", en: "WiFi", ar: "الإنترنت", amount: 0},
-    {key: "Utilities", en: "Utilities (legacy)", ar: "الخدمات (سابقاً)", amount: 0},
-    {key: "Maintenance", en: "Maintenance", ar: "الصيانة", amount: 0},
-    {key: "Supplies", en: "Supplies", ar: "المستلزمات", amount: 0},
-    {key: "Pest Control", en: "Pest Control", ar: "شركة المبيدات", amount: 0},
-    {key: "Other", en: "Other", ar: "أخرى", amount: 0}
-  ];
-  let rentPaid = 0;
-  let emergencySpent = 0;
+  const wifiBudget = 228.85 * 12;
+  const fixedBudget = cleaningBudget + wifiBudget;
+  let cleaningSpent = 0, wifiSpent = 0, phoneSpent = 0, variableSpent = 0, emergencySpent = 0;
   expenses.forEach(e => {
     if (!String(e.expense_date || "").startsWith(`${year}-`)) return;
     const amount = Number(e.amount) || 0;
     const category = String(e.category || "").trim().toLowerCase();
-    if (category === "rent") { rentPaid += amount; return; }
-    if (category === "emergency") { emergencySpent += amount; return; }
-    const group = groups.find(g => g.key.toLowerCase() === category) || groups[4];
-    group.amount += amount;
+    if (category === "rent") return;
+    if (category === "emergency") emergencySpent += amount;
+    else if (category === "cleaning") cleaningSpent += amount;
+    else if (category === "wifi") wifiSpent += amount;
+    else if (category === "phone bill" || category === "phone") phoneSpent += amount;
+    else variableSpent += amount;
   });
-  const cleaningSpent = groups[0].amount;
-  putEmergencyValues();
-  function putEmergencyValues() {
-    setText("os-emergency-title", currentLanguage === "ar" ? "احتياطي الطوارئ" : "Emergency Reserve");
-    setText("os-emergency-spent-label", currentLanguage === "ar" ? "المستخدم" : "Used");
-    setText("os-emergency-left-label", currentLanguage === "ar" ? "المتبقي" : "Remaining");
-    setText("os-emergency-note", currentLanguage === "ar" ? "احتياطي منفصل، غير مشمول في ميزانية التشغيل السنوية البالغة ٣٩٬٠٠٠ ريال." : "Separate reserve — not included in the 39,000 SAR annual operating budget.");
-    setText("os-emergency-spent", money(emergencySpent));
-    setText("os-emergency-left", money(5000-emergencySpent));
-    const bar = $("os-emergency-bar");
-    if (bar) { bar.style.width = `${Math.min(100,Math.max(0,emergencySpent/5000*100))}%`; bar.classList.toggle("os-over-budget",emergencySpent>5000); }
-  }
-  const otherSpent = groups.slice(1).reduce((total,g) => total + g.amount,0);
-  const put = (id,value) => setText(id,value);
+  const fixedSpent = cleaningSpent + wifiSpent + phoneSpent;
   const labels = {
-    "os-yearly-title": ["Annual Budget Overview","نظرة عامة على الميزانية السنوية"],
-    "os-yearly-desc": ["Annual allocations, actual spending and remaining budgets","المخصصات السنوية والمصروفات الفعلية والمبالغ المتبقية"],
-    "os-yearly-total-label": ["Total Annual Budget","إجمالي الميزانية السنوية"],
-    "os-yearly-total-note": ["31,000 rent + 6,000 cleaning + 2,000 other expenses","٣١٬٠٠٠ إيجار + ٦٬٠٠٠ تنظيف + ٢٬٠٠٠ مصروفات أخرى"],
-    "os-rent-label": ["Annual Rent","الإيجار السنوي"],
-    "os-clean-alloc-label": ["Cleaning","التنظيف"],
-    "os-other-alloc-label": ["Other Expenses","مصروفات أخرى"],
-    "os-clean-title": ["Cleaning Budget","ميزانية التنظيف"],
-    "os-other-title": ["Other Expenses Budget","ميزانية المصروفات الأخرى"],
-    "os-clean-spent-label": ["Spent","المصروف"],
-    "os-other-spent-label": ["Spent","المصروف"],
-    "os-clean-left-label": ["Remaining","المتبقي"],
-    "os-other-left-label": ["Remaining","المتبقي"],
-    "os-categories-title": ["Expenses by Category","المصروفات حسب الفئة"],
-    "os-categories-note": ["Actual recorded expenses","المصروفات المسجلة فعلياً"],
-    "os-yearly-footnote": ["Budget allocations are not expenses. Only recorded spending reduces the remaining budget. Annual rent is separate.","المخصصات ليست مصروفات فعلية. تُخصم المصروفات المسجلة فقط من المتبقي، والإيجار السنوي منفصل."]
+    "os-yearly-title": ["Annual Budget Overview", "نظرة عامة على الميزانية السنوية"],
+    "os-yearly-desc": ["Known recurring costs, variable spending and emergency reserve", "المصاريف الثابتة والمتغيرة واحتياطي الطوارئ"],
+    "os-yearly-total-label": ["Annual planning target", "الهدف السنوي التقديري"],
+    "os-yearly-total-note": ["31,000 rent + 8,746.20 known recurring costs + 2,000 variable allowance", "٣١٬٠٠٠ إيجار + ٨٬٧٤٦٫٢٠ مصاريف ثابتة معروفة + ٢٬٠٠٠ مخصص تقديري للمصاريف المتغيرة"],
+    "os-rent-label": ["Annual Rent", "الإيجار السنوي"],
+    "os-clean-alloc-label": ["Constant Expenses (known yearly)", "المصاريف الثابتة (المعروفة سنوياً)"],
+    "os-other-alloc-label": ["Variable Expenses (allowance)", "المصاريف المتغيرة (مخصص تقديري)"],
+    "os-clean-title": ["Constant Expenses", "المصاريف الثابتة"],
+    "os-other-title": ["Variable Expenses", "المصاريف المتغيرة"],
+    "os-fixed-clean-label": ["Cleaning · 500 SAR/month", "التنظيف · ٥٠٠ ريال شهرياً"],
+    "os-fixed-wifi-label": ["WiFi · 228.85 SAR/month", "الإنترنت · ٢٢٨٫٨٥ ريال شهرياً"],
+    "os-fixed-phone-label": ["Phone bill · amount pending", "فاتورة الهاتف · المبلغ غير محدد"],
+    "os-clean-spent-label": ["Total recorded", "إجمالي المسجل"],
+    "os-clean-left-label": ["Remaining against known annual costs", "المتبقي من التكاليف السنوية المعروفة"],
+    "os-other-spent-label": ["Actual recorded spending", "المصروف الفعلي المسجل"],
+    "os-variable-budget-label": ["No fixed budget", "بدون ميزانية ثابتة"],
+    "os-variable-note": ["Electricity, maintenance, supplies, pest control and other irregular expenses. A 2,000 SAR planning allowance remains in the annual target, but is not treated as a spending limit.", "الكهرباء والصيانة والمستلزمات وشركة المبيدات وغيرها. يبقى مخصص تقديري بقيمة ٢٬٠٠٠ ريال ضمن الهدف السنوي، لكنه ليس حداً للصرف."],
+    "os-fixed-note": ["Phone bill will be added to the yearly estimate once confirmed.", "ستُضاف فاتورة الهاتف إلى التقدير السنوي عند معرفة قيمتها."],
+    "os-yearly-footnote": ["Only recorded expenses count as spent. The annual target includes a provisional variable allowance; the emergency reserve is separate.", "تُحسب المصروفات المسجلة فقط. يشمل الهدف السنوي مخصصاً تقديرياً للمصاريف المتغيرة، واحتياطي الطوارئ منفصل."]
   };
-  Object.entries(labels).forEach(([id,v]) => put(id,v[ar ? 1 : 0]));
-  put("os-yearly-year",String(year));
-  put("os-clean-spent",money(cleaningSpent));
-  put("os-other-spent",money(otherSpent));
-  put("os-clean-left",money(cleaningBudget-cleaningSpent));
-  put("os-other-left",money(otherBudget-otherSpent));
-  const setBar = (id,spent,budget) => {
-    const bar = $(id);
-    if (bar) { bar.style.width = `${Math.min(100,Math.max(0,spent/budget*100))}%`; bar.classList.toggle("os-over-budget",spent>budget); }
-  };
-  setBar("os-clean-bar",cleaningSpent,cleaningBudget);
-  setBar("os-other-bar",otherSpent,otherBudget);
-  const container = $("os-category-bars");
-  if (container) {
-    container.replaceChildren();
-    const max = Math.max(1,emergencySpent,...groups.map(g => g.amount));
-    [...groups, {key:"Emergency",en:"Emergency",ar:"الطوارئ",amount:emergencySpent}].filter(g => g.amount > 0).forEach(g => {
-      const row = document.createElement("div"); row.className="os-yearly-bar-row";
-      const heading=document.createElement("div"); heading.className="os-yearly-bar-label";
-      const name=document.createElement("span"); name.textContent=ar?g.ar:g.en;
-      const value=document.createElement("strong"); value.textContent=money(g.amount);
-      heading.append(name,value);
-      const track=document.createElement("div"); track.className="os-yearly-track";
-      const fill=document.createElement("div"); fill.style.width=`${Math.max(0,g.amount/max*100)}%`;
-      track.append(fill); row.append(heading,track); container.append(row);
-    });
-  }
+  Object.entries(labels).forEach(([id,v]) => setText(id,v[ar ? 1 : 0]));
+  setText("os-yearly-year",String(year));
+  setText("os-fixed-budget-total",ar ? "٨٬٧٤٦٫٢٠ ريال/سنة" : "8,746.20 SAR/year");
+  setText("os-clean-spent",money(cleaningSpent));
+  setText("os-wifi-spent",money(wifiSpent));
+  setText("os-phone-spent",money(phoneSpent));
+  setText("os-fixed-spent",money(fixedSpent));
+  setText("os-clean-left",money(fixedBudget-fixedSpent));
+  setText("os-other-spent",money(variableSpent));
+  const fixedBar = $("os-clean-bar");
+  if (fixedBar) { fixedBar.style.width = `${Math.min(100,Math.max(0,fixedSpent/fixedBudget*100))}%`; fixedBar.classList.toggle("os-over-budget",fixedSpent>fixedBudget); }
+  setText("os-emergency-title",ar ? "احتياطي الطوارئ" : "Emergency Reserve");
+  setText("os-emergency-spent-label",ar ? "المستخدم" : "Used");
+  setText("os-emergency-left-label",ar ? "المتبقي" : "Remaining");
+  setText("os-emergency-note",ar ? "احتياطي منفصل، غير مشمول في الهدف السنوي البالغ ٣٩٬٧٤٦٫٢٠ ريال." : "Separate reserve — not included in the 39,746.20 SAR annual target.");
+  setText("os-emergency-spent",money(emergencySpent));
+  setText("os-emergency-left",money(5000-emergencySpent));
+  const emergencyBar = $("os-emergency-bar");
+  if (emergencyBar) { emergencyBar.style.width = `${Math.min(100,Math.max(0,emergencySpent/5000*100))}%`; emergencyBar.classList.toggle("os-over-budget",emergencySpent>5000); }
 }
 
 function renderAnnualCoverage(earningsMap) {
   const year = selectedReportMonth === "all" ? new Date().getFullYear() : Number(selectedReportMonth.slice(0, 4));
   renderYearlyExpenseTracker(year);
   // Coverage uses recorded booking earnings, not actual expense payments.
-  const annualBudget = 39000;
+  const annualBudget = 39746.20;
   let earned = 0;
   for (const [monthKey, amount] of earningsMap.entries()) {
     if (String(monthKey).startsWith(`${year}-`)) earned += Number(amount) || 0;
