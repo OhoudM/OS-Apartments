@@ -3449,3 +3449,25 @@ html[data-theme="dark"] .os-fixed-detail b {color:#f1f5ef;}
 .csv-export-message{margin:10px 0 0;color:var(--text-muted);font-size:12px;min-height:0;}
 .csv-export-message:empty{display:none;}
 @media(max-width:600px){.csv-export-panel{padding:16px}.csv-export-field{max-width:none;flex-basis:100%;}.csv-download-btn{width:100%;}}
+
+/* Professional variable expense summary — no artificial budget */
+.os-yearly-allocations { grid-template-columns:repeat(2,minmax(0,1fr)); }
+.os-yearly-budgets { align-items:start; }
+.os-variable-card { display:grid; gap:16px; align-content:start; }
+.os-variable-card .os-yearly-budget-top { align-items:center; flex-wrap:wrap; }
+.os-variable-pill { font-size:12px; font-weight:600; padding:6px 10px; border-radius:99px; background:#edf3eb; color:#446247; }
+.os-variable-summary { display:flex; align-items:baseline; justify-content:space-between; gap:14px; padding:16px; border-radius:12px; background:#f4f7f2; }
+.os-variable-summary span { color:#526353; font-size:13px; }
+.os-variable-summary strong { font-size:23px; color:#25392a; white-space:nowrap; }
+.os-variable-breakdown { display:grid; gap:0; }
+.os-variable-line { display:flex; justify-content:space-between; align-items:center; gap:12px; padding:11px 2px; border-bottom:1px solid #e3e9e0; font-size:14px; }
+.os-variable-line:last-child { border-bottom:0; }
+.os-variable-line b { white-space:nowrap; }
+.os-variable-empty { font-size:13px; color:#6d7a6e; margin:0; }
+.os-variable-card>.os-yearly-footnote { margin:0; }
+html[data-theme="dark"] .os-variable-pill { background:#3b4a3d; color:#d8e7d6; }
+html[data-theme="dark"] .os-variable-summary { background:#343d35; }
+html[data-theme="dark"] .os-variable-summary span,html[data-theme="dark"] .os-variable-empty { color:#c5d0c4; }
+html[data-theme="dark"] .os-variable-summary strong { color:#f1f5ef; }
+html[data-theme="dark"] .os-variable-line { border-color:#414b41; }
+@media(max-width:700px){.os-yearly-allocations{grid-template-columns:1fr}.os-variable-summary{flex-wrap:wrap}}

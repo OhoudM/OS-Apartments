@@ -2397,6 +2397,7 @@ function renderYearlyExpenseTracker(year) {
   const wifiBudget = 228.85 * 12;
   const fixedBudget = cleaningBudget + wifiBudget;
   let cleaningSpent = 0, wifiSpent = 0, phoneSpent = 0, variableSpent = 0, emergencySpent = 0;
+  const variableCategories = new Map();
   expenses.forEach(e => {
     if (!String(e.expense_date || "").startsWith(`${year}-`)) return;
     const amount = Number(e.amount) || 0;
@@ -2406,14 +2407,14 @@ function renderYearlyExpenseTracker(year) {
     else if (category === "cleaning") cleaningSpent += amount;
     else if (category === "wifi") wifiSpent += amount;
     else if (category === "phone bill" || category === "phone") phoneSpent += amount;
-    else variableSpent += amount;
+    else { variableSpent += amount; const key = String(e.category || "Other").trim() || "Other"; variableCategories.set(key, (variableCategories.get(key) || 0) + amount); }
   });
   const fixedSpent = cleaningSpent + wifiSpent + phoneSpent;
   const labels = {
     "os-yearly-title": ["Annual Budget Overview", "نظرة عامة على الميزانية السنوية"],
     "os-yearly-desc": ["Known recurring costs, variable spending and emergency reserve", "المصاريف الثابتة والمتغيرة واحتياطي الطوارئ"],
     "os-yearly-total-label": ["Annual planning target", "الهدف السنوي التقديري"],
-    "os-yearly-total-note": ["31,000 rent + 8,746.20 known recurring costs + 2,000 variable allowance", "٣١٬٠٠٠ إيجار + ٨٬٧٤٦٫٢٠ مصاريف ثابتة معروفة + ٢٬٠٠٠ مخصص تقديري للمصاريف المتغيرة"],
+    "os-yearly-total-note": ["31,000 rent + 8,746.20 known recurring costs; variable spending tracked separately", "٣١٬٠٠٠ إيجار + ٨٬٧٤٦٫٢٠ مصاريف ثابتة معروفة؛ المصروفات المتغيرة تُتابع بشكل منفصل"],
     "os-rent-label": ["Annual Rent", "الإيجار السنوي"],
     "os-clean-alloc-label": ["Constant Expenses (known yearly)", "المصاريف الثابتة (المعروفة سنوياً)"],
     "os-other-alloc-label": ["Variable Expenses (allowance)", "المصاريف المتغيرة (مخصص تقديري)"],
@@ -2425,10 +2426,10 @@ function renderYearlyExpenseTracker(year) {
     "os-clean-spent-label": ["Total recorded", "إجمالي المسجل"],
     "os-clean-left-label": ["Remaining against known annual costs", "المتبقي من التكاليف السنوية المعروفة"],
     "os-other-spent-label": ["Actual recorded spending", "المصروف الفعلي المسجل"],
-    "os-variable-budget-label": ["No fixed budget", "بدون ميزانية ثابتة"],
-    "os-variable-note": ["Electricity, maintenance, supplies, pest control and other irregular expenses. A 2,000 SAR planning allowance remains in the annual target, but is not treated as a spending limit.", "الكهرباء والصيانة والمستلزمات وشركة المبيدات وغيرها. يبقى مخصص تقديري بقيمة ٢٬٠٠٠ ريال ضمن الهدف السنوي، لكنه ليس حداً للصرف."],
+    "os-variable-budget-label": ["Tracked by actuals", "حسب المصروف الفعلي"],
+    "os-variable-note": ["No estimated budget. Only recorded spending is shown.", "لا توجد ميزانية تقديرية. تُعرض المصروفات المسجلة فقط."],
     "os-fixed-note": ["Phone bill will be added to the yearly estimate once confirmed.", "ستُضاف فاتورة الهاتف إلى التقدير السنوي عند معرفة قيمتها."],
-    "os-yearly-footnote": ["Only recorded expenses count as spent. The annual target includes a provisional variable allowance; the emergency reserve is separate.", "تُحسب المصروفات المسجلة فقط. يشمل الهدف السنوي مخصصاً تقديرياً للمصاريف المتغيرة، واحتياطي الطوارئ منفصل."]
+    "os-yearly-footnote": ["Only known recurring costs are included in the annual target. Variable spending and the emergency reserve are tracked separately.", "يشمل الهدف السنوي التكاليف الثابتة المعروفة فقط. المصروفات المتغيرة واحتياطي الطوارئ يُتابعان بشكل منفصل."]
   };
   Object.entries(labels).forEach(([id,v]) => setText(id,v[ar ? 1 : 0]));
   setText("os-yearly-year",String(year));
@@ -2439,12 +2440,30 @@ function renderYearlyExpenseTracker(year) {
   setText("os-fixed-spent",money(fixedSpent));
   setText("os-clean-left",money(fixedBudget-fixedSpent));
   setText("os-other-spent",money(variableSpent));
+  const breakdown = $("os-variable-breakdown");
+  if (breakdown) {
+    breakdown.replaceChildren();
+    const items = [...variableCategories.entries()].filter(([,v]) => v > 0).sort((a,b) => b[1]-a[1]);
+    if (!items.length) {
+      const empty = document.createElement("p");
+      empty.className = "os-variable-empty";
+      empty.textContent = ar ? "لا توجد مصروفات متغيرة مسجلة لهذه السنة" : "No variable expenses recorded this year";
+      breakdown.append(empty);
+    } else {
+      items.forEach(([category, amount]) => {
+        const line = document.createElement("div"); line.className = "os-variable-line";
+        const label = document.createElement("span"); label.textContent = typeof osExpenseLabel === "function" ? osExpenseLabel(category) : category;
+        const value = document.createElement("b"); value.textContent = money(amount);
+        line.append(label,value); breakdown.append(line);
+      });
+    }
+  }
   const fixedBar = $("os-clean-bar");
   if (fixedBar) { fixedBar.style.width = `${Math.min(100,Math.max(0,fixedSpent/fixedBudget*100))}%`; fixedBar.classList.toggle("os-over-budget",fixedSpent>fixedBudget); }
   setText("os-emergency-title",ar ? "احتياطي الطوارئ" : "Emergency Reserve");
   setText("os-emergency-spent-label",ar ? "المستخدم" : "Used");
   setText("os-emergency-left-label",ar ? "المتبقي" : "Remaining");
-  setText("os-emergency-note",ar ? "احتياطي منفصل، غير مشمول في الهدف السنوي البالغ ٣٩٬٧٤٦٫٢٠ ريال." : "Separate reserve — not included in the 39,746.20 SAR annual target.");
+  setText("os-emergency-note",ar ? "احتياطي منفصل، غير مشمول في الهدف السنوي البالغ ٣٩٬٧٤٦٫٢٠ ريال." : "Separate reserve — not included in the 37,746.20 SAR annual target.");
   setText("os-emergency-spent",money(emergencySpent));
   setText("os-emergency-left",money(5000-emergencySpent));
   const emergencyBar = $("os-emergency-bar");
@@ -2455,7 +2474,7 @@ function renderAnnualCoverage(earningsMap) {
   const year = selectedReportMonth === "all" ? new Date().getFullYear() : Number(selectedReportMonth.slice(0, 4));
   renderYearlyExpenseTracker(year);
   // Coverage uses recorded booking earnings, not actual expense payments.
-  const annualBudget = 39746.20;
+  const annualBudget = 37746.20;
   let earned = 0;
   for (const [monthKey, amount] of earningsMap.entries()) {
     if (String(monthKey).startsWith(`${year}-`)) earned += Number(amount) || 0;
