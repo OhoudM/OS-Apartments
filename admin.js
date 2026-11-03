@@ -243,8 +243,8 @@ const translations = {
     operatingExpenses: "Operating Expenses",
     netProfit: "Net Profit",
     occupancyRate: "Occupancy Rate",
-    annualCostCoverage: "Apartment Financial Overview",
-    annualCostCoverageDesc: "Money received, expenses, and annual budget in one place",
+    annualCostCoverage: "Annual Cost Overview",
+    annualCostCoverageDesc: "Known annual costs and recorded spending",
     annualBudget: "Annual Budget",
     annualRent: "Annual Rent",
     cleaningBudget: "Cleaning Budget",
@@ -256,12 +256,14 @@ const translations = {
     averageBookingValue: "Average Booking Value",
     earningsByMonth: "Earnings by Month",
     earningsByMonthDesc: "Compare your apartment's monthly performance",
+    occupancyTrend: "Occupancy Trend",
+    occupancyTrendDesc: "Percentage of calendar nights booked each month",
     bookingsByMonth: "Bookings by Month",
     bookingsByMonthDesc: "Compare monthly reservation counts",
     revenueVsExpenses: "Revenue vs. Expenses",
     revenueVsExpensesDesc: "Compare income, costs and profit over time",
     bookingsByPlatform: "Bookings by Platform",
-    bookingsByPlatformDesc: "See where your reservations come from",
+    bookingsByPlatformDesc: "Booking mix for the selected period",
     addBookingTitle: "Add Booking",
     totalBookingAmount: "Total Booking Amount (SAR)",
     addExpenseTitle: "Add Expense",
@@ -495,8 +497,8 @@ const translations = {
     operatingExpenses: "المصاريف التشغيلية",
     netProfit: "صافي الربح",
     occupancyRate: "نسبة الإشغال",
-    annualCostCoverage: "الملخص المالي للشقة",
-    annualCostCoverageDesc: "المبالغ المستلمة والمصروفات والميزانية السنوية في مكان واحد",
+    annualCostCoverage: "ملخص التكاليف السنوية",
+    annualCostCoverageDesc: "التكاليف السنوية المعروفة والمصاريف المسجلة",
     annualBudget: "الميزانية السنوية",
     annualRent: "الإيجار السنوي",
     cleaningBudget: "ميزانية النظافة",
@@ -508,12 +510,14 @@ const translations = {
     averageBookingValue: "متوسط قيمة الحجز",
     earningsByMonth: "الأرباح حسب الشهر",
     earningsByMonthDesc: "مقارنة أداء الشقة شهريًا",
+    occupancyTrend: "اتجاه نسبة الإشغال",
+    occupancyTrendDesc: "نسبة الليالي المحجوزة من إجمالي ليالي كل شهر",
     bookingsByMonth: "الحجوزات حسب الشهر",
     bookingsByMonthDesc: "مقارنة عدد الحجوزات الشهرية",
     revenueVsExpenses: "الإيرادات مقابل المصاريف",
     revenueVsExpensesDesc: "مقارنة الإيرادات والتكاليف والأرباح بمرور الوقت",
     bookingsByPlatform: "الحجوزات حسب المنصة",
-    bookingsByPlatformDesc: "معرفة مصادر الحجوزات",
+    bookingsByPlatformDesc: "توزيع الحجوزات للفترة المحددة",
     addBookingTitle: "إضافة حجز",
     totalBookingAmount: "إجمالي مبلغ الحجز (ريال)",
     addExpenseTitle: "إضافة مصروف",
@@ -2397,58 +2401,102 @@ function renderYearlyExpenseTracker(year) {
   const wifiBudget = 228.85 * 12;
   const fixedBudget = cleaningBudget + wifiBudget;
   let cleaningSpent = 0, wifiSpent = 0, phoneSpent = 0, variableSpent = 0, emergencySpent = 0;
-  expenses.forEach(e => {
-    if (!String(e.expense_date || "").startsWith(`${year}-`)) return;
-    const amount = Number(e.amount) || 0;
-    const category = String(e.category || "").trim().toLowerCase();
-    if (category === "rent") return;
-    if (category === "emergency") emergencySpent += amount;
-    else if (category === "cleaning") cleaningSpent += amount;
-    else if (category === "wifi") wifiSpent += amount;
-    else if (category === "phone bill" || category === "phone") phoneSpent += amount;
-    else variableSpent += amount;
+  let variableTransactions = 0;
+  const variableCategories = new Map();
+
+  expenses.forEach((expense) => {
+    if (!String(expense.expense_date || "").startsWith(`${year}-`)) return;
+    const amount = safeNumber(expense.amount);
+    if (amount === null) return;
+    const category = String(expense.category || "Other").trim();
+    const normalized = category.toLowerCase();
+    if (normalized === "rent") return;
+    if (normalized === "emergency") emergencySpent += amount;
+    else if (normalized === "cleaning") cleaningSpent += amount;
+    else if (normalized === "wifi") wifiSpent += amount;
+    else if (normalized === "phone bill" || normalized === "phone") phoneSpent += amount;
+    else {
+      variableSpent += amount;
+      variableTransactions++;
+      variableCategories.set(normalized, (variableCategories.get(normalized) || 0) + amount);
+    }
   });
   const fixedSpent = cleaningSpent + wifiSpent + phoneSpent;
   const labels = {
-    "os-yearly-title": ["Annual Budget Overview", "نظرة عامة على الميزانية السنوية"],
-    "os-yearly-desc": ["Known recurring costs, variable spending and emergency reserve", "المصاريف الثابتة والمتغيرة واحتياطي الطوارئ"],
-    "os-yearly-total-label": ["Annual planning target", "الهدف السنوي التقديري"],
-    "os-yearly-total-note": ["31,000 rent + 8,746.20 known recurring costs + 2,000 variable allowance", "٣١٬٠٠٠ إيجار + ٨٬٧٤٦٫٢٠ مصاريف ثابتة معروفة + ٢٬٠٠٠ مخصص تقديري للمصاريف المتغيرة"],
+    "os-yearly-title": ["Annual Cost Overview", "ملخص التكاليف السنوية"],
+    "os-yearly-desc": ["Known annual costs and recorded spending", "التكاليف السنوية المعروفة والمصاريف المسجلة"],
+    "os-yearly-total-label": ["Known Annual Commitments", "الالتزامات السنوية المعروفة"],
+    "os-yearly-total-note": ["31,000 rent + 6,000 cleaning + 2,746.20 Wi-Fi. Excludes phone bills and variable expenses.", "٣١٬٠٠٠ إيجار + ٦٬٠٠٠ تنظيف + ٢٬٧٤٦٫٢٠ إنترنت. لا تشمل فاتورة الهاتف أو المصاريف المتغيرة."],
     "os-rent-label": ["Annual Rent", "الإيجار السنوي"],
     "os-clean-alloc-label": ["Constant Expenses (known yearly)", "المصاريف الثابتة (المعروفة سنوياً)"],
-    "os-other-alloc-label": ["Variable Expenses (allowance)", "المصاريف المتغيرة (مخصص تقديري)"],
+    "os-other-alloc-label": ["Variable Expenses (recorded YTD)", "المصاريف المتغيرة (المسجلة خلال السنة)"],
     "os-clean-title": ["Constant Expenses", "المصاريف الثابتة"],
     "os-other-title": ["Variable Expenses", "المصاريف المتغيرة"],
     "os-fixed-clean-label": ["Cleaning · 500 SAR/month", "التنظيف · ٥٠٠ ريال شهرياً"],
-    "os-fixed-wifi-label": ["WiFi · 228.85 SAR/month", "الإنترنت · ٢٢٨٫٨٥ ريال شهرياً"],
+    "os-fixed-wifi-label": ["Wi-Fi · 228.85 SAR/month", "الإنترنت · ٢٢٨٫٨٥ ريال شهرياً"],
     "os-fixed-phone-label": ["Phone bill · amount pending", "فاتورة الهاتف · المبلغ غير محدد"],
-    "os-clean-spent-label": ["Total recorded", "إجمالي المسجل"],
+    "os-clean-spent-label": ["Total recorded", "إجمالي المصاريف المسجلة"],
     "os-clean-left-label": ["Remaining against known annual costs", "المتبقي من التكاليف السنوية المعروفة"],
-    "os-other-spent-label": ["Actual recorded spending", "المصروف الفعلي المسجل"],
-    "os-variable-budget-label": ["No fixed budget", "بدون ميزانية ثابتة"],
-    "os-variable-note": ["Electricity, maintenance, supplies, pest control and other irregular expenses. A 2,000 SAR planning allowance remains in the annual target, but is not treated as a spending limit.", "الكهرباء والصيانة والمستلزمات وشركة المبيدات وغيرها. يبقى مخصص تقديري بقيمة ٢٬٠٠٠ ريال ضمن الهدف السنوي، لكنه ليس حداً للصرف."],
-    "os-fixed-note": ["Phone bill will be added to the yearly estimate once confirmed.", "ستُضاف فاتورة الهاتف إلى التقدير السنوي عند معرفة قيمتها."],
-    "os-yearly-footnote": ["Only recorded expenses count as spent. The annual target includes a provisional variable allowance; the emergency reserve is separate.", "تُحسب المصروفات المسجلة فقط. يشمل الهدف السنوي مخصصاً تقديرياً للمصاريف المتغيرة، واحتياطي الطوارئ منفصل."]
+    "os-other-spent-label": ["Actual spending · year to date", "المصروف الفعلي · منذ بداية السنة"],
+    "os-variable-budget-label": ["No preset budget", "بدون ميزانية محددة"],
+    "os-variable-breakdown-label": ["Spending by category", "المصروفات حسب التصنيف"],
+    "os-variable-breakdown-context": ["Share of recorded variable costs", "النسبة من المصاريف المتغيرة المسجلة"],
+    "os-variable-note": ["No allowance or annual cap is assumed. The breakdown updates whenever an expense is recorded.", "لا يوجد مخصص تقديري أو حد سنوي للصرف. يتحدث التفصيل تلقائياً عند تسجيل مصروف."],
+    "os-fixed-note": ["Phone bill will be added to the annual estimate once confirmed.", "ستُضاف فاتورة الهاتف إلى التقدير السنوي عند معرفة قيمتها."],
+    "os-yearly-footnote": ["39,746.20 SAR includes known yearly commitments only. Pending phone bills, variable expenses and the reserve are excluded.", "مبلغ ٣٩٬٧٤٦٫٢٠ ريال يشمل الالتزامات السنوية المعروفة فقط، ولا يشمل فاتورة الهاتف غير المحددة أو المصاريف المتغيرة أو الاحتياطي."]
   };
-  Object.entries(labels).forEach(([id,v]) => setText(id,v[ar ? 1 : 0]));
-  setText("os-yearly-year",String(year));
-  setText("os-fixed-budget-total",ar ? "٨٬٧٤٦٫٢٠ ريال/سنة" : "8,746.20 SAR/year");
-  setText("os-clean-spent",money(cleaningSpent));
-  setText("os-wifi-spent",money(wifiSpent));
-  setText("os-phone-spent",money(phoneSpent));
-  setText("os-fixed-spent",money(fixedSpent));
-  setText("os-clean-left",money(fixedBudget-fixedSpent));
-  setText("os-other-spent",money(variableSpent));
+  Object.entries(labels).forEach(([id, value]) => setText(id, value[ar ? 1 : 0]));
+  setText("os-yearly-year", String(year));
+  setText("os-fixed-budget-total", ar ? "٨٬٧٤٦٫٢٠ ريال/سنة" : "8,746.20 SAR/year");
+  setText("os-clean-spent", money(cleaningSpent));
+  setText("os-wifi-spent", money(wifiSpent));
+  setText("os-phone-spent", money(phoneSpent));
+  setText("os-fixed-spent", money(fixedSpent));
+  setText("os-clean-left", money(fixedBudget - fixedSpent));
+  setText("os-other-spent", money(variableSpent));
+  setText("os-year-variable-total", money(variableSpent));
+  setText("os-variable-transactions", ar ? `${variableTransactions} عملية مسجلة` : `${variableTransactions} recorded transaction${variableTransactions === 1 ? "" : "s"}`);
+
+  const categoryNames = {
+    electricity: ["Electricity", "الكهرباء"],
+    utilities: ["Utilities", "المرافق"],
+    maintenance: ["Maintenance", "الصيانة"],
+    supplies: ["Supplies", "المستلزمات"],
+    "pest control": ["Pest control", "مكافحة الحشرات"],
+    other: ["Other", "أخرى"]
+  };
+  const list = $("os-variable-category-list");
+  if (list) {
+    list.replaceChildren();
+    if (!variableCategories.size) {
+      list.append(createElement("p", "os-variable-empty", ar ? "لم تُسجل مصاريف متغيرة لهذه السنة حتى الآن." : "No variable expenses recorded for this year."));
+    } else {
+      [...variableCategories.entries()].sort((a, b) => b[1] - a[1]).forEach(([name, amount]) => {
+        const title = categoryNames[name]?.[ar ? 1 : 0] || name;
+        const row = createElement("div", "os-variable-category");
+        const header = createElement("div", "os-variable-category-row");
+        header.append(createElement("span", "", title), createElement("strong", "", money(amount)));
+        const track = createElement("div", "os-variable-category-track");
+        const bar = createElement("div", "os-variable-category-fill");
+        const fraction = variableSpent > 0 ? Math.max(0, amount) / variableSpent : 0;
+        bar.style.width = `${Math.min(100, fraction * 100)}%`;
+        track.append(bar);
+        row.append(header, track);
+        list.append(row);
+      });
+    }
+  }
+
   const fixedBar = $("os-clean-bar");
-  if (fixedBar) { fixedBar.style.width = `${Math.min(100,Math.max(0,fixedSpent/fixedBudget*100))}%`; fixedBar.classList.toggle("os-over-budget",fixedSpent>fixedBudget); }
-  setText("os-emergency-title",ar ? "احتياطي الطوارئ" : "Emergency Reserve");
-  setText("os-emergency-spent-label",ar ? "المستخدم" : "Used");
-  setText("os-emergency-left-label",ar ? "المتبقي" : "Remaining");
-  setText("os-emergency-note",ar ? "احتياطي منفصل، غير مشمول في الهدف السنوي البالغ ٣٩٬٧٤٦٫٢٠ ريال." : "Separate reserve — not included in the 39,746.20 SAR annual target.");
-  setText("os-emergency-spent",money(emergencySpent));
-  setText("os-emergency-left",money(5000-emergencySpent));
+  if (fixedBar) { fixedBar.style.width = `${Math.min(100, Math.max(0, fixedSpent / fixedBudget * 100))}%`; fixedBar.classList.toggle("os-over-budget", fixedSpent > fixedBudget); }
+  setText("os-emergency-title", ar ? "احتياطي الطوارئ" : "Emergency Reserve");
+  setText("os-emergency-spent-label", ar ? "المستخدم" : "Used");
+  setText("os-emergency-left-label", ar ? "المتبقي" : "Remaining");
+  setText("os-emergency-note", ar ? "احتياطي منفصل، غير مشمول في الالتزامات السنوية المعروفة." : "Separate reserve — not part of known annual commitments.");
+  setText("os-emergency-spent", money(emergencySpent));
+  setText("os-emergency-left", money(5000 - emergencySpent));
   const emergencyBar = $("os-emergency-bar");
-  if (emergencyBar) { emergencyBar.style.width = `${Math.min(100,Math.max(0,emergencySpent/5000*100))}%`; emergencyBar.classList.toggle("os-over-budget",emergencySpent>5000); }
+  if (emergencyBar) { emergencyBar.style.width = `${Math.min(100, Math.max(0, emergencySpent / 5000 * 100))}%`; emergencyBar.classList.toggle("os-over-budget", emergencySpent > 5000); }
 }
 
 function renderAnnualCoverage(earningsMap) {
@@ -2462,9 +2510,9 @@ function renderAnnualCoverage(earningsMap) {
   }
   const percentage = annualBudget > 0 ? earned / annualBudget * 100 : 0;
   const clamped = Math.min(100, Math.max(0, percentage));
-  setText("os-annual-coverage-label", currentLanguage === "ar" ? "تغطية الميزانية من إيرادات الحجوزات" : "Annual budget covered by earnings");
+  setText("os-annual-coverage-label", currentLanguage === "ar" ? "تغطية الالتزامات السنوية من الإيرادات المقدّرة" : "Known annual costs covered by estimated earnings");
   setText("os-annual-coverage-percent", `${percentage.toFixed(1)}%`);
-  setText("os-annual-coverage-earned", currentLanguage === "ar" ? `${money(earned)} إيرادات مسجلة` : `${money(earned)} earned`);
+  setText("os-annual-coverage-earned", currentLanguage === "ar" ? `${money(earned)} إيرادات مقدّرة` : `${money(earned)} estimated earnings`);
   setText("os-annual-coverage-remaining", currentLanguage === "ar" ? `${money(Math.max(0,annualBudget-earned))} متبقي للوصول للهدف` : `${money(Math.max(0,annualBudget-earned))} to target`);
   const fill = $("os-annual-coverage-fill");
   if (fill) fill.style.width = `${clamped}%`;
@@ -2547,8 +2595,51 @@ function renderReports() {
       : "—"
   );
 
+  // All KPIs use the same selected period; comparisons use a previous calendar month.
+  const ar = currentLanguage === "ar";
+  const labels = {
+    "os-margin-label": ar ? "هامش الربح" : "Profit Margin",
+    "os-expense-ratio-label": ar ? "نسبة المصاريف للإيرادات" : "Expense Ratio",
+    "os-stay-length-label": ar ? "متوسط مدة الإقامة" : "Average Stay",
+    "os-performance-method": ar
+      ? "تُوزّع الإيرادات المقدّرة على ليالي الإقامة، ويُخصم فقط ما تم تسجيله من مصاريف. صافي الربح هنا ليس المبلغ القابل للسحب من الحساب."
+      : "Estimated revenue is allocated by stay night. Profit subtracts recorded expenses only; this is not the withdrawable bank balance."
+  };
+  Object.entries(labels).forEach(([id, value]) => setText(id, value));
+  setText("os-profit-margin", revenue > 0 ? `${(profit / revenue * 100).toFixed(1)}%` : "—");
+  setText("os-expense-ratio", revenue > 0 ? `${(expenseTotal / revenue * 100).toFixed(1)}%` : "—");
+  const staysWithDates = startingBookings.map(bookingNights).filter(n => n > 0);
+  const stayLength = staysWithDates.length ? staysWithDates.reduce((a,b)=>a+b,0)/staysWithDates.length : null;
+  setText("os-average-stay", stayLength === null ? "—" : ar ? `${stayLength.toFixed(1)} ليلة` : `${stayLength.toFixed(1)} nights`);
+
+  const previousMonth = !isAllTime ? (() => {
+    const [y, m] = month.split("-").map(Number);
+    return new Date(Date.UTC(y, m - 2, 1)).toISOString().slice(0, 7);
+  })() : null;
+  const hasPreviousData = !!previousMonth &&
+    (earningsMap.has(previousMonth) || expenseMap.has(previousMonth) ||
+      activeBookings().some(b => b.check_in?.startsWith(previousMonth)));
+  const comparison = (current, previous, unit = "percent") => {
+    if (isAllTime) return ar ? "جميع الفترات المسجلة" : "All recorded periods";
+    if (!hasPreviousData) return ar ? "لا توجد بيانات للشهر السابق" : "No previous-month data";
+    if (unit === "points") {
+      if (previous === null || current === null) return "—";
+      const difference = current - previous;
+      return `${difference > 0 ? "+" : ""}${difference.toFixed(0)} ${ar ? "نقطة عن الشهر السابق" : "pts vs previous month"}`;
+    }
+    if (Math.abs(previous) < .00001) return ar ? "الشهر السابق: صفر" : "Previous month: zero";
+    const change = (current - previous) / Math.abs(previous) * 100;
+    return `${change > 0 ? "+" : ""}${change.toFixed(1)}% ${ar ? "عن الشهر السابق" : "vs previous month"}`;
+  };
+  const prevRevenue = previousMonth ? (earningsMap.get(previousMonth) || 0) : 0;
+  const prevExpense = previousMonth ? (expenseMap.get(previousMonth) || 0) : 0;
+  setText("os-revenue-trend", comparison(revenue, prevRevenue));
+  setText("os-expenses-trend", comparison(expenseTotal, prevExpense));
+  setText("os-profit-trend", comparison(profit, prevRevenue - prevExpense));
+  setText("os-occupancy-trend", comparison(occupancy, previousMonth ? monthlyOccupancy(previousMonth) : null, "points"));
+
   renderAnnualCoverage(earningsMap);
-  renderEarningsChart(earningsMap);
+  renderOccupancyChart(earningsMap, expenseMap);
   renderPlatformChart();
   renderMonthlyBookingsChart(earningsMap, expenseMap);
   renderMonthlyFinancialChart(earningsMap, expenseMap);
@@ -2572,84 +2663,27 @@ $("report-month")?.addEventListener(
    SIMPLE CHARTS — NO EXTRA LIBRARY NEEDED
    ===================================================== */
 
-function renderEarningsChart(earningsMap) {
-  const container = $("monthly-earnings-chart");
+function renderOccupancyChart(earningsMap, expenseMap) {
+  const container = $("monthly-occupancy-chart");
   if (!container) return;
-
   container.dir = "ltr";
   container.replaceChildren();
-
-  const entries = [...earningsMap.entries()]
-    .sort(([a], [b]) => a.localeCompare(b))
-    .slice(-12);
-
-  if (!entries.length) {
-    container.append(
-      createElement("p", "", t("noChartData"))
-    );
+  const months = reportChartMonths(earningsMap, expenseMap);
+  if (!months.length) {
+    container.append(createElement("p", "", t("noChartData")));
     return;
   }
-
-  const max = Math.max(
-    ...entries.map(([, amount]) => amount),
-    1
-  );
-
-  const chart = createElement("div");
-  chart.style.display = "flex";
-  chart.style.alignItems = "flex-end";
-  chart.style.justifyContent = "space-around";
-  chart.style.gap = "12px";
-  chart.style.minHeight = "240px";
-  chart.style.overflowX = "auto";
-
-  entries.forEach(([key, amount]) => {
-    const [year, month] = key.split("-").map(Number);
-
-    const group = createElement("div");
-    group.style.flex = "1 0 52px";
-    group.style.minWidth = "52px";
-    group.style.textAlign = "center";
-
-    const amountLabel = createElement(
-      "div",
-      "",
-      Math.round(amount).toLocaleString("en-US")
-    );
-
-    amountLabel.style.fontSize = "11px";
-    amountLabel.style.marginBottom = "8px";
-    amountLabel.style.fontWeight = "600";
-
-    const bar = createElement(
-      "div",
-      "chart-bar"
-    );
-
-    bar.style.height = `${Math.max(
-      3,
-      (amount / max) * 160
-    )}px`;
-
-    bar.style.width = "70%";
-    bar.style.margin = "0 auto";
-    bar.title = money(amount);
-
-    const label = createElement(
-      "div",
-      "chart-label",
-      `${new Date(year, month - 1, 1).toLocaleString(
-        "en-US",
-        { month: "short" }
-      )} ${String(year).slice(-2)}`
-    );
-
-    label.style.marginTop = "8px";
-
-    group.append(amountLabel, bar, label);
+  const chart = createElement("div", "report-bar-chart os-occupancy-bar-chart");
+  months.forEach((month) => {
+    const pct = monthlyOccupancy(month) || 0;
+    const group = createElement("div", "report-bar-group");
+    const value = createElement("strong", "report-bar-value", `${pct}%`);
+    const bar = createElement("div", "report-bar os-occupancy-bar");
+    bar.style.height = `${pct > 0 ? Math.max(4, pct / 100 * 155) : 3}px`;
+    bar.title = `${reportMonthLabel(month)} · ${pct}%`;
+    group.append(value, bar, createElement("span", "report-bar-month", reportMonthLabel(month)));
     chart.append(group);
   });
-
   container.append(chart);
 }
 
@@ -2666,7 +2700,7 @@ function renderPlatformChart() {
 
   const counts = new Map();
 
-  activeBookings().forEach((booking) => {
+  activeBookings().filter(booking => selectedReportMonth === "all" || booking.check_in?.startsWith(selectedReportMonth)).forEach((booking) => {
     const platform = booking.platform || "Other";
 
     counts.set(
@@ -3844,7 +3878,10 @@ function translateReportLabels() {
     "annual-reserve-label": "emergencyReserve",
     "monthly-booking-details-title": "monthlyBookingDetails",
     "monthly-booking-details-description": "monthlyBookingDetailsDesc",
+    "monthly-bookings-label": "totalBookings",
     "monthly-nights-label": "bookedNights",
+    "occupancy-trends-title": "occupancyTrend",
+    "occupancy-trends-desc": "occupancyTrendDesc",
     "monthly-nightly-rate-label": "averageNightlyRate",
     "monthly-booking-value-label": "averageBookingValue",
     "booking-trends-title": "bookingsByMonth",
@@ -3886,16 +3923,6 @@ function translateReportLabels() {
       }
     });
 
-  // Keep Monthly Booking Details entirely in English, including Arabic UI mode.
-  const bookingDetailEnglish = {
-    "monthly-booking-details-title": "Monthly Booking Details",
-    "monthly-booking-details-description": "Bookings, nights and average apartment pricing",
-    "monthly-bookings-label": "Total Bookings",
-    "monthly-nights-label": "Booked Nights",
-    "monthly-nightly-rate-label": "Average Nightly Rate",
-    "monthly-booking-value-label": "Average Booking Value"
-  };
-  Object.entries(bookingDetailEnglish).forEach(([id, label]) => setText(id, label));
 
   const monthSelect = $("report-month");
 

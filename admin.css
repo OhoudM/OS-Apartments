@@ -3431,3 +3431,71 @@ html[data-theme="dark"] .os-emergency-btn {color:#e7b781;border-color:#a4764b}
 html[data-theme="dark"] .os-fixed-detail {border-color:#414b41;}
 html[data-theme="dark"] .os-fixed-detail span {color:#c5d0c4;}
 html[data-theme="dark"] .os-fixed-detail b {color:#f1f5ef;}
+
+
+/* ======================== OS ANALYTICS V2 ======================== */
+#tab-reports { --report-soft: #f5f8f3; --report-border: #dce5d8; }
+#tab-reports > .panel { border-radius: 20px; }
+#tab-reports > .panel .section-header { margin-bottom: 22px; }
+#tab-reports .os-performance-kpis { margin-bottom: 14px; gap: 14px; }
+#tab-reports .os-performance-kpis .stat-card { box-shadow: none; border-color: var(--report-border); border-radius: 15px; padding: 21px 20px; position: relative; }
+#tab-reports .os-performance-kpis .stat-card::before { content: ""; position: absolute; inset: 0 auto 0 0; width: 4px; border-radius: 14px 0 0 14px; background: #809978; }
+#tab-reports .os-performance-kpis .stat-card:nth-child(2)::before { background: #c5ab79; }
+#tab-reports .os-performance-kpis .stat-card:nth-child(3)::before { background: #3e6549; }
+#tab-reports .os-performance-kpis .stat-card:nth-child(4)::before { background: #8a9a7e; }
+#tab-reports .os-performance-kpis h3 { font-size: clamp(20px,2vw,29px); line-height: 1.15; font-variant-numeric: tabular-nums; }
+#tab-reports .os-performance-kpis .os-kpi-comparison { margin-top: 14px; font-weight: 500; color: var(--text-muted); line-height: 1.45; font-size: 12px; }
+#tab-reports .os-report-insights { display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); gap: 12px; margin: 12px 0 14px; }
+#tab-reports .os-insight { display: flex; justify-content: space-between; align-items: center; gap: 12px; background: var(--report-soft); border: 1px solid var(--report-border); border-radius: 12px; padding: 14px 16px; }
+#tab-reports .os-insight span { font-size: 13px; color: #526353; }
+#tab-reports .os-insight strong { font-size: 18px; color: #284330; font-variant-numeric: tabular-nums; text-align: end; }
+#tab-reports .os-report-method-note { margin: 0; font-size: 12px; line-height: 1.6; color: var(--text-muted); }
+#tab-reports .os-yearly-hero { background: linear-gradient(120deg,#213b30,#44674d); }
+#tab-reports .os-yearly-allocations>div { border-color: var(--report-border); }
+#tab-reports .os-yearly-budget-card { min-width: 0; }
+#tab-reports .os-variable-expense-card { display: flex; flex-direction: column; gap: 16px; }
+#tab-reports .os-variable-tag { background: #edf3eb; border: 1px solid #d3dfd0; border-radius: 99px; padding: 6px 10px; font-size: 12px; font-weight: 650; color: #426345; white-space: nowrap; }
+#tab-reports .os-variable-summary { border: 1px solid var(--report-border); border-radius: 12px; background: var(--report-soft); padding: 15px; display: grid; gap: 8px; }
+#tab-reports .os-variable-summary>span { font-size: 13px; color: #596b5a; }
+#tab-reports .os-variable-total { display: flex; justify-content: space-between; align-items: end; gap: 12px; flex-wrap: wrap; }
+#tab-reports .os-variable-total>b { color: #263f2e; font-size: 26px; font-variant-numeric: tabular-nums; }
+#tab-reports .os-variable-total>span { font-size: 12px; color: #617261; }
+#tab-reports .os-variable-category-head { display: flex; justify-content: space-between; gap: 12px; align-items: center; }
+#tab-reports .os-variable-category-head span:first-child { font-size: 13px; font-weight: 750; color: #2d4936; }
+#tab-reports .os-variable-category-head span:last-child { font-size: 11px; color: #738074; text-align: end; }
+#tab-reports .os-variable-category-list { display: grid; align-content: start; gap: 15px; min-height: 68px; }
+#tab-reports .os-variable-category { display: grid; gap: 7px; }
+#tab-reports .os-variable-category-row { display: flex; justify-content: space-between; align-items: baseline; gap: 10px; }
+#tab-reports .os-variable-category-row span { font-size: 13px; color: #415a45; }
+#tab-reports .os-variable-category-row strong { font-size: 13px; color: #263e2b; font-variant-numeric: tabular-nums; }
+#tab-reports .os-variable-category-track { height: 7px; background: #ebf0e9; border-radius: 99px; overflow: hidden; }
+#tab-reports .os-variable-category-fill { height: 100%; border-radius: inherit; background: #87a082; transition: width .25s ease; }
+#tab-reports .os-variable-empty { margin: 8px 0; color: var(--text-muted); font-size: 13px; }
+#tab-reports .os-variable-expense-card>.os-yearly-footnote { margin-top: auto; border-top: 1px solid var(--report-border); padding-top: 12px; }
+#tab-reports .reports-charts-grid .chart-container { background: var(--surface); border: 0; padding: 10px 0 0; min-height: 230px; }
+#tab-reports .os-occupancy-bar { background: #63886e; }
+#tab-reports .report-bar-month { font-size: 11px; }
+html[dir="rtl"] #tab-reports .os-performance-kpis .stat-card::before { inset: 0 0 0 auto; border-radius: 0 14px 14px 0; }
+html[data-theme="dark"] #tab-reports { --report-soft: #25342a; --report-border: #415346; }
+html[data-theme="dark"] #tab-reports .os-variable-tag { background: #2c4633; color: #e2eee0; border-color: #4a6451; }
+html[data-theme="dark"] #tab-reports .os-variable-summary>span,
+html[data-theme="dark"] #tab-reports .os-variable-total>span,
+html[data-theme="dark"] #tab-reports .os-variable-category-row span,
+html[data-theme="dark"] #tab-reports .os-insight span,
+html[data-theme="dark"] #tab-reports .os-variable-category-head span { color: #c8d6ca; }
+html[data-theme="dark"] #tab-reports .os-variable-total>b,
+html[data-theme="dark"] #tab-reports .os-variable-category-row strong,
+html[data-theme="dark"] #tab-reports .os-insight strong { color: #f0f8ec; }
+html[data-theme="dark"] #tab-reports .os-variable-category-track { background: #3e5042; }
+@media(max-width: 980px) {
+  #tab-reports .os-performance-kpis { grid-template-columns: repeat(2, minmax(0,1fr)); }
+  #tab-reports .os-report-insights { grid-template-columns: 1fr; }
+}
+@media(max-width: 600px) {
+  #tab-reports .os-performance-kpis { gap: 9px; }
+  #tab-reports .os-performance-kpis .stat-card { padding: 15px 12px; }
+  #tab-reports .os-performance-kpis h3 { font-size: 20px; }
+  #tab-reports .os-yearly-budget-top { align-items: start; flex-wrap: wrap; }
+  #tab-reports .os-yearly-hero { padding: 18px; }
+  #tab-reports .os-variable-category-head { flex-wrap: wrap; }
+}

@@ -7,7 +7,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="admin.css?v=20261101-emergency-visible">
+  <link rel="stylesheet" href="admin.css?v=20261103-analytics-v2">
 </head>
 <body>
 
@@ -496,41 +496,51 @@
       </select>
     </div>
 
-    <div class="finance-grid">
+    <div class="finance-grid os-performance-kpis">
       <div class="stat-card">
-        <span id="report-revenue-label">Operating Revenue | الأرباح التشغيلية</span>
+        <span id="report-revenue-label">Operating Revenue</span>
         <h3 id="monthly-earnings">—</h3>
+        <small id="os-revenue-trend" class="os-kpi-comparison">—</small>
       </div>
 
       <div class="stat-card">
-        <span id="report-expenses-label">Operating Expenses | المصاريف التشغيلية</span>
+        <span id="report-expenses-label">Operating Expenses</span>
         <h3 id="monthly-expenses">—</h3>
+        <small id="os-expenses-trend" class="os-kpi-comparison">—</small>
       </div>
 
       <div class="stat-card">
-        <span id="report-profit-label">Net Profit | صافي الربح</span>
+        <span id="report-profit-label">Net Profit</span>
         <h3 id="monthly-profit">—</h3>
+        <small id="os-profit-trend" class="os-kpi-comparison">—</small>
       </div>
 
       <div class="stat-card">
         <span id="monthly-occupancy-label">Occupancy Rate</span>
         <h3 id="monthly-occupancy">—</h3>
+        <small id="os-occupancy-trend" class="os-kpi-comparison">—</small>
       </div>
     </div>
+    <div class="os-report-insights" aria-label="Performance insights">
+      <div class="os-insight"><span id="os-margin-label">Profit Margin</span><strong id="os-profit-margin">—</strong></div>
+      <div class="os-insight"><span id="os-expense-ratio-label">Expense Ratio</span><strong id="os-expense-ratio">—</strong></div>
+      <div class="os-insight"><span id="os-stay-length-label">Average Stay</span><strong id="os-average-stay">—</strong></div>
+    </div>
+    <p id="os-performance-method" class="os-report-method-note">Estimated revenue is allocated by stay night. Profit subtracts recorded expenses only; this is not the withdrawable bank balance.</p>
   </section>
 
   <!-- Annual expense budget tracker; does not change booking earnings -->
   <section class="panel os-yearly-tracker">
     <div class="section-header"><div>
-      <h2 id="os-yearly-title">Annual Budget Overview</h2>
-      <p id="os-yearly-desc">Annual allocations, actual spending and remaining budgets</p>
+      <h2 id="os-yearly-title">Annual Cost Overview</h2>
+      <p id="os-yearly-desc">Known annual costs and spending recorded this year</p>
     </div><span class="os-year-tag" id="os-yearly-year">2026</span></div>
     <div class="os-yearly-hero">
-      <span id="os-yearly-total-label">Total Annual Budget</span>
+      <span id="os-yearly-total-label">Known Annual Commitments</span>
       <strong>39,746.20 SAR</strong>
-      <small id="os-yearly-total-note">31,000 rent + 8,746.20 known recurring costs + 2,000 variable allowance</small>
+      <small id="os-yearly-total-note">31,000 rent + 6,000 cleaning + 2,746.20 Wi-Fi. Excludes pending phone bill and variable costs.</small>
       <div class="os-annual-coverage">
-        <div class="os-annual-coverage-head"><span id="os-annual-coverage-label">Annual budget covered by earnings</span><strong id="os-annual-coverage-percent">0%</strong></div>
+        <div class="os-annual-coverage-head"><span id="os-annual-coverage-label">Known annual costs covered by estimated earnings</span><strong id="os-annual-coverage-percent">0%</strong></div>
         <div class="os-annual-coverage-track" role="progressbar" aria-label="Annual budget covered by earnings" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"><div id="os-annual-coverage-fill"></div></div>
         <div class="os-annual-coverage-foot"><span id="os-annual-coverage-earned">0 SAR earned</span><span id="os-annual-coverage-remaining">39,746.20 SAR to target</span></div>
       </div>
@@ -538,7 +548,7 @@
     <div class="os-yearly-allocations">
       <div><span id="os-rent-label">Annual Rent</span><strong>31,000 SAR</strong></div>
       <div><span id="os-clean-alloc-label">Constant Expenses (known yearly)</span><strong>8,746.20 SAR</strong></div>
-      <div><span id="os-other-alloc-label">Variable Expenses (allowance)</span><strong>2,000 SAR</strong></div>
+      <div><span id="os-other-alloc-label">Variable Expenses (recorded YTD)</span><strong id="os-year-variable-total">—</strong></div>
     </div>
     <div class="os-yearly-budgets">
       <div class="os-yearly-budget-card">
@@ -552,19 +562,24 @@
         <div class="os-yearly-track"><div id="os-clean-bar"></div></div>
         <p class="os-yearly-footnote" id="os-fixed-note">Phone bill will be added to the yearly estimate once confirmed.</p>
       </div>
-      <div class="os-yearly-budget-card">
-        <div class="os-yearly-budget-top"><h3 id="os-other-title">Variable Expenses</h3><strong id="os-variable-budget-label">No fixed budget</strong></div>
-        <div class="os-yearly-budget-numbers"><span id="os-other-spent-label">Actual recorded spending</span><b id="os-other-spent">—</b></div>
-        <p class="os-yearly-footnote" id="os-variable-note">Electricity, maintenance, supplies, pest control and other irregular expenses. A 2,000 SAR planning allowance remains in the annual target, but is not treated as a spending limit.</p>
+      <div class="os-yearly-budget-card os-variable-expense-card">
+        <div class="os-yearly-budget-top"><h3 id="os-other-title">Variable Expenses</h3><span id="os-variable-budget-label" class="os-variable-tag">No preset budget</span></div>
+        <div class="os-variable-summary">
+          <span id="os-other-spent-label">Actual spending · year to date</span>
+          <div class="os-variable-total"><b id="os-other-spent">—</b><span id="os-variable-transactions">—</span></div>
+        </div>
+        <div class="os-variable-category-head"><span id="os-variable-breakdown-label">Spending by category</span><span id="os-variable-breakdown-context">Share of recorded variable costs</span></div>
+        <div id="os-variable-category-list" class="os-variable-category-list" aria-live="polite"></div>
+        <p class="os-yearly-footnote" id="os-variable-note">Only recorded expenses appear here. No annual allowance or spending limit has been assumed.</p>
       </div>
     </div>
     <div class="os-yearly-budget-card os-emergency-budget-card">
       <div class="os-yearly-budget-top"><h3 id="os-emergency-title">Emergency Reserve</h3><strong>5,000 SAR</strong></div>
       <div class="os-yearly-budget-numbers"><span id="os-emergency-spent-label">Used</span><b id="os-emergency-spent">0.00 SAR</b><span id="os-emergency-left-label">Remaining</span><b id="os-emergency-left">5,000.00 SAR</b></div>
       <div class="os-yearly-track"><div id="os-emergency-bar"></div></div>
-      <p id="os-emergency-note" class="os-yearly-footnote">Separate reserve — not included in the 39,746.20 SAR annual operating budget.</p>
+      <p id="os-emergency-note" class="os-yearly-footnote">Separate reserve — not part of known annual commitments.</p>
     </div>
-    <p class="os-yearly-footnote" id="os-yearly-footnote">Budgets are planned allocations. Only recorded expenses reduce remaining budgets. Rent is tracked separately.</p>
+    <p class="os-yearly-footnote" id="os-yearly-footnote">The 39,746.20 SAR figure is for known yearly commitments only. Phone bills and variable expenses are tracked as recorded; reserve remains separate.</p>
   </section>
 
   <!-- MONTHLY BOOKING DETAILS -->
@@ -606,13 +621,11 @@
   <section class="panel">
     <div class="section-header">
       <div>
-        <h2 data-i18n="earningsByMonth">Earnings by Month</h2>
-        <p data-i18n="earningsByMonthDesc">
-          Compare your apartment's monthly performance
-        </p>
+        <h2 id="occupancy-trends-title">Occupancy Trend</h2>
+        <p id="occupancy-trends-desc">Percentage of calendar nights booked each month</p>
       </div>
     </div>
-    <div id="monthly-earnings-chart" class="chart-container">
+    <div id="monthly-occupancy-chart" class="chart-container">
       <p>Charts will appear after analytics setup.</p>
     </div>
   </section>
@@ -652,9 +665,7 @@
     <div class="section-header">
       <div>
         <h2 data-i18n="bookingsByPlatform">Bookings by Platform</h2>
-        <p data-i18n="bookingsByPlatformDesc">
-          See where your reservations come from
-        </p>
+        <p data-i18n="bookingsByPlatformDesc">Booking mix for the selected period</p>
       </div>
     </div>
     <div id="platform-chart" class="chart-container">
@@ -996,7 +1007,7 @@
     </form>
   </dialog>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <script src="admin.js?v=20261101-emergency-visible"></script>
+  <script src="admin.js?v=20261103-analytics-v2"></script>
   <script src="https://cdn.jsdelivr.net/npm/exceljs@4.4.0/dist/exceljs.min.js"></script>
   <script src="export-excel.js?v=2"></script>
 
