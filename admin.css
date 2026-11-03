@@ -3421,3 +3421,13 @@ html[data-theme="dark"] .os-emergency-btn {color:#e7b781;border-color:#a4764b}
 /* Emergency reserve is separate from operating allocations */
 .os-yearly-tracker > .os-emergency-budget-card {margin:18px 0 22px;max-width:none;}
 .os-yearly-tracker > .os-emergency-budget-card .os-yearly-footnote {margin-top:12px;}
+
+/* Fixed vs variable expense summary */
+.os-fixed-detail {display:grid;gap:12px;margin:18px 0;padding:14px 0;border-top:1px solid #dce3da;border-bottom:1px solid #dce3da;}
+.os-fixed-detail>div {display:flex;justify-content:space-between;align-items:baseline;gap:12px;font-size:14px;}
+.os-fixed-detail span {color:#526353;}
+.os-fixed-detail b {color:#25392a;text-align:end;white-space:nowrap;}
+.os-yearly-budget-card>.os-yearly-footnote {margin-top:14px;line-height:1.55;}
+html[data-theme="dark"] .os-fixed-detail {border-color:#414b41;}
+html[data-theme="dark"] .os-fixed-detail span {color:#c5d0c4;}
+html[data-theme="dark"] .os-fixed-detail b {color:#f1f5ef;}

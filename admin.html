@@ -527,40 +527,42 @@
     </div><span class="os-year-tag" id="os-yearly-year">2026</span></div>
     <div class="os-yearly-hero">
       <span id="os-yearly-total-label">Total Annual Budget</span>
-      <strong>39,000 SAR</strong>
-      <small id="os-yearly-total-note">31,000 rent + 6,000 cleaning + 2,000 other expenses</small>
+      <strong>39,746.20 SAR</strong>
+      <small id="os-yearly-total-note">31,000 rent + 8,746.20 known recurring costs + 2,000 variable allowance</small>
       <div class="os-annual-coverage">
         <div class="os-annual-coverage-head"><span id="os-annual-coverage-label">Annual budget covered by earnings</span><strong id="os-annual-coverage-percent">0%</strong></div>
         <div class="os-annual-coverage-track" role="progressbar" aria-label="Annual budget covered by earnings" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"><div id="os-annual-coverage-fill"></div></div>
-        <div class="os-annual-coverage-foot"><span id="os-annual-coverage-earned">0 SAR earned</span><span id="os-annual-coverage-remaining">39,000 SAR to target</span></div>
+        <div class="os-annual-coverage-foot"><span id="os-annual-coverage-earned">0 SAR earned</span><span id="os-annual-coverage-remaining">39,746.20 SAR to target</span></div>
       </div>
     </div>
     <div class="os-yearly-allocations">
       <div><span id="os-rent-label">Annual Rent</span><strong>31,000 SAR</strong></div>
-      <div><span id="os-clean-alloc-label">Cleaning</span><strong>6,000 SAR</strong></div>
-      <div><span id="os-other-alloc-label">Other Expenses</span><strong>2,000 SAR</strong></div>
+      <div><span id="os-clean-alloc-label">Constant Expenses (known yearly)</span><strong>8,746.20 SAR</strong></div>
+      <div><span id="os-other-alloc-label">Variable Expenses (allowance)</span><strong>2,000 SAR</strong></div>
     </div>
     <div class="os-yearly-budgets">
       <div class="os-yearly-budget-card">
-        <div class="os-yearly-budget-top"><h3 id="os-clean-title">Cleaning Budget</h3><strong>6,000 SAR</strong></div>
-        <div class="os-yearly-budget-numbers"><span id="os-clean-spent-label">Spent</span><b id="os-clean-spent">—</b><span id="os-clean-left-label">Remaining</span><b id="os-clean-left">—</b></div>
+        <div class="os-yearly-budget-top"><h3 id="os-clean-title">Constant Expenses</h3><strong id="os-fixed-budget-total">8,746.20 SAR/year</strong></div>
+        <div class="os-fixed-detail">
+          <div><span id="os-fixed-clean-label">Cleaning · 500 SAR/month</span><b id="os-clean-spent">—</b></div>
+          <div><span id="os-fixed-wifi-label">WiFi · 228.85 SAR/month</span><b id="os-wifi-spent">—</b></div>
+          <div><span id="os-fixed-phone-label">Phone bill · amount pending</span><b id="os-phone-spent">—</b></div>
+        </div>
+        <div class="os-yearly-budget-numbers"><span id="os-clean-spent-label">Total recorded</span><b id="os-fixed-spent">—</b><span id="os-clean-left-label">Remaining against known annual costs</span><b id="os-clean-left">—</b></div>
         <div class="os-yearly-track"><div id="os-clean-bar"></div></div>
+        <p class="os-yearly-footnote" id="os-fixed-note">Phone bill will be added to the yearly estimate once confirmed.</p>
       </div>
       <div class="os-yearly-budget-card">
-        <div class="os-yearly-budget-top"><h3 id="os-other-title">Other Expenses Budget</h3><strong>2,000 SAR</strong></div>
-        <div class="os-yearly-budget-numbers"><span id="os-other-spent-label">Spent</span><b id="os-other-spent">—</b><span id="os-other-left-label">Remaining</span><b id="os-other-left">—</b></div>
-        <div class="os-yearly-track"><div id="os-other-bar"></div></div>
+        <div class="os-yearly-budget-top"><h3 id="os-other-title">Variable Expenses</h3><strong id="os-variable-budget-label">No fixed budget</strong></div>
+        <div class="os-yearly-budget-numbers"><span id="os-other-spent-label">Actual recorded spending</span><b id="os-other-spent">—</b></div>
+        <p class="os-yearly-footnote" id="os-variable-note">Electricity, maintenance, supplies, pest control and other irregular expenses. A 2,000 SAR planning allowance remains in the annual target, but is not treated as a spending limit.</p>
       </div>
     </div>
     <div class="os-yearly-budget-card os-emergency-budget-card">
       <div class="os-yearly-budget-top"><h3 id="os-emergency-title">Emergency Reserve</h3><strong>5,000 SAR</strong></div>
       <div class="os-yearly-budget-numbers"><span id="os-emergency-spent-label">Used</span><b id="os-emergency-spent">0.00 SAR</b><span id="os-emergency-left-label">Remaining</span><b id="os-emergency-left">5,000.00 SAR</b></div>
       <div class="os-yearly-track"><div id="os-emergency-bar"></div></div>
-      <p id="os-emergency-note" class="os-yearly-footnote">Separate reserve — not included in the 39,000 SAR annual operating budget.</p>
-    </div>
-    <div class="os-yearly-chart-card">
-      <div class="os-yearly-chart-heading"><h3 id="os-categories-title">Expenses by Category</h3><span id="os-categories-note">Actual recorded expenses</span></div>
-      <div id="os-category-bars" class="os-yearly-bars"></div>
+      <p id="os-emergency-note" class="os-yearly-footnote">Separate reserve — not included in the 39,746.20 SAR annual operating budget.</p>
     </div>
     <p class="os-yearly-footnote" id="os-yearly-footnote">Budgets are planned allocations. Only recorded expenses reduce remaining budgets. Rent is tracked separately.</p>
   </section>
@@ -901,6 +903,7 @@
           <select id="expense-category" required>
             <option value="Cleaning">Cleaning</option>
             <option value="WiFi">WiFi</option>
+            <option value="Phone Bill">Phone Bill</option>
             <option value="Electricity">Electricity</option>
             <option value="Maintenance">Maintenance</option>
             <option value="Supplies">Supplies</option>
