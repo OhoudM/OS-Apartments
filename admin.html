@@ -7,7 +7,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="admin.css?v=20261103-variable-clean">
+  <link rel="stylesheet" href="admin.css?v=20261104-payment-editor">
 </head>
 <body>
 
@@ -867,6 +867,56 @@
       </form>
     </dialog>
 
+    <!-- ONE PAYMENT EDITOR: guest payment and bank payout remain separate records -->
+    <dialog id="os-unified-payment-dialog" class="admin-dialog os-unified-payment-dialog">
+      <div class="dialog-header">
+        <div><h2 id="os-unified-heading">Edit Payment</h2><p id="os-unified-subtitle"></p></div>
+        <button type="button" id="os-unified-close" aria-label="Close">×</button>
+      </div>
+      <form id="os-unified-form">
+        <div class="os-payment-editor-section">
+          <h3 id="os-unified-guest-heading">Guest payment</h3>
+          <div class="form-grid">
+            <label><span id="os-unified-guest-label">Payment status</span>
+              <select id="os-unified-guest-status" required>
+                <option value="not_verified">Not verified</option><option value="unpaid">Unpaid</option>
+                <option value="partially_paid">Partially paid</option><option value="paid">Paid</option>
+              </select>
+            </label>
+            <label><span id="os-unified-method-label">Payment method</span>
+              <select id="os-unified-guest-method">
+                <option value="">Not recorded</option><option value="Apple Pay">Apple Pay</option>
+                <option value="Tabby">Tabby</option><option value="Cash">Cash</option>
+                <option value="Bank Transfer">Bank Transfer</option><option value="Card">Card</option>
+                <option value="Other">Other</option>
+              </select>
+            </label>
+          </div>
+        </div>
+        <div class="os-payment-editor-section" id="os-unified-bank-section">
+          <h3 id="os-unified-bank-heading">Bank payout</h3>
+          <p id="os-unified-bank-hint">Confirm only when the money arrives in your bank account.</p>
+          <div class="form-grid">
+            <label><span id="os-unified-bank-label">Payout status</span>
+              <select id="os-unified-bank-status">
+                <option value="not_verified">Not verified</option><option value="pending">Pending transfer</option>
+                <option value="partially_received">Partially received</option><option value="received">Received in bank</option>
+              </select>
+            </label>
+            <label><span id="os-unified-amount-label">Amount received in bank (SAR)</span>
+              <input id="os-unified-bank-amount" type="number" min="0" step="0.01" placeholder="0.00">
+            </label>
+            <label><span id="os-unified-date-label">Transfer date</span>
+              <input id="os-unified-bank-date" type="date">
+            </label>
+          </div>
+        </div>
+        <p id="os-unified-error" role="alert" aria-live="polite"></p>
+        <div class="os-unified-actions"><button type="button" id="os-unified-cancel">Cancel</button>
+          <button type="submit" id="os-unified-save" class="primary-btn">Save changes</button></div>
+      </form>
+    </dialog>
+
     <!-- GUEST BOOKING TOTALS DETAILS (OVERVIEW ONLY) -->
     <dialog id="guest-totals-dialog" class="admin-dialog">
       <div class="dialog-header">
@@ -1000,7 +1050,7 @@
     </form>
   </dialog>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <script src="admin.js?v=20261103-variable-clean"></script>
+  <script src="admin.js?v=20261104-payment-editor"></script>
   <script src="export-excel.js?v=20261103-months"></script>
 
   

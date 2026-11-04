@@ -3471,3 +3471,20 @@ html[data-theme="dark"] .os-variable-summary span,html[data-theme="dark"] .os-va
 html[data-theme="dark"] .os-variable-summary strong { color:#f1f5ef; }
 html[data-theme="dark"] .os-variable-line { border-color:#414b41; }
 @media(max-width:700px){.os-yearly-allocations{grid-template-columns:1fr}.os-variable-summary{flex-wrap:wrap}}
+
+/* Simplified single-editor payment flow */
+.os-unified-payment-dialog { width: min(94vw, 660px); }
+.os-unified-payment-dialog #os-unified-subtitle { margin: 4px 0 0; font-size: 13px; }
+.os-payment-editor-section { padding: 16px; border: 1px solid var(--border); border-radius: 13px; background: var(--surface-soft); }
+.os-payment-editor-section h3 { color: var(--olive-dark); margin: 0 0 12px; }
+.os-payment-editor-section > p { margin: -4px 0 14px; font-size: 12px; }
+#os-unified-form { gap: 16px; }
+#os-unified-bank-section .form-grid label:last-child { grid-column: 1 / -1; }
+.os-unified-actions { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 10px; }
+#os-unified-error { color: var(--danger); margin: 0; }
+.os-simple-detail-actions { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 20px; }
+.os-financial-advanced { margin-top: 20px; font-size: 12px; color: var(--text-muted); background: transparent; border-style: dashed; }
+@media (max-width: 700px) {
+  .os-unified-payment-dialog .form-grid { grid-template-columns: 1fr; }
+  .os-unified-actions button { flex: 1 1 130px; }
+}

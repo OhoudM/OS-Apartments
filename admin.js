@@ -1856,6 +1856,16 @@ function osPrepareSimpleDetailTabs(booking) {
     paymentTab.setAttribute("aria-selected", String(isPayment));
     $("open-payment-correction").hidden = true;
   };
+  if (!cancelledBooking(booking) && String(booking.platform || "").toLowerCase() === "gathern") {
+    const advanced = createElement("button", "os-financial-advanced", ar ? "تصحيح مبالغ الحجز" : "Correct booking amounts");
+    advanced.type = "button";
+    advanced.addEventListener("click", () => {
+      osReturnDetailsId = booking.id;
+      $("breakdown-dialog").close();
+      openGathernFinancialEdit(booking.id);
+    });
+    bookingPanel.append(advanced);
+  }
   bookingTab.onclick = () => showTab(false);
   paymentTab.onclick = () => showTab(true);
   const addInfo = (label, value) => {
@@ -1879,15 +1889,9 @@ function osPrepareSimpleDetailTabs(booking) {
       btn.addEventListener("click", () => { osReturnDetailsId = booking.id; $("breakdown-dialog").close(); fn(); });
       actions.append(btn);
     };
-    makeAction(ar ? "تعديل دفع الضيف" : "Update guest payment", () => osOpenGuestPayment(booking.id));
-    if (String(booking.platform || "").toLowerCase() !== "direct") {
-      makeAction(ar ? "تحديث التحويل البنكي" : "Update bank payout", () => osOpenPayout(booking.id));
-    } else {
-      makeAction(ar ? "تعديل الحجز" : "Edit booking", () => openEditBooking(booking.id));
-    }
-    if (String(booking.platform || "").toLowerCase() === "gathern") {
-      makeAction(ar ? "تصحيح التفاصيل المالية" : "Correct financial details", () => openGathernFinancialEdit(booking.id));
-    }
+    makeAction(ar ? "تعديل الدفع" : "Edit Payment", () => osOpenUnifiedPayment(booking.id));
+    // Corrections to Gathern's booking totals belong in Booking details,
+    // not the everyday payment workflow. The existing correction logic is retained.
     paymentPanel.append(actions);
   }
   showTab(false);
@@ -4523,6 +4527,129 @@ document.querySelectorAll("[data-return-details]").forEach(button => {
 
 setLanguage(currentLanguage);
 checkSession();
+
+/* OS Apartments — single payment editor. No booking total/commission writes. */
+let osUnifiedPaymentId = null;
+let osUnifiedPaymentSaving = false;
+function osUnifiedText(en, ar) { return currentLanguage === "ar" ? ar : en; }
+function osOpenUnifiedPayment(id) {
+  const b = bookings.find(item => String(item.id) === String(id));
+  if (!b || cancelledBooking(b)) return;
+  osUnifiedPaymentId = id;
+  const direct = String(b.platform || "").trim().toLowerCase() === "direct";
+  const labels = [
+    ["os-unified-heading", "Edit Payment", "تعديل الدفع"],
+    ["os-unified-guest-heading", "Guest payment", "دفع الضيف"],
+    ["os-unified-guest-label", "Payment status", "حالة دفع الضيف"],
+    ["os-unified-method-label", "Payment method", "طريقة الدفع"],
+    ["os-unified-bank-heading", "Bank payout", "التحويل البنكي"],
+    ["os-unified-bank-hint", "Only confirm when the money reaches your bank account.", "أكدي الاستلام فقط عند وصول المبلغ لحسابك البنكي."],
+    ["os-unified-bank-label", "Payout status", "حالة التحويل البنكي"],
+    ["os-unified-amount-label", "Amount received in bank (SAR)", "المبلغ المستلم في البنك (ريال)"],
+    ["os-unified-date-label", "Transfer date", "تاريخ التحويل"],
+    ["os-unified-cancel", "Cancel", "إلغاء"],
+    ["os-unified-save", "Save changes", "حفظ التغييرات"]
+  ];
+  labels.forEach(([key,en,ar]) => setText(key,osUnifiedText(en,ar)));
+  setText("os-unified-subtitle", `${b.guest_name || "—"} · ${b.platform || "—"}`);
+  const status = $("os-unified-guest-status");
+  status.value = osGuestPaymentState(b);
+  [...status.options].forEach(option => {
+    const labels = {
+      not_verified:["Not verified","غير مؤكد"], unpaid:["Unpaid","غير مدفوع"],
+      partially_paid:["Partially paid","مدفوع جزئياً"], paid:["Paid","مدفوع"]
+    };
+    option.textContent = osUnifiedText(...labels[option.value]);
+  });
+  const method = $("os-unified-guest-method");
+  method.value = b.guest_payment_method || "";
+  [...method.options].forEach(option => {
+    const names = {"": ["Not recorded", "غير مسجلة"], "Cash": ["Cash", "نقداً"],
+      "Bank Transfer": ["Bank Transfer", "تحويل بنكي"], "Card": ["Card", "بطاقة"],
+      "Other": ["Other", "أخرى"]};
+    option.textContent = names[option.value] ? osUnifiedText(...names[option.value]) : option.value;
+  });
+  $("os-unified-bank-section").hidden = direct;
+  const payout = $("os-unified-bank-status");
+  payout.value = direct ? "not_verified" : osPayoutState(b);
+  [...payout.options].forEach(option => {
+    const names = {not_verified:["Not verified","غير مؤكد"], pending:["Pending transfer","بانتظار التحويل"],
+      partially_received:["Partially received","مستلم جزئياً"], received:["Received in bank","تم الاستلام"]};
+    option.textContent = osUnifiedText(...names[option.value]);
+  });
+  $("os-unified-bank-amount").value = direct ? "" : (safeNumber(b.host_payout_received) ?? "");
+  $("os-unified-bank-date").value = direct ? "" : (b.host_payout_date || "");
+  setText("os-unified-error", "");
+  $("os-unified-payment-dialog").showModal();
+}
+$("os-unified-close")?.addEventListener("click", () => $("os-unified-payment-dialog").close());
+$("os-unified-cancel")?.addEventListener("click", () => $("os-unified-payment-dialog").close());
+$("os-unified-payment-dialog")?.addEventListener("close", osReturnToDetails);
+$("os-unified-form")?.addEventListener("submit", async event => {
+  event.preventDefault();
+  if (osUnifiedPaymentSaving || !bookingsLoaded) return;
+  const b = bookings.find(item => String(item.id) === String(osUnifiedPaymentId));
+  if (!b || cancelledBooking(b)) return;
+  const direct = String(b.platform || "").trim().toLowerCase() === "direct";
+  const guestStatus = $("os-unified-guest-status").value;
+  const method = $("os-unified-guest-method").value;
+  const payoutStatus = $("os-unified-bank-status").value;
+  const amountText = $("os-unified-bank-amount").value.trim();
+  const payoutAmount = amountText === "" ? null : Number(amountText);
+  const payoutDate = $("os-unified-bank-date").value || null;
+  const errorBox = $("os-unified-error");
+  errorBox.textContent = "";
+  if (!["paid","partially_paid","unpaid","not_verified"].includes(guestStatus) ||
+      !["","Apple Pay","Tabby","Cash","Bank Transfer","Card","Other"].includes(method)) {
+    errorBox.textContent = osUnifiedText("Select valid guest payment details.", "اختاري بيانات دفع صحيحة.");
+    return;
+  }
+  if (!direct) {
+    if (!["not_verified","pending","partially_received","received"].includes(payoutStatus) ||
+        (payoutAmount !== null && (!Number.isFinite(payoutAmount) || payoutAmount < 0)) ||
+        (["received","partially_received"].includes(payoutStatus) && (payoutAmount === null || payoutAmount <= 0 || !payoutDate)) ||
+        (["pending","not_verified"].includes(payoutStatus) && (payoutAmount !== null || payoutDate))) {
+      errorBox.textContent = osUnifiedText("For received payouts, enter a positive amount and date. For pending/unverified, clear both.", "عند الاستلام أدخلي مبلغاً وتاريخاً، وعند الانتظار أو عدم التأكيد اتركيهما فارغين.");
+      return;
+    }
+    const expected = safeNumber(b.amount);
+    if (expected !== null && payoutAmount !== null &&
+        (cents(payoutAmount) > cents(expected) ||
+         (payoutStatus === "received" && cents(payoutAmount) !== cents(expected)) ||
+         (payoutStatus === "partially_received" && cents(payoutAmount) >= cents(expected)))) {
+      errorBox.textContent = osUnifiedText("The payout must not exceed host earnings; select partial only for a smaller amount.", "لا يمكن أن يتجاوز التحويل صافي المستحقات، والاستلام الجزئي يجب أن يكون أقل منها.");
+      return;
+    }
+  }
+  osUnifiedPaymentSaving = true;
+  const save = $("os-unified-save"); save.disabled = true;
+  try {
+    const {data:auth,error:authError} = await supabaseClient.auth.getUser();
+    if (authError || !auth?.user) throw Error(t("sessionExpired"));
+    const fields = ["id","platform","status","amount","guest_payment_status","guest_payment_method",
+      "host_payout_status","host_payout_received","host_payout_date"];
+    const {data:fresh,error:readError} = await supabaseClient.from("Bookings")
+      .select(fields.join(",")).eq("id",b.id).single();
+    if (readError) throw readError;
+    for (const key of fields.filter(k => k !== "id")) {
+      if (String(fresh[key] ?? "") !== String(b[key] ?? "")) throw Error(t("stalePayment"));
+    }
+    if (cancelledBooking(fresh)) throw Error(t("stalePayment"));
+    const changes = {guest_payment_status:guestStatus, guest_payment_method:method || null};
+    if (!direct) Object.assign(changes, {
+      host_payout_status:payoutStatus, host_payout_received:payoutAmount, host_payout_date:payoutDate
+    });
+    const {data,error} = await supabaseClient.from("Bookings").update(changes)
+      .eq("id",b.id).eq("status",fresh.status).select("id");
+    if (error) throw error;
+    if (!data || data.length !== 1) throw Error(osUnifiedText("Save failed. Check database permissions.", "تعذر الحفظ. تحققي من الصلاحيات."));
+    await loadBookings();
+    if (!bookingsLoaded) throw Error(osUnifiedText("Saved, but refresh failed. Please reload before editing again.", "تم الحفظ، لكن تعذر تحديث البيانات. أعيدي تحميل الصفحة."));
+    $("os-unified-payment-dialog").close();
+    showMessage(osUnifiedText("Payment details saved.", "تم حفظ تفاصيل الدفع."));
+  } catch(error) { errorBox.textContent = t("saveError") + error.message; }
+  finally { osUnifiedPaymentSaving = false; save.disabled = false; }
+});
 
 /* OS Apartments: independently tracked bank payouts; does not modify booking totals. */
 let osPayoutBookingId = null;
